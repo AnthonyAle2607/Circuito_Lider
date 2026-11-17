@@ -38,13 +38,28 @@ describe('salud', () => {
   });
 });
 
+const minimo = {
+  DATABASE_URL: 'postgres://u:p@localhost:5433/pautas',
+  REDIS_URL: 'redis://localhost:6380',
+  MFA_KEY: Buffer.alloc(32, 1).toString('base64'),
+};
+
 describe('configuración', () => {
   it('se detiene con un mensaje claro si falta algo', () => {
     expect(() => loadConfig({})).toThrow(/DATABASE_URL/);
   });
 
   it('usa el puerto 4100 por defecto', () => {
-    const c = loadConfig({ DATABASE_URL: 'postgres://u:p@localhost:5433/pautas', REDIS_URL: 'redis://localhost:6380' });
+    const c = loadConfig({ ...minimo });
     expect(c.port).toBe(4100);
+    expect(c.mfaKey).toHaveLength(32);
+  });
+
+  it('exige una llave MFA de 32 bytes', () => {
+    expect(() => loadConfig({ ...minimo, MFA_KEY: Buffer.alloc(16).toString('base64') })).toThrow(/MFA_KEY/);
+  });
+
+  it('no permite escribir enlaces de verificación en los registros en producción', () => {
+    expect(() => loadConfig({ ...minimo, AVISOS_EN_CONSOLA: '1', NODE_ENV: 'production' })).toThrow(/solo para desarrollo/);
   });
 });

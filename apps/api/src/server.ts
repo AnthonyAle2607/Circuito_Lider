@@ -15,6 +15,13 @@ const app = await buildApp({
       await redis.ping();
     },
   },
+  db,
+  mfaKey: cfg.mfaKey,
+  portalUrl: cfg.portalUrl,
+  avisosEnConsola: cfg.avisosEnConsola,
+  redis,
+  limites: cfg.limites,
+  trustProxy: cfg.trustProxy,
   logger: true,
 });
 

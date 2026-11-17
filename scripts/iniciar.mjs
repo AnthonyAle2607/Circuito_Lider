@@ -36,6 +36,13 @@ if (spawnSync('docker', ['info'], { stdio: 'ignore' }).status !== 0) fallar('Doc
 console.log('Levantando Postgres, Redis y MinIO…');
 if (!correr('docker', [...COMPOSE, 'up', '-d', '--wait', 'postgres', 'redis', 'minio'])) fallar('No levantaron los contenedores.');
 if (!correr('pnpm', ['db:migrate'])) fallar('Fallaron las migraciones (pnpm db:migrate).');
+
+// Solo desarrollo: las migraciones crean los roles de la aplicación sin acceso; aquí se les da la clave de .env.example.
+// En producción las claves las pone el runbook del servidor y este paso no corre.
+const claves = "ALTER ROLE app_api WITH LOGIN PASSWORD 'app_api_dev'; ALTER ROLE app_worker WITH LOGIN PASSWORD 'app_worker_dev';";
+if (spawnSync('docker', [...COMPOSE, 'exec', '-T', 'postgres', 'psql', '-q', '-U', 'postgres', '-d', 'pautas', '-c', claves], { stdio: 'ignore' }).status !== 0) {
+  fallar('No pude dejar listos los roles app_api y app_worker.');
+}
 if (SIN_APPS) {
   console.log('✔ Base, colas y almacén listos.');
   process.exit(0);

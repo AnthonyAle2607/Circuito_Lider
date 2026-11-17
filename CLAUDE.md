@@ -18,7 +18,26 @@ El mapa interactivo del plan está en `vault/proyectos/sistema-de-pautas/floorpl
 | Tipos | `pnpm typecheck` |
 | Pruebas | `pnpm test` |
 | Migraciones | `pnpm db:migrate` |
+| Alta de alguien del equipo (imprime clave inicial y enlace del doble factor una sola vez) | `pnpm --filter @sp/api crear-miembro-equipo --email x@invermedia.com --nombre "X" --roles ventas,revisor` |
+| Verificar la bitácora | `select * from bitacora_verificar();` (filas revisadas, primera rota o vacío) |
 | Apagar contenedores | `docker compose -f infra/docker-compose.yml stop` |
+
+## Acceso a la base
+
+- **Dueño / migrador** (`DATABASE_URL_MIGRATOR`): aplica migraciones y da de alta al equipo. La API nunca lo usa.
+- **`app_api`** (`DATABASE_URL`): sin privilegios, sujeto a la RLS. Todo dato de un anunciante se consulta dentro de
+  `withTenant(db, anuncianteId, fn)`; fuera de ahí la RLS no deja ver nada. Lo que ocurre antes de saber quién es el
+  anunciante (ingreso por correo, verificación por código) va por funciones `SECURITY DEFINER` acotadas.
+- **`app_worker`**: trabajos en segundo plano; puede añadir a la bitácora y leer el outbox.
+- Las migraciones crean los roles sin acceso; `pnpm iniciar` les pone la clave de desarrollo.
+- Pruebas: `@sp/db/testing` da una base PGlite migrada; `comoApi()` cambia al rol real para que la RLS y los permisos se prueben de verdad.
+- Los arreglos de enums (`rol_equipo[]`) llegan como texto desde el driver: selecciónalos con `rolesEquipo` de `@sp/db`.
+
+## Sesiones
+
+Token opaco `Authorization: Bearer` (se guarda solo su hash). El portal y el panel lo guardan del lado del servidor en
+su propia cookie HttpOnly y llaman a la API desde el servidor. Anunciante: 12 h sin uso o 7 días. Equipo: clave + código
+TOTP obligatorio, 8 h sin uso o 12 h; un código no se puede reutilizar.
 
 ## Puertos (no chocan con ContentSniper)
 
@@ -28,13 +47,14 @@ Portal 3100 · Panel 3110 · API 4100 · Postgres 5433 · Redis 6380 · MinIO 91
 
 ```
 apps/
-  api/        Servidor principal (Fastify + Zod). /v1/health, /v1/ready
+  api/        Servidor principal (Fastify + Zod). Salud, cuentas del anunciante, sesión del equipo
   workers/    Trabajos en segundo plano (BullMQ sobre Redis)
   portal/     Web pública del anunciante (Next.js)
   panel/      Herramienta interna del equipo (Next.js)
 packages/
   schemas/    Contratos compartidos (Zod)
-  db/         Conexión (Kysely), ping y runner de migraciones
+  db/         Conexión (Kysely), tipos de tablas, withTenant, runner de migraciones, base de prueba (PGlite)
+  audit/      Bitácora encadenada: registrar() dentro de la transacción y verificar()
 migrations/   NNNN_nombre.sql; una aplicada no se edita nunca
 config/       marca.yaml (y luego tarifario, validador, agente, pasarela, límites de gasto)
 infra/        docker-compose.yml de desarrollo
@@ -42,7 +62,8 @@ scripts/      iniciar.mjs
 ```
 
 Paquetes por venir, cada uno en su PT: `core-fsm`, `pricing`, `inventory` (PT-3), `payments` (PT-5), `sales-agent` (PT-5b),
-`provider-gateway`, `audit` (PT-1), `ui` (PT-4), `services/validador` en Python (PT-6).
+`provider-gateway`, `ui` (PT-4), `services/validador` en Python (PT-6). El despachador del outbox llega con el primer
+evento que tenga quien lo consuma (el correo de verificación, con n8n).
 
 ## Invariantes (toda revisión de código las verifica)
 
@@ -70,4 +91,7 @@ Paquetes por venir, cada uno en su PT: `core-fsm`, `pricing`, `inventory` (PT-3)
 ## Estado
 
 - **PT-0 · Base del repo:** hecho (monorepo, contenedores, salud, CI, este archivo).
-- Siguiente: **PT-1 · Base de datos y acceso** (identidad, catálogo, auditoría encadenada, outbox, RLS, sesión del cliente, equipo con doble factor).
+- **PT-1 · Base de datos y acceso:** hecho. Migraciones 0001 identidad, 0002 catálogo, 0003 bitácora y outbox; RLS por
+  anunciante; registro, verificación de correo, ingreso y salida del anunciante; ingreso del equipo con doble factor.
+  Pendiente para cuando haya correo: el despachador del outbox que envía el enlace de verificación.
+- Siguiente: **PT-2 · Catálogo y parrilla** (carga de las 9 emisoras, API de parrilla, edición de franjas en el panel).

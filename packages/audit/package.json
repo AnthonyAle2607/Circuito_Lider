@@ -1,0 +1,10 @@
+{
+  "name": "@sp/audit",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": { ".": "./src/index.ts" },
+  "scripts": { "typecheck": "tsc -p tsconfig.json", "test": "vitest run" },
+  "dependencies": { "@sp/db": "workspace:*", "kysely": "^0.27.5" },
+  "devDependencies": { "@electric-sql/pglite": "^0.2.17" }
+}
