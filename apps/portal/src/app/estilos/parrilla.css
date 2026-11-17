@@ -1,5 +1,5 @@
 /* Diseño «Parrilla · Invermedia» (disenos/propuesta-2-parrilla-invermedia.html), portado tal cual a PT-4.
-   Las tipografías las sirve next/font (variables --font-*). Lo nuevo del portal está en portal.css. */
+   Las tipografías vienen de @fontsource (variables --font-* en portal.css). Lo nuevo del portal está en portal.css. */
 /* Layout: cabina al aire. Negro espresso, luz roja de "al aire", cinta mostaza para rotular, crema para leer, vino para las bandas. Colores planos, sin degradados.
    Héroe: una redacción de radio con 9 agentes, cada uno en su emisora, que se arma al cargar. Carruseles que no se frenan y se pueden arrastrar. Tema oscuro deliberado. */
 :root{

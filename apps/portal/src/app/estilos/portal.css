@@ -1,5 +1,8 @@
 /* Piezas nuevas del portal (cuenta, cotización, pedidos), con los mismos tokens del diseño. */
 
+/* Familias de @fontsource (importadas en layout.tsx), usadas por los tokens --f-* de parrilla.css. */
+:root{--font-oswald:"Oswald";--font-roboto:"Roboto";--font-roboto-mono:"Roboto Mono"}
+
 .pagina{padding-block:56px 96px;min-height:70vh}
 .pagina h1{font-size:clamp(40px,6vw,76px);font-weight:700;margin:12px 0 8px}
 .pagina .intro{color:var(--soft);max-width:60ch;margin:0 0 32px;font-size:18px}
