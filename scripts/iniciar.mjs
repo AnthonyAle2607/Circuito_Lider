@@ -45,6 +45,8 @@ if (spawnSync('docker', [...COMPOSE, 'exec', '-T', 'postgres', 'psql', '-q', '-U
 }
 // La parrilla de Circuito Líder: solo añade lo que falta, nunca pisa lo corregido en el panel.
 if (!correr('pnpm', ['cargar-parrilla'])) fallar('No se pudo cargar la parrilla (pnpm cargar-parrilla).');
+// Tarifario de EJEMPLO, solo si la base no tiene ninguno (los precios reales se publican desde el panel).
+if (!correr('pnpm', ['cargar-tarifario-ejemplo'])) fallar('No se pudo cargar el tarifario de ejemplo.');
 if (SIN_APPS) {
   console.log('✔ Base, colas y almacén listos.');
   process.exit(0);

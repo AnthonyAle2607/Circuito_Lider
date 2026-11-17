@@ -38,9 +38,18 @@ importers:
       '@sp/catalogo':
         specifier: workspace:*
         version: link:../../packages/catalogo
+      '@sp/core-fsm':
+        specifier: workspace:*
+        version: link:../../packages/core-fsm
       '@sp/db':
         specifier: workspace:*
         version: link:../../packages/db
+      '@sp/inventory':
+        specifier: workspace:*
+        version: link:../../packages/inventory
+      '@sp/pricing':
+        specifier: workspace:*
+        version: link:../../packages/pricing
       '@sp/schemas':
         specifier: workspace:*
         version: link:../../packages/schemas
@@ -128,7 +137,13 @@ importers:
       ioredis:
         specifier: ^5.4.2
         version: 5.11.1
+      pg:
+        specifier: ^8.13.1
+        version: 8.23.1
     devDependencies:
+      '@types/pg':
+        specifier: ^8.11.10
+        version: 8.23.1
       tsx:
         specifier: ^4.19.2
         version: 4.23.15
@@ -151,6 +166,9 @@ importers:
       '@sp/db':
         specifier: workspace:*
         version: link:../db
+      '@sp/pricing':
+        specifier: workspace:*
+        version: link:../pricing
       kysely:
         specifier: ^0.27.5
         version: 0.27.6
@@ -167,6 +185,8 @@ importers:
       tsx:
         specifier: ^4.19.2
         version: 4.23.15
+
+  packages/core-fsm: {}
 
   packages/db:
     dependencies:
@@ -186,6 +206,27 @@ importers:
       tsx:
         specifier: ^4.19.2
         version: 4.23.15
+
+  packages/inventory:
+    dependencies:
+      '@sp/db':
+        specifier: workspace:*
+        version: link:../db
+      kysely:
+        specifier: ^0.27.5
+        version: 0.27.6
+    devDependencies:
+      '@electric-sql/pglite':
+        specifier: ^0.2.17
+        version: 0.2.17
+      '@types/pg':
+        specifier: ^8.11.10
+        version: 8.23.1
+      pg:
+        specifier: ^8.13.1
+        version: 8.23.1
+
+  packages/pricing: {}
 
   packages/schemas:
     dependencies:

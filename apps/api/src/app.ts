@@ -6,8 +6,11 @@ import type { Kysely } from 'kysely';
 import type { Database } from '@sp/db';
 import { manejarErrores } from './plugins/errores';
 import { rutasCatalogo } from './routes/catalogo';
+import { rutasCotizaciones } from './routes/cotizaciones';
 import { rutasCuentas } from './routes/cuentas';
 import { rutasPanelCatalogo } from './routes/panel/catalogo';
+import { rutasPanelVentas } from './routes/panel/ventas';
+import { rutasPedidos } from './routes/pedidos';
 import { rutasSesionEquipo } from './routes/panel/sesion';
 import { rutasSalud, type Comprobaciones } from './routes/salud';
 
@@ -18,14 +21,19 @@ export interface Opciones {
   mfaKey?: Buffer;
   portalUrl?: string;
   avisosEnConsola?: boolean;
+  /** Versión vigente de los términos que se aceptan al reservar. */
+  terminosVersion?: string;
   /** Con Redis el límite de peticiones se comparte entre procesos; sin él vive en memoria. */
   redis?: Redis;
   /** Peticiones por minuto y dirección en general, y en las rutas de acceso. */
-  limites?: { general: number; acceso: number };
+  limites?: { general: number; acceso: number; cotizar?: number };
   /** Detrás de Caddy y del túnel: confiar en X-Forwarded-For para saber la IP real. */
   trustProxy?: boolean;
   logger?: boolean;
 }
+
+/** Términos en borrador hasta que Invermedia entregue el contrato modelo (pregunta abierta 5). */
+export const TERMINOS_POR_DEFECTO = '2026-11-borrador';
 
 /** Arma el servidor sin abrir el puerto, para que las pruebas lo usen con `inject`. */
 export async function buildApp(op: Opciones): Promise<FastifyInstance> {
@@ -47,6 +55,9 @@ export async function buildApp(op: Opciones): Promise<FastifyInstance> {
     await rutasSesionEquipo(app, { db: op.db, mfaKey: op.mfaKey, limiteAcceso: limites.acceso });
     await rutasCatalogo(app, op.db);
     await rutasPanelCatalogo(app, op.db);
+    await rutasCotizaciones(app, { db: op.db, terminosVersion: op.terminosVersion ?? TERMINOS_POR_DEFECTO, limiteCotizar: limites.cotizar ?? 30 });
+    await rutasPedidos(app, op.db);
+    await rutasPanelVentas(app, op.db);
   }
   return app;
 }

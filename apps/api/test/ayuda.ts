@@ -51,9 +51,31 @@ export async function montar(op: { limiteAcceso?: number } = {}) {
     return { id, email, secreto, codigo };
   }
 
+  /** Sesión del equipo (clave + código) con los roles pedidos: devuelve la cabecera Authorization. */
+  async function sesionEquipo(roles: string[]) {
+    const e = await miembroEquipo(roles);
+    const { reto } = (await app.inject({ method: 'POST', url: '/v1/panel/sesion', payload: { email: e.email, password: CLAVE }, headers: ip() })).json();
+    const { token } = (await app.inject({ method: 'POST', url: '/v1/panel/sesion/codigo', payload: { reto, codigo: e.codigo() }, headers: ip() })).json();
+    return { authorization: `Bearer ${token}` };
+  }
+
+  /** Un anunciante registrado, con el correo verificado (o no) y la sesión abierta. */
+  async function anunciante(op: { verificado?: boolean } = {}) {
+    const email = `cliente${n++}@ejemplo.com`;
+    await app.inject({ method: 'POST', url: '/v1/cuentas/registro', payload: { empresa: `Empresa ${n}`, pais: 'US', nombre: 'Ana', email, password: CLAVE }, headers: ip() });
+    if (op.verificado !== false) {
+      const [f] = await q<{ datos: { enlace: string } }>(`SELECT datos FROM outbox WHERE tipo = 'cuenta.registrada' AND datos->>'email' = $1`, [email]);
+      const codigo = new URL(f!.datos.enlace).searchParams.get('codigo');
+      await app.inject({ method: 'POST', url: '/v1/cuentas/verificar-correo', payload: { codigo }, headers: ip() });
+    }
+    const { token } = (await app.inject({ method: 'POST', url: '/v1/cuentas/ingresar', payload: { email, password: CLAVE }, headers: ip() })).json();
+    const [u] = await q<{ anunciante_id: string }>(`SELECT anunciante_id FROM usuarios WHERE email = $1`, [email]);
+    return { auth: { authorization: `Bearer ${token}` }, anuncianteId: u!.anunciante_id, email };
+  }
+
   const cerrar = async () => {
     await app.close();
     await b.cerrar();
   };
-  return { app, b, q, dueño, ip, miembroEquipo, cerrar };
+  return { app, b, q, dueño, ip, miembroEquipo, sesionEquipo, anunciante, cerrar };
 }

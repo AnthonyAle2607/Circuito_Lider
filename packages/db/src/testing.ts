@@ -13,6 +13,7 @@ import {
   type Driver,
   type QueryResult,
 } from 'kysely';
+import { PARSERS } from './index';
 import { runMigrations } from './migrate';
 import type { Database } from './schema';
 
@@ -78,7 +79,7 @@ export function pgliteKysely(pg: PGlite): Kysely<Database> {
  * `comoApi()` para comprobar con el rol real de la aplicación (si le faltara un permiso o la RLS le ocultara algo, fallan).
  */
 export async function baseDePrueba() {
-  const pg = new PGlite({ extensions: { citext } });
+  const pg = new PGlite({ extensions: { citext }, parsers: PARSERS });
   await runMigrations({ query: (s, p) => pg.query(s, p) as never, exec: (s) => pg.exec(s) }, MIGRACIONES);
   const db = pgliteKysely(pg);
   return {

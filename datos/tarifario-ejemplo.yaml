@@ -1,0 +1,26 @@
+# TARIFARIO DE EJEMPLO. No son precios reales de Circuito Líder (pregunta abierta 2: falta el tarifario real).
+# Sirve para construir y probar el cotizador. Toda cotización hecha con él lleva `esEjemplo: true` y el portal lo avisa.
+# Se carga con `pnpm cargar-tarifario-ejemplo` solo si la base todavía no tiene ningún tarifario.
+# Precios en centavos de dólar por emisión.
+
+version: 1
+moneda: USD
+vigencia_cotizacion_horas: 72     # cuánto vale el precio de una cotización
+reserva_horas: 24                 # cuánto se retienen los espacios sin pagar (luego se liberan solos)
+umbral_aprobacion_centimos: 500000  # desde USD 5.000 una persona de ventas aprueba antes de reservar
+notas: Tarifario de ejemplo para desarrollo. Reemplazar por el real.
+
+tarifas:
+  # En cadena: el spot suena en las 9 emisoras a la vez.
+  - { alcance: nacional, duracion_segundos: 30, precio_centimos: 6000 }
+  - { alcance: nacional, duracion_segundos: 45, precio_centimos: 8000 }
+  - { alcance: nacional, duracion_segundos: 60, precio_centimos: 10000 }
+  # Local: solo en una emisora.
+  - { alcance: local, duracion_segundos: 30, precio_centimos: 1500 }
+  - { alcance: local, duracion_segundos: 45, precio_centimos: 2000 }
+  - { alcance: local, duracion_segundos: 60, precio_centimos: 2500 }
+
+descuentos:
+  - { min_emisiones: 20, descuento_bps: 500 }    # 5 %
+  - { min_emisiones: 50, descuento_bps: 1000 }   # 10 %
+  - { min_emisiones: 100, descuento_bps: 1500 }  # 15 %

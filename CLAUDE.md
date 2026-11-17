@@ -19,6 +19,8 @@ El mapa interactivo del plan está en `vault/proyectos/sistema-de-pautas/floorpl
 | Pruebas | `pnpm test` |
 | Migraciones | `pnpm db:migrate` |
 | Cargar o completar la parrilla de Circuito Líder (no pisa lo corregido en el panel) | `pnpm cargar-parrilla` |
+| Cargar el tarifario de EJEMPLO (solo si no hay ninguno) | `pnpm cargar-tarifario-ejemplo` |
+| Prueba de concurrencia del inventario contra Postgres real | `PRUEBAS_PG_URL=postgres://postgres:postgres@127.0.0.1:5433/postgres pnpm --filter @sp/inventory exec vitest run test/concurrencia.pg.test.ts` |
 | Alta de alguien del equipo (imprime clave inicial y enlace del doble factor una sola vez) | `pnpm --filter @sp/api crear-miembro-equipo --email x@invermedia.com --nombre "X" --roles ventas,revisor` |
 | Verificar la bitácora | `select * from bitacora_verificar();` (filas revisadas, primera rota o vacío) |
 | Apagar contenedores | `docker compose -f infra/docker-compose.yml stop` |
@@ -29,7 +31,9 @@ El mapa interactivo del plan está en `vault/proyectos/sistema-de-pautas/floorpl
 - **`app_api`** (`DATABASE_URL`): sin privilegios, sujeto a la RLS. Todo dato de un anunciante se consulta dentro de
   `withTenant(db, anuncianteId, fn)`; fuera de ahí la RLS no deja ver nada. Lo que ocurre antes de saber quién es el
   anunciante (ingreso por correo, verificación por código) va por funciones `SECURITY DEFINER` acotadas.
-- **`app_worker`**: trabajos en segundo plano; puede añadir a la bitácora y leer el outbox.
+- **`app_worker`** (`DATABASE_URL_WORKER`): trabajos en segundo plano; añade a la bitácora, lee el outbox y corre
+  `liberar_reservas_vencidas()`.
+- Dinero: `bigint` en centavos, llega como `number`. Fechas: `date` llega como texto `AAAA-MM-DD` (ver `PARSERS` en `@sp/db`).
 - Las migraciones crean los roles sin acceso; `pnpm iniciar` les pone la clave de desarrollo.
 - Pruebas: `@sp/db/testing` da una base PGlite migrada; `comoApi()` cambia al rol real para que la RLS y los permisos se prueben de verdad.
 - Los arreglos de enums (`rol_equipo[]`) llegan como texto desde el driver: selecciónalos con `rolesEquipo` de `@sp/db`.
@@ -56,15 +60,18 @@ packages/
   schemas/    Contratos compartidos (Zod)
   db/         Conexión (Kysely), tipos de tablas, withTenant, runner de migraciones, base de prueba (PGlite)
   audit/      Bitácora encadenada: registrar() dentro de la transacción y verificar()
-  catalogo/   Parrilla: lectura y validación de datos/*.yaml, carga idempotente y consultas (emisoras, parrilla)
-datos/        circuito-lider.yaml: la parrilla publicada (horas de Venezuela; tanda estimada)
+  catalogo/   Parrilla y tarifario: datos/*.yaml, carga idempotente, consultas, publicar tarifario
+  core-fsm/   Estados del pedido y de la cotización con guardas
+  pricing/    Cálculo puro de precios (centavos, descuento por volumen, umbral de aprobación)
+  inventory/  Cupos: tomar (UPDATE condicionado con bloqueo), devolver, segundos libres; fechas de Caracas
+datos/        circuito-lider.yaml (parrilla publicada) y tarifario-ejemplo.yaml (precios de EJEMPLO)
 migrations/   NNNN_nombre.sql; una aplicada no se edita nunca
 config/       marca.yaml (y luego tarifario, validador, agente, pasarela, límites de gasto)
 infra/        docker-compose.yml de desarrollo
 scripts/      iniciar.mjs
 ```
 
-Paquetes por venir, cada uno en su PT: `core-fsm`, `pricing`, `inventory` (PT-3), `payments` (PT-5), `sales-agent` (PT-5b),
+Paquetes por venir, cada uno en su PT: `payments` (PT-5), `sales-agent` (PT-5b),
 `provider-gateway`, `ui` (PT-4), `services/validador` en Python (PT-6). El despachador del outbox llega con el primer
 evento que tenga quien lo consuma (el correo de verificación, con n8n).
 
@@ -101,4 +108,9 @@ evento que tenga quien lo consuma (el correo de verificación, con n8n).
   las 9 emisoras, 13 programas y 51 franjas; `GET /v1/emisoras`, `GET /v1/parrilla`; panel con ingreso en dos pasos y
   edición de franjas (`/v1/panel/franjas`), cada cambio en la bitácora; portal `/parrilla`. Los segundos de tanda son
   estimados (240 s por hora) hasta que Circuito Líder los confirme.
-- Siguiente: **PT-3 · Inventario y precios** (cupos por fecha, tarifario versionado, cotización, reserva sin sobreventa).
+- **PT-3 · Inventario y precios:** hecho. Migración 0005; tarifario versionado e inmutable (P4) con uno de EJEMPLO;
+  `GET /v1/disponibilidad`, `POST /v1/cotizaciones`, `GET /v1/cotizaciones/:id`, `POST /v1/cotizaciones/:id/reservar`,
+  `GET /v1/pedidos`, `GET /v1/pedidos/:id`, `POST /v1/pedidos/:id/cancelar`; panel: aprobaciones y `PUT /v1/panel/tarifario`.
+  Reservar toma el cupo con un UPDATE condicionado: 50 reservas simultáneas sobre el último cupo, gana una (probado en
+  Postgres real, también en la CI). El trabajo `liberar-reservas` vence cada minuto los pedidos sin pagar (P3).
+- Siguiente: **PT-4 · Portal del cliente** (el diseño elegido migrado a React: cotizador, reserva, cuenta y seguimiento).

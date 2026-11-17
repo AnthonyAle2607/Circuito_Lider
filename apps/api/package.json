@@ -21,7 +21,10 @@
     "@fastify/rate-limit": "^10.2.2",
     "@sp/audit": "workspace:*",
     "kysely": "^0.27.5",
-    "@sp/catalogo": "workspace:*"
+    "@sp/catalogo": "workspace:*",
+    "@sp/core-fsm": "workspace:*",
+    "@sp/pricing": "workspace:*",
+    "@sp/inventory": "workspace:*"
   },
   "devDependencies": {
     "tsx": "^4.19.2",

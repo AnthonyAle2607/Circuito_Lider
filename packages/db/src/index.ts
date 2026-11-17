@@ -6,6 +6,19 @@ export type * from './schema';
 export * from './migrate';
 export * from './tenant';
 
+/**
+ * Cómo llegan dos tipos desde la base, igual en `pg` y en PGlite (pruebas):
+ *  - bigint (int8, OID 20) → number. El dinero va en centavos y los ids de bitácora: muy lejos de 2^53.
+ *  - date (OID 1082) → texto «AAAA-MM-DD». Convertido a Date caería en la zona horaria del proceso y una fecha de
+ *    Caracas podría correrse un día.
+ */
+export const PARSERS = {
+  20: (v: string) => Number(v),
+  1082: (v: string) => v,
+} as const;
+pg.types.setTypeParser(20, PARSERS[20]);
+pg.types.setTypeParser(1082, PARSERS[1082]);
+
 /** Cliente Kysely sobre un pool. Toda consulta usa parámetros enlazados ($1…): nunca se concatena SQL. */
 export function createDb(connectionString: string, max = 10): Kysely<Database> {
   return new Kysely<Database>({

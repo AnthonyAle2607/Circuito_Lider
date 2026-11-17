@@ -1,5 +1,5 @@
 import type { FastifyInstance } from 'fastify';
-import type { ZodType } from 'zod';
+import type { ZodTypeAny, output } from 'zod';
 
 /** Error con estado HTTP y un mensaje que SÍ se puede mostrar al usuario. Todo lo demás sale como 500 genérico. */
 export class HttpError extends Error {
@@ -7,6 +7,8 @@ export class HttpError extends Error {
     readonly status: number,
     readonly codigo: string,
     readonly mensaje: string,
+    /** Datos que ayudan al cliente a corregir (por ejemplo, qué emisiones se quedaron sin cupo). */
+    readonly extra?: Record<string, unknown>,
   ) {
     super(mensaje);
   }
@@ -15,7 +17,7 @@ export class HttpError extends Error {
 export const noAutorizado = () => new HttpError(401, 'no_autorizado', 'Inicia sesión para continuar.');
 
 /** Valida la entrada con su contrato; si no cumple, 400 con el primer problema. */
-export function validar<T>(esquema: ZodType<T>, valor: unknown): T {
+export function validar<S extends ZodTypeAny>(esquema: S, valor: unknown): output<S> {
   const r = esquema.safeParse(valor);
   if (!r.success) {
     const p = r.error.issues[0]!;
@@ -27,7 +29,7 @@ export function validar<T>(esquema: ZodType<T>, valor: unknown): T {
 export function manejarErrores(app: FastifyInstance): void {
   app.setErrorHandler((err, req, reply) => {
     if (err instanceof HttpError) {
-      return reply.code(err.status).send({ error: err.codigo, mensaje: err.mensaje });
+      return reply.code(err.status).send({ ...err.extra, error: err.codigo, mensaje: err.mensaje });
     }
     const status = (err as { statusCode?: number }).statusCode;
     if (status === 429) {

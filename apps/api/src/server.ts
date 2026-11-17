@@ -21,6 +21,7 @@ const app = await buildApp({
   avisosEnConsola: cfg.avisosEnConsola,
   redis,
   limites: cfg.limites,
+  terminosVersion: cfg.terminosVersion,
   trustProxy: cfg.trustProxy,
   logger: true,
 });

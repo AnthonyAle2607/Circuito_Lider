@@ -11,6 +11,8 @@ const Entorno = z.object({
   TRUST_PROXY: z.enum(['0', '1']).default('0'),
   LIMITE_GENERAL: z.coerce.number().int().positive().default(300),
   LIMITE_ACCESO: z.coerce.number().int().positive().default(10),
+  LIMITE_COTIZAR: z.coerce.number().int().positive().default(30),
+  TERMINOS_VERSION: z.string().min(1).max(60).default('2026-11-borrador'),
 });
 
 export type Config = {
@@ -22,7 +24,8 @@ export type Config = {
   portalUrl: string;
   avisosEnConsola: boolean;
   trustProxy: boolean;
-  limites: { general: number; acceso: number };
+  limites: { general: number; acceso: number; cotizar: number };
+  terminosVersion: string;
 };
 
 /** Lee y valida el entorno. Si falta algo, se detiene con un mensaje claro en vez de arrancar a medias. */
@@ -45,6 +48,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     portalUrl: e.PORTAL_URL.replace(/\/$/, ''),
     avisosEnConsola: e.AVISOS_EN_CONSOLA === '1',
     trustProxy: e.TRUST_PROXY === '1',
-    limites: { general: e.LIMITE_GENERAL, acceso: e.LIMITE_ACCESO },
+    limites: { general: e.LIMITE_GENERAL, acceso: e.LIMITE_ACCESO, cotizar: e.LIMITE_COTIZAR },
+    terminosVersion: e.TERMINOS_VERSION,
   };
 }

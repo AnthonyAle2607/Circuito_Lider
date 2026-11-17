@@ -11,6 +11,12 @@ export type EstadoCuenta = 'activa' | 'suspendida' | 'cerrada';
 export type RolEquipo = 'ventas' | 'revisor' | 'programacion' | 'finanzas' | 'gerencia' | 'admin';
 export type TipoSesion = 'anunciante' | 'equipo';
 export type TipoActor = 'anunciante' | 'equipo' | 'agente' | 'sistema';
+export type Alcance = 'nacional' | 'local';
+export type EstadoCotizacion = 'vigente' | 'en_aprobacion' | 'rechazada' | 'reservada';
+export type EstadoPedido = 'reservado' | 'pagado' | 'cancelado' | 'vencido';
+export type EstadoReserva = 'retenida' | 'confirmada' | 'liberada';
+/** Dinero en centavos (bigint en la base, number aquí: ver PARSERS en index.ts). */
+type Centimos = number;
 
 // ── 0001 identidad ──────────────────────────────────────────────────────────
 export interface AnunciantesTabla {
@@ -129,7 +135,7 @@ export interface FranjasTabla {
 
 // ── 0003 bitácora y outbox ──────────────────────────────────────────────────
 export interface BitacoraTabla {
-  id: Generated<string>;
+  id: Generated<number>;
   anunciante_id: string | null;
   actor_tipo: TipoActor;
   actor_id: string | null;
@@ -145,7 +151,7 @@ export interface BitacoraTabla {
 }
 
 export interface OutboxTabla {
-  id: Generated<string>;
+  id: Generated<number>;
   anunciante_id: string | null;
   tipo: string;
   datos: ColumnType<unknown, string | undefined, string>;
@@ -153,6 +159,93 @@ export interface OutboxTabla {
   despachado_at: Date | null;
   intentos: Generated<number>;
   ultimo_error: string | null;
+}
+
+// ── 0005 inventario y precios ───────────────────────────────────────────────
+export interface TarifariosTabla {
+  id: Generated<string>;
+  version: number;
+  moneda: string;
+  vigente_desde: ColumnType<Date, Date | string, never>;
+  vigencia_cotizacion_horas: number;
+  reserva_horas: number;
+  umbral_aprobacion_centimos: Centimos;
+  es_ejemplo: Generated<boolean>;
+  notas: string | null;
+  creado_por: string | null;
+  creado_at: Generated<Date>;
+}
+
+export interface TarifasTabla {
+  tarifario_id: string;
+  alcance: Alcance;
+  duracion_segundos: number;
+  precio_centimos: Centimos;
+}
+
+export interface DescuentosVolumenTabla {
+  tarifario_id: string;
+  min_emisiones: number;
+  descuento_bps: number;
+}
+
+export interface CotizacionesTabla {
+  id: Generated<string>;
+  tarifario_id: string;
+  moneda: string;
+  duracion_segundos: number;
+  emisiones: number;
+  subtotal_centimos: Centimos;
+  descuento_centimos: Centimos;
+  total_centimos: Centimos;
+  estado: ColumnType<EstadoCotizacion, EstadoCotizacion | undefined, EstadoCotizacion>;
+  requiere_aprobacion: ColumnType<boolean, boolean | undefined, never>;
+  vence_at: Date;
+  decidido_por: string | null;
+  decidido_at: Date | null;
+  motivo_decision: string | null;
+  ip: string | null;
+  creado_at: Generated<Date>;
+}
+
+export interface CotizacionLineasTabla {
+  cotizacion_id: string;
+  franja_id: string;
+  fecha: ColumnType<string, string, never>;
+  precio_centimos: Centimos;
+}
+
+export interface PedidosTabla {
+  id: Generated<string>;
+  anunciante_id: string;
+  cotizacion_id: string;
+  usuario_id: string;
+  estado: ColumnType<EstadoPedido, EstadoPedido | undefined, EstadoPedido>;
+  moneda: string;
+  total_centimos: Centimos;
+  reserva_vence_at: Date;
+  terminos_version: string;
+  terminos_aceptados_at: Date;
+  creado_at: Generated<Date>;
+  actualizado_at: Ahora;
+}
+
+export interface CuposTabla {
+  franja_id: string;
+  fecha: ColumnType<string, string, never>;
+  segundos_usados: ColumnType<number, number | undefined, number>;
+}
+
+export interface ReservasTabla {
+  id: Generated<string>;
+  anunciante_id: string;
+  pedido_id: string;
+  franja_id: string;
+  fecha: ColumnType<string, string, never>;
+  segundos: number;
+  estado: ColumnType<EstadoReserva, EstadoReserva | undefined, EstadoReserva>;
+  creado_at: Generated<Date>;
+  liberada_at: Date | null;
 }
 
 export interface Database {
@@ -168,4 +261,12 @@ export interface Database {
   franjas: FranjasTabla;
   bitacora: BitacoraTabla;
   outbox: OutboxTabla;
+  tarifarios: TarifariosTabla;
+  tarifas: TarifasTabla;
+  descuentos_volumen: DescuentosVolumenTabla;
+  cotizaciones: CotizacionesTabla;
+  cotizacion_lineas: CotizacionLineasTabla;
+  pedidos: PedidosTabla;
+  cupos: CuposTabla;
+  reservas: ReservasTabla;
 }
