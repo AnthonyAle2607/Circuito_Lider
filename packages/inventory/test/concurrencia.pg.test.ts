@@ -3,7 +3,8 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import pg from 'pg';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { createDb, runMigrations } from '@sp/db';
+import { Kysely, PostgresDialect } from 'kysely';
+import { runMigrations, type Database } from '@sp/db';
 import { SinCupo, tomarCupos } from '../src/index';
 
 /**
@@ -18,7 +19,8 @@ const nombre = `prueba_concurrencia_${randomBytes(4).toString('hex')}`;
 
 describe.skipIf(!URL_ADMIN)('concurrencia en Postgres real', () => {
   let urlBase = '';
-  let db: ReturnType<typeof createDb>;
+  let pool: pg.Pool;
+  let db: Kysely<Database>;
 
   beforeAll(async () => {
     const admin = new pg.Client({ connectionString: URL_ADMIN });
@@ -32,11 +34,16 @@ describe.skipIf(!URL_ADMIN)('concurrencia en Postgres real', () => {
     await c.connect();
     await runMigrations(c, MIGRACIONES);
     await c.end();
-    db = createDb(urlBase, 60);
+    // Pool propio con manejador de errores: al borrar la base desechable, una conexión que aún se cierra no debe
+    // tumbar la corrida con un error sin atender (pasaba a veces en la CI).
+    pool = new pg.Pool({ connectionString: urlBase, max: 60 });
+    pool.on('error', () => {});
+    db = new Kysely<Database>({ dialect: new PostgresDialect({ pool }) });
   });
 
   afterAll(async () => {
     await db?.destroy();
+    await new Promise((r) => setTimeout(r, 200));
     const admin = new pg.Client({ connectionString: URL_ADMIN });
     await admin.connect();
     await admin.query(`DROP DATABASE IF EXISTS ${nombre} WITH (FORCE)`);
