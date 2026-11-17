@@ -17,6 +17,7 @@ El mapa interactivo del plan está en `vault/proyectos/sistema-de-pautas/floorpl
 | Solo contenedores y migraciones | `pnpm iniciar --sin-apps` |
 | Tipos | `pnpm typecheck` |
 | Pruebas | `pnpm test` |
+| Compilar el portal sin pisar el `next dev` | `NEXT_DIST_DIR=.next-prueba pnpm --filter @sp/portal exec next build` |
 | Migraciones | `pnpm db:migrate` |
 | Cargar o completar la parrilla de Circuito Líder (no pisa lo corregido en el panel) | `pnpm cargar-parrilla` |
 | Cargar el tarifario de EJEMPLO (solo si no hay ninguno) | `pnpm cargar-tarifario-ejemplo` |
@@ -113,4 +114,11 @@ evento que tenga quien lo consuma (el correo de verificación, con n8n).
   `GET /v1/pedidos`, `GET /v1/pedidos/:id`, `POST /v1/pedidos/:id/cancelar`; panel: aprobaciones y `PUT /v1/panel/tarifario`.
   Reservar toma el cupo con un UPDATE condicionado: 50 reservas simultáneas sobre el último cupo, gana una (probado en
   Postgres real, también en la CI). El trabajo `liberar-reservas` vence cada minuto los pedidos sin pagar (P3).
-- Siguiente: **PT-4 · Portal del cliente** (el diseño elegido migrado a React: cotizador, reserva, cuenta y seguimiento).
+- **PT-4 · Portal del cliente:** hecho con el diseño **Parrilla · Invermedia** (elegido el 2026-11-17). La decoración de
+  la maqueta se conserva tal cual (`componentes/marcado.ts` + `componentes/efectos-diseno.ts`, apagable al salir de la
+  página); paquetes y cotizador son React sobre la parrilla y el tarifario reales (`componentes/Venta.tsx`, con
+  `GET /v1/tarifario` y `@sp/pricing` para el precio en vivo; el que vale lo calcula la API). Cuenta: registro,
+  confirmación de correo con botón, ingreso, reserva con términos, mis pedidos, detalle y cancelación. Sesión del
+  anunciante en cookie HttpOnly `sp_sesion`; las llamadas a la API van desde el servidor del portal (acciones).
+  Probado de punta a punta con un usuario nuevo en el navegador.
+- Siguiente: **PT-5 · Pagos** (pasarela con pago alojado, transferencia, conciliación) y **PT-5b · Agente vendedor**.

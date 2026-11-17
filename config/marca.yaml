@@ -1,15 +1,16 @@
-# Marca de la plataforma. Nombre y dominio aún por decidir (pregunta abierta 11): este es provisional.
-# Cambiar la marca no debe tocar código (decisión D13).
-nombre: Sistema de Pautas
-lema: Tu anuncio suena en Venezuela
+# Marca de la plataforma (decisión D13: cambiarla no toca código).
+# 2026-11-17: se eligió el diseño «Parrilla · Invermedia» para el portal. Ojo: la reunión del 2026-11-04 había pedido
+# un nombre y dominio propios, distintos de Invermedia (pregunta abierta 11). Si eso se mantiene, se cambia aquí.
+nombre: Invermedia Radio
+lema: Tu anuncio en 9 radios de Venezuela
 mascota: Toño
 colores:
-  fondo: "#15100D"
-  superficie: "#211915"
-  texto: "#F2E6D3"
-  texto_suave: "#A8988A"
-  acento: "#E2A746"
-  alerta: "#E5352B"
+  fondo: "#2E123E"
+  superficie: "#3E1A52"
+  texto: "#FFFFFF"
+  texto_suave: "#D9CCE2"
+  acento: "#FE6B00"
+  alerta: "#FF8A3D"
 tipografias:
   titulos: Oswald
   texto: Roboto

@@ -1,6 +1,7 @@
 import type { FastifyInstance } from 'fastify';
 import type { Kysely } from 'kysely';
-import { listarEmisoras, parrillaDeEmisora } from '@sp/catalogo';
+import { listarEmisoras, parrillaDeEmisora, tarifarioVigente } from '@sp/catalogo';
+import { duracionesDisponibles } from '@sp/pricing';
 import type { Database } from '@sp/db';
 import { ConsultaParrilla, type Emisora, type Parrilla } from '@sp/schemas';
 import { HttpError, validar } from '../plugins/errores';
@@ -20,5 +21,16 @@ export async function rutasCatalogo(app: FastifyInstance, db: Kysely<Database>):
     if (!p) throw new HttpError(404, 'emisora_no_existe', 'No encontramos esa emisora.');
     reply.header('cache-control', cache);
     return p;
+  });
+
+  /**
+   * El tarifario vigente, para que el portal muestre el precio mientras se elige. Es público como cualquier lista de
+   * precios. El precio que vale es el que calcula POST /v1/cotizaciones y queda guardado en la cotización.
+   */
+  app.get('/v1/tarifario', async (_req, reply) => {
+    const t = await tarifarioVigente(db);
+    if (!t) throw new HttpError(404, 'sin_tarifario', 'Todavía no hay tarifario publicado.');
+    reply.header('cache-control', cache);
+    return { ...t, duraciones: duracionesDisponibles(t) };
   });
 }

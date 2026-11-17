@@ -24,6 +24,8 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm typecheck
       - run: pnpm test
+      # El portal y el panel deben compilar para producción (detecta errores que el modo desarrollo deja pasar).
+      - run: pnpm --filter @sp/portal --filter @sp/panel build
 
   migraciones:
     name: Migraciones y concurrencia contra Postgres 16

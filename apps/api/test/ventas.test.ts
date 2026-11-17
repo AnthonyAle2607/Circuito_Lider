@@ -45,6 +45,12 @@ describe('disponibilidad', () => {
     expect(enc).toMatchObject({ capacidad: 720, libres: 720, alcance: 'nacional', cupoConfirmado: false });
     expect(d.every((x) => diaIso(x.fecha) >= 1)).toBe(true);
   });
+
+  it('publica el tarifario vigente para que el portal muestre el precio mientras se elige', async () => {
+    const r = await m.app.inject('/v1/tarifario');
+    expect(r.statusCode).toBe(200);
+    expect(r.json()).toMatchObject({ version: 1, moneda: 'USD', esEjemplo: true, duraciones: [30, 45, 60] });
+  });
 });
 
 describe('cotizar', () => {

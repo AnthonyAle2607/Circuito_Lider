@@ -103,6 +103,9 @@ importers:
 
   apps/portal:
     dependencies:
+      '@sp/pricing':
+        specifier: workspace:*
+        version: link:../../packages/pricing
       '@sp/schemas':
         specifier: workspace:*
         version: link:../../packages/schemas
