@@ -1,0 +1,17 @@
+# Marca de la plataforma. Nombre y dominio aún por decidir (pregunta abierta 11): este es provisional.
+# Cambiar la marca no debe tocar código (decisión D13).
+nombre: Sistema de Pautas
+lema: Tu anuncio suena en Venezuela
+mascota: Toño
+colores:
+  fondo: "#15100D"
+  superficie: "#211915"
+  texto: "#F2E6D3"
+  texto_suave: "#A8988A"
+  acento: "#E2A746"
+  alerta: "#E5352B"
+tipografias:
+  titulos: Oswald
+  texto: Roboto
+correo:
+  remitente: "no-responder@dominio-por-definir.example"
