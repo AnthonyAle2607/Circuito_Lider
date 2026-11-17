@@ -1,5 +1,5 @@
 import 'server-only';
-import { Preparado } from '@sp/schemas';
+import { Emisora, Parrilla, Preparado } from '@sp/schemas';
 
 const API_URL = process.env.API_URL ?? 'http://127.0.0.1:4100';
 
@@ -11,4 +11,21 @@ export async function estadoDelServidor(): Promise<Preparado | null> {
   } catch {
     return null;
   }
+}
+
+export async function emisoras(): Promise<Emisora[]> {
+  const r = await fetch(`${API_URL}/v1/emisoras`, { next: { revalidate: 60 }, signal: AbortSignal.timeout(5000) });
+  if (!r.ok) throw new Error(`La API respondió ${r.status} al pedir las emisoras`);
+  return Emisora.array().parse(await r.json());
+}
+
+/** null si la emisora no existe. */
+export async function parrilla(slug: string): Promise<Parrilla | null> {
+  const r = await fetch(`${API_URL}/v1/parrilla?emisora=${encodeURIComponent(slug)}`, {
+    next: { revalidate: 60 },
+    signal: AbortSignal.timeout(5000),
+  });
+  if (r.status === 404 || r.status === 400) return null;
+  if (!r.ok) throw new Error(`La API respondió ${r.status} al pedir la parrilla`);
+  return Parrilla.parse(await r.json());
 }

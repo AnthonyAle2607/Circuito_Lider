@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { estadoDelServidor } from '@/lib/api';
 import { leerMarca } from '@/lib/marca';
 
@@ -13,6 +14,14 @@ export default async function Inicio() {
       <p style={{ color: c.acento, letterSpacing: 2, textTransform: 'uppercase', fontSize: 13 }}>Portal del anunciante</p>
       <h1 style={{ fontFamily: 'Oswald, Impact, sans-serif', fontSize: 'clamp(40px, 8vw, 72px)', margin: '8px 0' }}>{m.nombre}</h1>
       <p style={{ color: c.texto_suave, fontSize: 18 }}>{m.lema}. En construcción.</p>
+      <p style={{ marginTop: 24 }}>
+        <Link
+          href="/parrilla"
+          style={{ display: 'inline-block', padding: '12px 20px', borderRadius: 999, background: c.acento, color: c.fondo, fontWeight: 600, textDecoration: 'none' }}
+        >
+          Ver la parrilla de las 9 emisoras
+        </Link>
+      </p>
       <section style={{ marginTop: 40, padding: 16, background: c.superficie, borderRadius: 8 }}>
         <strong>Servidor: </strong>
         {estado === null ? (

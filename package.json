@@ -12,7 +12,8 @@
     "typecheck": "turbo run typecheck",
     "test": "turbo run test",
     "db:migrate": "pnpm --filter @sp/db migrate",
-    "iniciar": "node scripts/iniciar.mjs"
+    "iniciar": "node scripts/iniciar.mjs",
+    "cargar-parrilla": "pnpm --filter @sp/catalogo cargar"
   },
   "devDependencies": {
     "@types/node": "^22.10.7",

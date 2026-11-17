@@ -1,0 +1,76 @@
+# Parrilla de Circuito Líder tal como la publica circuitolider.com (revisión del 2026-11-05).
+# Se carga con `pnpm cargar-parrilla`: solo añade lo que falta, nunca pisa lo que el equipo corrigió en el panel.
+#
+# Horas en hora de Venezuela (America/Caracas). Días ISO: 1 = lunes … 7 = domingo.
+# Lo que NO está publicado y queda marcado:
+#  - segundos_tanda: ESTIMADO (pregunta abierta 3). Todas las franjas entran con cupo_confirmado = false.
+#    Supuesto: 4 minutos de tanda por hora de programa (240 s/h).
+#  - Las horas entre programas (música continua) no se publican y no se cargan todavía.
+#  - El 3 Pack en Mérida («L–D en 4 horarios») no publica sus horas: no se carga.
+#  - Play House Líder (21:00–01:00) cruza la medianoche: se parte en 21:00–24:00 y 00:00–01:00 del día siguiente.
+#  - En Mérida, El Brunch (10–12) se cruza con CONVOCADOS (11–13, nacional). Se carga como está publicado;
+#    hay que confirmar con la emisora cuál suena de 11 a 12.
+
+circuito: Circuito Líder
+segundos_por_hora: 240
+
+emisoras:
+  - { slug: caracas,        nombre: Líder Caracas,        ciudad: Caracas,        frecuencia: 94.9 FM }
+  - { slug: valencia,       nombre: Líder Valencia,       ciudad: Valencia,       frecuencia: 106.7 FM }
+  - { slug: merida,         nombre: Líder Mérida,         ciudad: Mérida,         frecuencia: 92.3 FM }
+  - { slug: san-cristobal,  nombre: Líder San Cristóbal,  ciudad: San Cristóbal,  frecuencia: 91.1 FM }
+  - { slug: barquisimeto,   nombre: Líder Barquisimeto,   ciudad: Barquisimeto,   frecuencia: 94.9 FM }
+  - { slug: maracaibo,      nombre: Líder Maracaibo,      ciudad: Maracaibo,      frecuencia: 100.5 FM }
+  - { slug: puerto-ordaz,   nombre: Líder Puerto Ordaz,   ciudad: Puerto Ordaz,   frecuencia: 100.3 FM }
+  - { slug: el-vigia,       nombre: Líder El Vigía,       ciudad: El Vigía,       frecuencia: 100.1 FM }
+  - { slug: puerto-la-cruz, nombre: Líder Puerto La Cruz, ciudad: Puerto La Cruz, frecuencia: 100.5 FM }
+
+# Programas en cadena: suenan a la vez en las nueve emisoras («Hora Nacional»).
+nacionales:
+  - nombre: ENCENDIDOS
+    locutores: Angélica Gómez, Jesús Berbín, Kate Ramos
+    franjas: [{ dias: [1, 2, 3, 4, 5], inicio: "06:00", fin: "09:00" }]
+  - nombre: CONVOCADOS
+    locutores: Guillermo Arcay, Eduardo Pino, Carlos Marcano
+    franjas: [{ dias: [1, 2, 3, 4, 5], inicio: "11:00", fin: "13:00" }]
+  - nombre: AL AIRE
+    locutores: Auri Castillo, Abel Saraiba
+    franjas: [{ dias: [1, 2, 3, 4, 5], inicio: "17:00", fin: "18:00" }]
+
+# Programas locales: solo en su emisora.
+locales:
+  caracas:
+    - nombre: Máximo Volumen
+      locutores: Máximo Ferro
+      franjas: [{ dias: [1, 2, 3, 4, 5], inicio: "09:00", fin: "11:00" }]
+    - nombre: Batita en Líder
+      locutores: Batita González
+      franjas: [{ dias: [1, 2, 3, 4, 5], inicio: "13:00", fin: "15:00" }]
+    - nombre: El 3 Pack
+      locutores: Estella Guerrero
+      franjas: [{ dias: [1, 2, 3, 4, 5], inicio: "15:15", fin: "16:15" }]
+    - nombre: Venezuela Subterránea
+      locutores: DJ 13
+      franjas: [{ dias: [3], inicio: "21:00", fin: "22:00" }]
+    - nombre: Play House Líder
+      locutores: DJ Turntable
+      franjas:
+        - { dias: [5, 6], inicio: "21:00", fin: "24:00" }
+        - { dias: [6, 7], inicio: "00:00", fin: "01:00" }
+    - nombre: Más que To2
+      locutores: Randy Alvarado
+      franjas: [{ dias: [6, 7], inicio: "09:00", fin: "10:00" }]
+  merida:
+    - nombre: El Brunch
+      locutores: Scarlett Vergara
+      franjas: [{ dias: [1, 2, 3, 4, 5], inicio: "10:00", fin: "12:00" }]
+    - nombre: Cambio de Luces
+      locutores: Leo Colella
+      franjas: [{ dias: [1, 2, 3, 4, 5], inicio: "15:00", fin: "17:00" }]
+    - nombre: Tiempo de Juego
+      locutores: Carlos Rangel
+      franjas: [{ dias: [6, 7], inicio: "09:00", fin: "12:00" }]
+  maracaibo:
+    - nombre: Más que To2
+      locutores: Randy Alvarado
+      franjas: [{ dias: [6, 7], inicio: "09:00", fin: "10:00" }]

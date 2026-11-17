@@ -43,6 +43,8 @@ const claves = "ALTER ROLE app_api WITH LOGIN PASSWORD 'app_api_dev'; ALTER ROLE
 if (spawnSync('docker', [...COMPOSE, 'exec', '-T', 'postgres', 'psql', '-q', '-U', 'postgres', '-d', 'pautas', '-c', claves], { stdio: 'ignore' }).status !== 0) {
   fallar('No pude dejar listos los roles app_api y app_worker.');
 }
+// La parrilla de Circuito Líder: solo añade lo que falta, nunca pisa lo corregido en el panel.
+if (!correr('pnpm', ['cargar-parrilla'])) fallar('No se pudo cargar la parrilla (pnpm cargar-parrilla).');
 if (SIN_APPS) {
   console.log('✔ Base, colas y almacén listos.');
   process.exit(0);

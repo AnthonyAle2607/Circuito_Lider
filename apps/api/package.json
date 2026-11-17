@@ -20,7 +20,8 @@
     "@node-rs/argon2": "^2.0.2",
     "@fastify/rate-limit": "^10.2.2",
     "@sp/audit": "workspace:*",
-    "kysely": "^0.27.5"
+    "kysely": "^0.27.5",
+    "@sp/catalogo": "workspace:*"
   },
   "devDependencies": {
     "tsx": "^4.19.2",

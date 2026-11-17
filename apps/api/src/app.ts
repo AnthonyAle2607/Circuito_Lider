@@ -5,7 +5,9 @@ import type { Redis } from 'ioredis';
 import type { Kysely } from 'kysely';
 import type { Database } from '@sp/db';
 import { manejarErrores } from './plugins/errores';
+import { rutasCatalogo } from './routes/catalogo';
 import { rutasCuentas } from './routes/cuentas';
+import { rutasPanelCatalogo } from './routes/panel/catalogo';
 import { rutasSesionEquipo } from './routes/panel/sesion';
 import { rutasSalud, type Comprobaciones } from './routes/salud';
 
@@ -43,6 +45,8 @@ export async function buildApp(op: Opciones): Promise<FastifyInstance> {
       limiteAcceso: limites.acceso,
     });
     await rutasSesionEquipo(app, { db: op.db, mfaKey: op.mfaKey, limiteAcceso: limites.acceso });
+    await rutasCatalogo(app, op.db);
+    await rutasPanelCatalogo(app, op.db);
   }
   return app;
 }

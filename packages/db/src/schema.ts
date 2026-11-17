@@ -93,6 +93,7 @@ export interface CircuitosTabla {
 export interface EmisorasTabla {
   id: Generated<string>;
   circuito_id: string;
+  slug: string;
   nombre: string;
   ciudad: string;
   frecuencia: string;
@@ -108,6 +109,7 @@ export interface ProgramasTabla {
   nombre: string;
   alcance: 'nacional' | 'local';
   descripcion: string | null;
+  locutores: string | null;
   activo: Generated<boolean>;
   creado_at: Generated<Date>;
 }
@@ -120,6 +122,8 @@ export interface FranjasTabla {
   hora_fin: string;
   segundos_tanda: number;
   activa: Generated<boolean>;
+  cupo_confirmado: Generated<boolean>;
+  actualizado_at: Ahora;
   creado_at: Generated<Date>;
 }
 

@@ -18,6 +18,7 @@ El mapa interactivo del plan está en `vault/proyectos/sistema-de-pautas/floorpl
 | Tipos | `pnpm typecheck` |
 | Pruebas | `pnpm test` |
 | Migraciones | `pnpm db:migrate` |
+| Cargar o completar la parrilla de Circuito Líder (no pisa lo corregido en el panel) | `pnpm cargar-parrilla` |
 | Alta de alguien del equipo (imprime clave inicial y enlace del doble factor una sola vez) | `pnpm --filter @sp/api crear-miembro-equipo --email x@invermedia.com --nombre "X" --roles ventas,revisor` |
 | Verificar la bitácora | `select * from bitacora_verificar();` (filas revisadas, primera rota o vacío) |
 | Apagar contenedores | `docker compose -f infra/docker-compose.yml stop` |
@@ -55,6 +56,8 @@ packages/
   schemas/    Contratos compartidos (Zod)
   db/         Conexión (Kysely), tipos de tablas, withTenant, runner de migraciones, base de prueba (PGlite)
   audit/      Bitácora encadenada: registrar() dentro de la transacción y verificar()
+  catalogo/   Parrilla: lectura y validación de datos/*.yaml, carga idempotente y consultas (emisoras, parrilla)
+datos/        circuito-lider.yaml: la parrilla publicada (horas de Venezuela; tanda estimada)
 migrations/   NNNN_nombre.sql; una aplicada no se edita nunca
 config/       marca.yaml (y luego tarifario, validador, agente, pasarela, límites de gasto)
 infra/        docker-compose.yml de desarrollo
@@ -94,4 +97,8 @@ evento que tenga quien lo consuma (el correo de verificación, con n8n).
 - **PT-1 · Base de datos y acceso:** hecho. Migraciones 0001 identidad, 0002 catálogo, 0003 bitácora y outbox; RLS por
   anunciante; registro, verificación de correo, ingreso y salida del anunciante; ingreso del equipo con doble factor.
   Pendiente para cuando haya correo: el despachador del outbox que envía el enlace de verificación.
-- Siguiente: **PT-2 · Catálogo y parrilla** (carga de las 9 emisoras, API de parrilla, edición de franjas en el panel).
+- **PT-2 · Catálogo y parrilla:** hecho. Migración 0004 (slug, locutores, cupo confirmado, claves naturales); carga de
+  las 9 emisoras, 13 programas y 51 franjas; `GET /v1/emisoras`, `GET /v1/parrilla`; panel con ingreso en dos pasos y
+  edición de franjas (`/v1/panel/franjas`), cada cambio en la bitácora; portal `/parrilla`. Los segundos de tanda son
+  estimados (240 s por hora) hasta que Circuito Líder los confirme.
+- Siguiente: **PT-3 · Inventario y precios** (cupos por fecha, tarifario versionado, cotización, reserva sin sobreventa).
