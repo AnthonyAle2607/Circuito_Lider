@@ -24,8 +24,11 @@ emisoras:
   - { slug: puerto-ordaz,   nombre: Líder Puerto Ordaz,   ciudad: Puerto Ordaz,   frecuencia: 100.3 FM }
   - { slug: el-vigia,       nombre: Líder El Vigía,       ciudad: El Vigía,       frecuencia: 100.1 FM }
   - { slug: puerto-la-cruz, nombre: Líder Puerto La Cruz, ciudad: Puerto La Cruz, frecuencia: 100.5 FM }
+  # Añadida el 2026-11-18: el reproductor de circuitolider.com ya la lista, pero su página de programación no publica
+  # programas. Se supone que lleva la cadena nacional, como las demás Líder (confirmar con la emisora).
+  - { slug: margarita,      nombre: Líder Margarita,      ciudad: Margarita,      frecuencia: 97.3 FM }
 
-# Programas en cadena: suenan a la vez en las nueve emisoras («Hora Nacional»).
+# Programas en cadena: suenan a la vez en las diez emisoras («Hora Nacional»).
 nacionales:
   - nombre: ENCENDIDOS
     locutores: Angélica Gómez, Jesús Berbín, Kate Ramos

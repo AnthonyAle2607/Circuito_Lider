@@ -71,9 +71,9 @@ function paquetes(franjas: Map<string, Franja>) {
       clave: 'nacional',
       etiqueta: 'Nacional',
       nombre: 'Red completa',
-      desc: 'Programas en cadena, en las 9 ciudades a la vez.',
+      desc: 'Programas en cadena, en las 10 ciudades a la vez.',
       ids: todas.filter((f) => f.alcance === 'nacional').map((f) => f.id),
-      puntos: ['9 emisoras con un solo spot', 'ENCENDIDOS, CONVOCADOS y AL AIRE', 'De lunes a viernes', 'Certificado de transmisión'],
+      puntos: ['10 emisoras con un solo spot', 'ENCENDIDOS, CONVOCADOS y AL AIRE', 'De lunes a viernes', 'Certificado de transmisión'],
     },
   ];
 }
@@ -391,7 +391,7 @@ export function Venta({ datos }: { datos: DatosVenta }) {
             <h2>
               La programación es tu <span className="tape r">calendario</span>
             </h2>
-            <p>Toca una emisora y luego las horas en las que quieres sonar. Las celdas rojas son programas en cadena nacional: suenan en las nueve emisoras a la vez.</p>
+            <p>Toca una emisora y luego las horas en las que quieres sonar. Las celdas rojas son programas en cadena nacional: suenan en las diez emisoras a la vez.</p>
           </div>
           {!t && <div className="aviso error">Todavía no hay tarifario publicado. Vuelve pronto.</div>}
           <div className="tuner">

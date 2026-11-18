@@ -6,11 +6,11 @@
 export const ANTES_DE_VENTA = String.raw`  <section class="hero">
     <div class="wrap">
       <span class="onair"><i aria-hidden="true"></i><span id="liveNow">Al aire</span></span>
-      <h1><span class="wd" style="--i:0">Tu</span> <span class="wd" style="--i:1">anuncio</span> <span class="wd" style="--i:2">en</span> <span class="tape">9&nbsp;radios</span> <span class="wd" style="--i:3">de</span> <span class="wd" style="--i:4">Venezuela.</span></h1>
-      <p class="lead">Invermedia pone tu marca en nueve emisoras, con un equipo que trabaja tu pauta en cada una. Eliges la hora, subes tu spot y pagas en línea desde cualquier país. Te enviamos la prueba de cada emisión.</p>
+      <h1><span class="wd" style="--i:0">Tu</span> <span class="wd" style="--i:1">anuncio</span> <span class="wd" style="--i:2">en</span> <span class="tape">10&nbsp;radios</span> <span class="wd" style="--i:3">de</span> <span class="wd" style="--i:4">Venezuela.</span></h1>
+      <p class="lead">Invermedia pone tu marca en diez emisoras, con un equipo que trabaja tu pauta en cada una. Eliges la hora, subes tu spot y pagas en línea desde cualquier país. Te enviamos la prueba de cada emisión.</p>
       <div class="ctas"><a class="btn primary" href="#cotizar">Cotizar mi pauta <span class="arrow">→</span></a><a class="btn" href="#paquetes">Ver paquetes</a></div>
     </div>
-    <svg class="newsroom" id="newsroom" viewBox="0 0 1200 660" role="img" aria-label="Redacción de radio con nueve agentes, cada uno en su emisora: Caracas, Valencia, Maracaibo, Barquisimeto, Mérida, San Cristóbal, El Vigía, Puerto Ordaz y Puerto La Cruz"></svg>
+    <svg class="newsroom" id="newsroom" viewBox="0 0 1200 660" role="img" aria-label="Redacción de radio con diez agentes, cada uno en su emisora: Caracas, Valencia, Maracaibo, Barquisimeto, Mérida, San Cristóbal, El Vigía, Puerto Ordaz, Puerto La Cruz y Margarita"></svg>
   </section>
 
   <!-- PROGRAMAS -->
@@ -37,7 +37,7 @@ export const ANTES_DE_VENTA = String.raw`  <section class="hero">
           <div><h3>Elige las emisoras</h3><p>Toda la red o ciudad por ciudad: Caracas, Valencia, Maracaibo y seis más.</p></div>
           <div class="ui" aria-hidden="true"><div class="bar"><span class="t">Emisoras</span><span class="t" id="u1c">0 de 9</span></div><div class="chips" id="u1"></div></div></div>
         <div class="step" data-s="2"><span class="n">2</span>
-          <div><h3>Marca las horas</h3><p>La programación real, hora por hora. Las franjas en rojo son programas en cadena: suenan en las nueve emisoras a la vez.</p></div>
+          <div><h3>Marca las horas</h3><p>La programación real, hora por hora. Las franjas en rojo son programas en cadena: suenan en las diez emisoras a la vez.</p></div>
           <div class="ui" aria-hidden="true"><div class="bar"><span class="t">Lun – Dom · 06:00 a 12:00</span><span class="t" id="u2c">0 franjas</span></div><div class="mini" id="u2"></div></div></div>
         <div class="step" data-s="3"><span class="n">3</span>
           <div><h3>Sube y revisamos</h3><p>Tu comercial de 30 a 60 segundos. Una persona lo revisa según la normativa de CONATEL antes de programarlo.</p></div>
@@ -53,11 +53,11 @@ export const ANTES_DE_VENTA = String.raw`  <section class="hero">
   <!-- CÍRCULO DE EMISORAS -->
   <section class="ringsec band-w" id="emisoras">
     <div class="wrap ring-wrap">
-      <div class="sec-head rv" style="margin:0"><span class="label">Cobertura</span><h2>Una compra. <span class="tape">Nueve emisoras.</span></h2><p>Los programas en cadena nacional suenan en todo el circuito al mismo tiempo. Las franjas locales, solo donde las elijas. Arrastra el círculo para girarlo.</p>
+      <div class="sec-head rv" style="margin:0"><span class="label">Cobertura</span><h2>Una compra. <span class="tape">Diez emisoras.</span></h2><p>Los programas en cadena nacional suenan en todo el circuito al mismo tiempo. Las franjas locales, solo donde las elijas. Arrastra el círculo para girarlo.</p>
         <div class="ctas" style="justify-content:flex-start"><a class="btn m" href="#paquetes">Ver paquetes <span class="arrow">→</span></a></div></div>
-      <div class="wheel" id="wheel" aria-label="Las nueve emisoras de Circuito Líder">
+      <div class="wheel" id="wheel" aria-label="Las diez emisoras de Circuito Líder">
         <div class="orbit" id="orbit"></div>
-        <div class="dial" aria-hidden="true"><div class="face"></div><div class="tk" id="ticks"></div><div class="needle"></div><div class="knob"></div><span class="cnt">9 emisoras FM</span></div>
+        <div class="dial" aria-hidden="true"><div class="face"></div><div class="tk" id="ticks"></div><div class="needle"></div><div class="knob"></div><span class="cnt">10 emisoras FM</span></div>
       </div>
     </div>
   </section>`;
@@ -86,7 +86,7 @@ export const DESPUES_DE_VENTA = String.raw`  <!-- SUGERENCIAS -->
           <div class="it" style="transition-delay:270ms"><span class="mk">✕</span>Transferir a cada emisora por separado</div>
           <div class="it" style="transition-delay:360ms"><span class="mk">✕</span>Confiar en que salió al aire</div></div>
         <div class="col us"><h3>Con Invermedia</h3>
-          <div class="it" style="transition-delay:120ms"><span class="mk">✓</span>Nueve emisoras en una sola compra</div>
+          <div class="it" style="transition-delay:120ms"><span class="mk">✓</span>Diez emisoras en una sola compra</div>
           <div class="it" style="transition-delay:210ms"><span class="mk">✓</span>Precio al instante, mientras eliges</div>
           <div class="it" style="transition-delay:300ms"><span class="mk">✓</span>Una persona revisa tu spot y te dice qué cambiar</div>
           <div class="it" style="transition-delay:390ms"><span class="mk">✓</span>Un solo pago en línea</div>
@@ -111,7 +111,7 @@ export const DESPUES_DE_VENTA = String.raw`  <!-- SUGERENCIAS -->
     <div class="wrap">
       <div class="sec-head rv"><span class="label">Preguntas</span><h2>Antes de comprar</h2></div>
       <details><summary>¿Puedo comprar desde fuera de Venezuela?</summary><p>Sí. La plataforma está pensada para anunciantes en el exterior. Los medios de pago y las monedas se confirman antes del lanzamiento.</p></details>
-      <details><summary>¿Qué vendemos hoy?</summary><p>Comerciales grabados de 30 a 60 segundos en las nueve emisoras de Circuito Líder. La mención en vivo del locutor y el patrocinio de programas llegan después.</p></details>
+      <details><summary>¿Qué vendemos hoy?</summary><p>Comerciales grabados de 30 a 60 segundos en las diez emisoras de Circuito Líder. La mención en vivo del locutor y el patrocinio de programas llegan después.</p></details>
       <details><summary>¿Qué pasa si mi spot no cumple la normativa?</summary><p>Te avisamos con el motivo y lo que hay que cambiar antes de programarlo.</p></details>
       <details><summary>¿Cómo sé que salió al aire?</summary><p>Cada emisión aparece en tu panel y al final recibes un certificado con fecha, hora y emisora.</p></details>
       <details><summary>Prefiero que alguien me ayude.</summary><p>El equipo de ventas arma la pauta contigo por correo o WhatsApp.</p></details>

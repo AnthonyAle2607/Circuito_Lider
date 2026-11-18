@@ -20,16 +20,16 @@ export function iniciarEfectos(): () => void {
  const clearInterval = (id) => { window.clearInterval(id); tiempos.delete(id); };
 const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
 const $=s=>document.querySelector(s);
-const ST=[{c:"Caracas",f:"94.9",p:14},{c:"Valencia",f:"106.7",p:10},{c:"Maracaibo",f:"100.5",p:10},{c:"Barquisimeto",f:"94.9",p:8},{c:"Mérida",f:"92.3",p:6},{c:"San Cristóbal",f:"91.1",p:6},{c:"El Vigía",f:"100.1",p:5},{c:"Puerto Ordaz",f:"100.3",p:7},{c:"Puerto La Cruz",f:"100.5",p:7}];
+const ST=[{c:"Caracas",f:"94.9",p:14},{c:"Valencia",f:"106.7",p:10},{c:"Maracaibo",f:"100.5",p:10},{c:"Barquisimeto",f:"94.9",p:8},{c:"Mérida",f:"92.3",p:6},{c:"San Cristóbal",f:"91.1",p:6},{c:"El Vigía",f:"100.1",p:5},{c:"Puerto Ordaz",f:"100.3",p:7},{c:"Puerto La Cruz",f:"100.5",p:7},{c:"Margarita",f:"97.3",p:5}];
 const money=n=>"$"+Math.round(n).toLocaleString("es-VE");
 const ease=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
 
-/* ===== Héroe: redacción con 9 agentes, uno por emisora ===== */
+/* ===== Héroe: redacción con 10 agentes, uno por emisora ===== */
 (function newsroom(){
  const C={ink:"#2E123E",ink2:"#3E1A52",ink3:"#52266B",line:"#5E3A75",cream:"#FFFFFF",mustard:"#FE6B00",red:"#FE6B00",wine:"#3E1A52",desk:"#251036",deskTop:"#52266B"};
- const SKIN=["#8D5A3B","#C68B62","#5E3A26","#E0B08A","#A86F4C","#704328","#D79F78","#B67B55","#4E2F1F"];
- const HAIR=["#2E123E","#3A2418","#2E123E","#6B3E22","#2E123E","#2A1A12","#8A5530","#2E123E","#2A1A12"];
- const SHIRT=[C.mustard,C.cream,C.red,C.wine,C.mustard,C.cream,C.wine,C.red,C.cream];
+ const SKIN=["#8D5A3B","#C68B62","#5E3A26","#E0B08A","#A86F4C","#704328","#D79F78","#B67B55","#4E2F1F","#C68B62"];
+ const HAIR=["#2E123E","#3A2418","#2E123E","#6B3E22","#2E123E","#2A1A12","#8A5530","#2E123E","#2A1A12","#6B3E22"];
+ const SHIRT=[C.mustard,C.cream,C.red,C.wine,C.mustard,C.cream,C.wine,C.red,C.cream,C.mustard];
  const RADIO=[C.red,C.mustard,C.cream,C.red,C.cream,C.mustard,C.red,C.cream,C.mustard];
  const svg=$("#newsroom");const NS="http://www.w3.org/2000/svg";
  const el=(t,a={},p)=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);if(p)p.appendChild(e);return e};
@@ -105,15 +105,15 @@ const ease=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
   const bt=el("text",{x:0,y:4,"text-anchor":"middle",fill:C.ink,"font-size":13,"font-weight":700},bi);
   bubbles.push({g:bi,t:bt,st});
  }
- // fila de atrás (4) y fila de adelante (5)
- const back=[[5,330],[6,510],[7,690],[8,870]],front=[[0,150],[1,375],[2,600],[3,825],[4,1050]];
+ // fila de atrás (4) y fila de adelante (6, un poco más chica para que quepan)
+ const back=[[5,330],[6,510],[7,690],[8,870]],front=[[0,95],[1,291],[2,487],[3,683],[4,879],[9,1075]];
  const rowBack=g(root),deskBack=g(root),itemsBack=g(root),rowFront=g(root),deskFront=g(root),itemsFront=g(root);
  back.forEach(([i,x],k)=>agent(rowBack,i,ST[i],x,402,.78,200+k*110));
  el("rect",{x:210,y:400,width:780,height:44,rx:6,fill:C.desk},deskBack);el("rect",{x:210,y:398,width:780,height:6,fill:C.deskTop},deskBack);
  back.forEach(([i,x],k)=>deskItems(itemsBack,i,ST[i],x,402,.78,200+k*110));
- front.forEach(([i,x],k)=>agent(rowFront,i,ST[i],x,560,1,650+k*110));
+ front.forEach(([i,x],k)=>agent(rowFront,i,ST[i],x,560,.9,650+k*110));
  el("rect",{x:20,y:558,width:1160,height:102,rx:10,fill:C.desk},deskFront);el("rect",{x:20,y:556,width:1160,height:8,fill:C.deskTop},deskFront);
- front.forEach(([i,x],k)=>deskItems(itemsFront,i,ST[i],x,560,1,650+k*110));
+ front.forEach(([i,x],k)=>deskItems(itemsFront,i,ST[i],x,560,.9,650+k*110));
  // cada radio sintoniza su frecuencia al aparecer
  lcds.forEach(({t,to,delay})=>{if(reduce){t.textContent=to.toFixed(1);return}luego(()=>{const t0=performance.now();(function f(now){const p=Math.min(1,(now-t0)/1100);t.textContent=(88+(to-88)*ease(p)).toFixed(1);if(p<1)raf(f)})(t0)},delay+400)});
  // tareas que cambian: tres burbujas visibles a la vez
@@ -133,7 +133,7 @@ function flapTo(el,text){text=text.toUpperCase();[...el.childNodes].forEach(n=>{
 const fmtH=h=>String(Math.floor(h)%24).padStart(2,"0")+":"+String(Math.round(h%1*60)).padStart(2,"0");
 let flapI=0;(function liveNow(){const u=new Date(Date.now()-4*3600e3),day=u.getUTCDay(),h=u.getUTCHours()+u.getUTCMinutes()/60;const cur=SHOWS.find(s=>s.d.includes(day)&&h>=s.a&&h<s.b);
  const nx=SHOWS.filter(s=>s.d.includes(day)&&s.a>h).sort((a,b)=>a.a-b.a)[0];
- const msgs=[cur?(cur.nat?`Al aire ${cur.n}`:`Al aire ${cur.n}`):"Al aire musica",nx?`Sigue ${nx.n} ${fmtH(nx.a)}`:"Mañana ENCENDIDOS 06:00","9 emisoras 9 ciudades"];
+ const msgs=[cur?(cur.nat?`Al aire ${cur.n}`:`Al aire ${cur.n}`):"Al aire musica",nx?`Sigue ${nx.n} ${fmtH(nx.a)}`:"Mañana ENCENDIDOS 06:00","10 emisoras 10 ciudades"];
  flapTo($("#liveNow"),msgs[flapI++%msgs.length]);luego(liveNow,reduce?60000:4800)})();
 
 /* odómetro: cada dígito rueda hasta su valor */
@@ -258,7 +258,7 @@ document.querySelectorAll(".sug").forEach(c=>c.querySelectorAll("button").forEac
   comprar:"Es así: <b>1)</b> eliges emisoras y horas en la parrilla, <b>2)</b> subes tu spot de 30 a 60 s, <b>3)</b> una persona lo revisa y pagas en línea, <b>4)</b> recibes la prueba de cada emisión. <a href=\"#como\">Ver los pasos</a>",
   precios:"El precio sale al instante en el <a href=\"#cotizar\">cotizador</a>: eliges emisoras, horas y semanas y ves el total. Los <a href=\"#paquetes\">paquetes</a> son un buen punto de partida.",
   exterior:"¡Sí! La plataforma está pensada para anunciantes fuera de Venezuela. Los medios de pago y las monedas se confirman antes del lanzamiento.",
-  emisoras:"Son 9 emisoras de Circuito Líder: Caracas 94.9, Valencia 106.7, Maracaibo 100.5, Barquisimeto 94.9, Mérida 92.3, San Cristóbal 91.1, El Vigía 100.1, Puerto Ordaz 100.3 y Puerto La Cruz 100.5.",
+  emisoras:"Son 10 emisoras de Circuito Líder: Caracas 94.9, Valencia 106.7, Maracaibo 100.5, Barquisimeto 94.9, Mérida 92.3, San Cristóbal 91.1, El Vigía 100.1, Puerto Ordaz 100.3, Puerto La Cruz 100.5 y Margarita 97.3.",
   certificado:"Cada emisión aparece en tu panel con hora y emisora, y al cerrar la campaña te llega el certificado de transmisión. 📄",
   normativa:"Una persona escucha tu spot y lo revisa según la normativa de CONATEL. Si algo no cumple, te decimos qué cambiar antes de programarlo.",
   formatos:"Hoy vendemos comerciales grabados de 30 a 60 segundos. La mención en vivo del locutor y el patrocinio de programas llegan después.",

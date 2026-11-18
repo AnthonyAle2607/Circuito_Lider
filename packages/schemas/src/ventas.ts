@@ -53,7 +53,7 @@ export const Cotizacion = z.object({
       fecha: z.string(),
       programa: z.string(),
       alcance: z.enum(['nacional', 'local']),
-      /** Ciudad de la emisora, o «9 emisoras» si es en cadena. */
+      /** Ciudad de la emisora, o «10 emisoras» si es en cadena. */
       donde: z.string(),
       inicio: z.string(),
       fin: z.string(),

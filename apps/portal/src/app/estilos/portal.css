@@ -50,8 +50,8 @@
 button.btn{cursor:pointer;font:inherit}
 button.btn[disabled]{opacity:.5;cursor:not-allowed}
 
-/* En teléfonos angostos, la cinta «9 radios» del héroe (no se parte) cabía justo en la maqueta y se salía con 375 px. */
-@media (max-width:430px){.hero h1{font-size:clamp(38px,10.8vw,62px)}}
+/* En teléfonos angostos, la cinta «10 radios» del héroe (no se parte) cabía justo en la maqueta y se salía con 375 px. */
+@media (max-width:430px){.hero h1{font-size:clamp(36px,9.6vw,62px)}}
 
 /* cotizador real: filas por programa y horario, columnas por día */
 .grid.real th:first-child{width:190px}

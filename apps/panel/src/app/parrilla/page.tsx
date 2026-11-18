@@ -56,7 +56,7 @@ export default async function PanelParrilla({ searchParams }: { searchParams: Pr
       {q.aviso && <p role="status" style={{ color: c.acento }}>{q.aviso}</p>}
       {q.error && <p role="alert" style={{ color: c.alerta }}>{q.error}</p>}
       <p style={{ color: c.texto_suave, fontSize: 14 }}>
-        {estimadas} de {filas.length} franjas tienen la tanda <strong>estimada</strong> (sin confirmar con la emisora). Los cambios en programas en cadena afectan a las 9 emisoras. Cada cambio queda en la bitácora.
+        {estimadas} de {filas.length} franjas tienen la tanda <strong>estimada</strong> (sin confirmar con la emisora). Los cambios en programas en cadena afectan a las 10 emisoras. Cada cambio queda en la bitácora.
       </p>
 
       <div style={{ overflowX: 'auto', background: c.superficie, borderRadius: 8 }}>

@@ -10,9 +10,9 @@ afterAll(() => b.cerrar());
 const archivo = leerArchivoParrilla(ARCHIVO);
 
 describe('archivo de Circuito Líder', () => {
-  it('tiene las nueve emisoras con frecuencias válidas', () => {
-    expect(archivo.emisoras).toHaveLength(9);
-    expect(new Set(archivo.emisoras.map((e) => e.slug)).size).toBe(9);
+  it('tiene las diez emisoras con frecuencias válidas', () => {
+    expect(archivo.emisoras).toHaveLength(10);
+    expect(new Set(archivo.emisoras.map((e) => e.slug)).size).toBe(10);
   });
 
   it('rechaza una franja que cruza la medianoche sin partir', () => {
@@ -35,7 +35,7 @@ describe('archivo de Circuito Líder', () => {
 describe('carga', () => {
   it('carga todo una vez y repetirla no duplica', async () => {
     const r1 = await cargarParrilla(b.db, archivo);
-    expect(r1.emisoras).toBe(9);
+    expect(r1.emisoras).toBe(10);
     expect(r1.programas).toBe(3 + 6 + 3 + 1);
     const r2 = await cargarParrilla(b.db, archivo);
     expect(r2).toEqual({ emisoras: 0, programas: 0, franjas: 0 });
@@ -60,7 +60,7 @@ describe('consultas (con el rol de la API)', () => {
     const e = await listarEmisoras(b.db);
     await b.comoDueno();
     expect(e.map((x) => x.slug)).toContain('caracas');
-    expect(e).toHaveLength(9);
+    expect(e).toHaveLength(10);
   });
 
   it('la parrilla de Caracas trae los nacionales y sus locales, no los de Mérida', async () => {

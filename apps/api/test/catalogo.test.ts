@@ -24,10 +24,10 @@ const franjaDeEncendidosLunes = async () =>
   (await m.q<{ id: string }>(`SELECT f.id FROM franjas f JOIN programas p ON p.id = f.programa_id WHERE p.nombre = 'ENCENDIDOS' AND f.dia_semana = 1`))[0]!.id;
 
 describe('catálogo público', () => {
-  it('lista las nueve emisoras sin sesión', async () => {
+  it('lista las diez emisoras sin sesión', async () => {
     const r = await m.app.inject('/v1/emisoras');
     expect(r.statusCode).toBe(200);
-    expect(Emisora.array().parse(r.json())).toHaveLength(9);
+    expect(Emisora.array().parse(r.json())).toHaveLength(10);
     expect(r.headers['cache-control']).toBe('public, max-age=60');
   });
 

@@ -78,7 +78,7 @@ export default async function PaginaParrilla({ searchParams }: { searchParams: P
         {p.emisora.nombre} · {p.emisora.frecuencia}
       </h2>
       <p style={{ color: c.texto_suave, fontSize: 14, margin: '0 0 24px' }}>
-        <span style={{ color: c.acento }}>■</span> En cadena: suena en las 9 ciudades a la vez ·{' '}
+        <span style={{ color: c.acento }}>■</span> En cadena: suena en las 10 ciudades a la vez ·{' '}
         <span style={{ color: c.alerta }}>■</span> Local: solo en {p.emisora.ciudad}
       </p>
 

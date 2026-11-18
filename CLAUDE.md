@@ -1,6 +1,6 @@
 # Sistema de Pautas Comerciales
 
-Plataforma de Invermedia donde anunciantes del exterior compran espacios de radio en las nueve emisoras de Circuito
+Plataforma de Invermedia donde anunciantes del exterior compran espacios de radio en las diez emisoras de Circuito
 Líder: conversan con Toño (agente vendedor con IA), cotizan, reservan, pagan por pasarela y suben su comercial grabado;
 el equipo revisa el spot, programa y certifica cada emisión. Fase 1: solo Circuito Líder y solo comerciales grabados.
 
@@ -106,7 +106,7 @@ evento que tenga quien lo consuma (el correo de verificación, con n8n).
   anunciante; registro, verificación de correo, ingreso y salida del anunciante; ingreso del equipo con doble factor.
   Pendiente para cuando haya correo: el despachador del outbox que envía el enlace de verificación.
 - **PT-2 · Catálogo y parrilla:** hecho. Migración 0004 (slug, locutores, cupo confirmado, claves naturales); carga de
-  las 9 emisoras, 13 programas y 51 franjas; `GET /v1/emisoras`, `GET /v1/parrilla`; panel con ingreso en dos pasos y
+  las 9 emisoras, 13 programas y 51 franjas (Margarita 97.3 se añadió el 2026-11-18: 10 emisoras, sin programas locales publicados); `GET /v1/emisoras`, `GET /v1/parrilla`; panel con ingreso en dos pasos y
   edición de franjas (`/v1/panel/franjas`), cada cambio en la bitácora; portal `/parrilla`. Los segundos de tanda son
   estimados (240 s por hora) hasta que Circuito Líder los confirme.
 - **PT-3 · Inventario y precios:** hecho. Migración 0005; tarifario versionado e inmutable (P4) con uno de EJEMPLO;
