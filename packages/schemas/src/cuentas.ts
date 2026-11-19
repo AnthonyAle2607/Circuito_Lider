@@ -56,16 +56,17 @@ export const CambioClave = z.object({
 
 export const Yo = z.object({
   usuario: z.object({ id: z.string(), nombre: z.string(), email: z.string(), correoVerificado: z.boolean() }),
+  /** Los datos de empresa admiten faltar (respuesta de una API anterior): el panel nunca debe caerse por eso. */
   anunciante: z.object({
     id: z.string(),
     empresa: z.string(),
     pais: z.string(),
     zonaHoraria: z.string(),
-    idFiscal: z.string().nullable(),
-    sector: z.string().nullable(),
-    sitioWeb: z.string().nullable(),
-    telefono: z.string().nullable(),
-    direccion: z.string().nullable(),
+    idFiscal: z.string().nullable().default(null),
+    sector: z.string().nullable().default(null),
+    sitioWeb: z.string().nullable().default(null),
+    telefono: z.string().nullable().default(null),
+    direccion: z.string().nullable().default(null),
   }),
 });
 export type Yo = z.infer<typeof Yo>;
