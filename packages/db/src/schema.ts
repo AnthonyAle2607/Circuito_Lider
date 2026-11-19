@@ -256,6 +256,38 @@ export interface ReservasTabla {
   liberada_at: Date | null;
 }
 
+export type EstadoAnuncio = 'procesando' | 'aprobado' | 'en_revision' | 'rechazado';
+
+export interface AnunciosTabla {
+  id: Generated<string>;
+  anunciante_id: string;
+  subido_por: string;
+  nombre: string;
+  archivo_nombre: string;
+  archivo_clave: string;
+  formato: 'mp4' | 'mp3' | 'wav';
+  bytes: number;
+  duracion_ms: number | null;
+  estado: Generated<EstadoAnuncio>;
+  motivo: string | null;
+  transcripcion: string | null;
+  coincidencias: Generated<unknown>;
+  intentos: Generated<number>;
+  tomado_at: Date | null;
+  revisado_por: string | null;
+  revisado_at: Date | null;
+  creado_at: Generated<Date>;
+  actualizado_at: Generated<Date>;
+}
+
+export interface PalabrasProhibidasTabla {
+  id: Generated<number>;
+  palabra: string;
+  categoria: string;
+  activa: Generated<boolean>;
+  creado_at: Generated<Date>;
+}
+
 export interface Database {
   anunciantes: AnunciantesTabla;
   usuarios: UsuariosTabla;
@@ -277,4 +309,6 @@ export interface Database {
   pedidos: PedidosTabla;
   cupos: CuposTabla;
   reservas: ReservasTabla;
+  anuncios: AnunciosTabla;
+  palabras_prohibidas: PalabrasProhibidasTabla;
 }

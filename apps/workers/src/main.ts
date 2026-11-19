@@ -1,7 +1,10 @@
 import { Queue, Worker } from 'bullmq';
 import { Redis } from 'ioredis';
 import pg from 'pg';
-import { COLAS, LATIDO, LIBERAR, latir, liberarReservas } from './colas';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { almacenS3, configS3DelEntorno, leerReglas, revisarSpot, transcriptorDelEntorno } from '@sp/spots';
+import { COLAS, LATIDO, LIBERAR, REVISAR, latir, liberarReservas, revisarAnuncios } from './colas';
 
 const redisUrl = process.env.REDIS_URL;
 const dbUrl = process.env.DATABASE_URL_WORKER;
@@ -21,6 +24,14 @@ const cola = new Queue(COLAS.sistema, { connection: conexion });
 await cola.upsertJobScheduler('latido', { every: LATIDO.cadaMs }, { name: LATIDO.trabajo });
 await cola.upsertJobScheduler('liberar-reservas', { every: LIBERAR.cadaMs }, { name: LIBERAR.trabajo });
 
+// PT-6: revisión de anuncios. Sin MinIO no hay archivos que revisar; sin Whisper todo pasa a revisión humana.
+const s3 = configS3DelEntorno();
+const reglas = leerReglas(resolve(dirname(fileURLToPath(import.meta.url)), '../../../config/spots.yaml'));
+const transcriptor = transcriptorDelEntorno();
+const herramientas = s3 ? { almacen: almacenS3(s3), transcriptor } : null;
+if (herramientas) await cola.upsertJobScheduler('revisar-anuncios', { every: REVISAR.cadaMs }, { name: REVISAR.trabajo });
+log('revisión de anuncios', { almacen: Boolean(s3), transcriptor: transcriptor?.nombre ?? 'ninguno (todo a revisión humana)' });
+
 const trabajador = new Worker(
   COLAS.sistema,
   async (job) => {
@@ -28,6 +39,9 @@ const trabajador = new Worker(
     if (job.name === LIBERAR.trabajo) {
       const n = await liberarReservas(db);
       if (n > 0) log('reservas vencidas liberadas', { pedidos: n });
+    }
+    if (job.name === REVISAR.trabajo && herramientas) {
+      await revisarAnuncios(db, (spot, prohibidas) => revisarSpot(herramientas, spot, reglas, prohibidas), log);
     }
   },
   { connection: conexion },

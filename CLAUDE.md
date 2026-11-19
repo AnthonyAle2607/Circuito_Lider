@@ -129,4 +129,9 @@ evento que tenga quien lo consuma (el correo de verificación, con n8n).
   `componentes/Radio.tsx`: sigue sonando al navegar), qué suena ahora y después (`lib/vivo.ts`, hora de Caracas) y la
   ficha de cada programa. Migración `0007_vitrina` (`emisoras.stream_url`, `emisoras.descripcion`); los textos de
   `datos/circuito-lider.yaml` son PROVISIONALES y el cargador solo completa lo que falta.
-- Siguiente: **PT-6 · Spots y validador** (reglas en `config/spots.yaml`), **PT-5 · Pagos** y **PT-5b · Agente vendedor**.
+- **PT-6 · Subida y revisión de spots** (2026-11-19): `/cuenta/anuncios` sube MP4/MP3/WAV (≤60 MB) a MinIO; el trabajo
+  `revisar-anuncios` (cada 10 s, `@sp/spots`) mide con ffprobe, rechaza lo que pasa de 40 s, transcribe con whisper.cpp
+  (`WHISPER_BIN`, `WHISPER_MODEL`) y busca `palabras_prohibidas` (`pnpm cargar-palabras`); una coincidencia o la falta de
+  transcripción lo mandan a revisión humana en el panel (`/anuncios`, rol revisor). Migración `0008_anuncios`: la API no
+  cambia estados; lo hacen `resolver_anuncio()` (trabajos) y `decidir_anuncio()` (revisor).
+- Siguiente: instalar whisper.cpp y su modelo; **PT-5 · Pagos**, **PT-7 · Grabación y certificado** y **PT-5b · Agente vendedor**.

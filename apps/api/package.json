@@ -12,22 +12,24 @@
   },
   "dependencies": {
     "@fastify/helmet": "^13.0.1",
-    "@sp/db": "workspace:*",
-    "@sp/schemas": "workspace:*",
-    "fastify": "^5.2.1",
-    "ioredis": "^5.4.2",
-    "zod": "^3.24.1",
-    "@node-rs/argon2": "^2.0.2",
+    "@fastify/multipart": "9.0.3",
     "@fastify/rate-limit": "^10.2.2",
+    "@node-rs/argon2": "^2.0.2",
     "@sp/audit": "workspace:*",
-    "kysely": "^0.27.5",
     "@sp/catalogo": "workspace:*",
     "@sp/core-fsm": "workspace:*",
+    "@sp/db": "workspace:*",
+    "@sp/inventory": "workspace:*",
     "@sp/pricing": "workspace:*",
-    "@sp/inventory": "workspace:*"
+    "@sp/schemas": "workspace:*",
+    "@sp/spots": "workspace:^",
+    "fastify": "^5.2.1",
+    "ioredis": "^5.4.2",
+    "kysely": "^0.27.5",
+    "zod": "^3.24.1"
   },
   "devDependencies": {
-    "tsx": "^4.19.2",
-    "@electric-sql/pglite": "^0.2.17"
+    "@electric-sql/pglite": "^0.2.17",
+    "tsx": "^4.19.2"
   }
 }

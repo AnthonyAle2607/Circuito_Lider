@@ -30,3 +30,53 @@ export async function liberarReservas(db: { query(sql: string): Promise<{ rows: 
   const r = await db.query('select liberar_reservas_vencidas() as n');
   return Number(r.rows[0]?.n ?? 0);
 }
+
+/** PT-6: cada 10 s se revisan los anuncios subidos (duración, transcripción y palabras prohibidas). */
+export const REVISAR = {
+  trabajo: 'revisar-anuncios',
+  cadaMs: 10_000,
+  /** Cuántos anuncios por pasada, para no tapar la cola si llegan muchos juntos. */
+  porPasada: 5,
+} as const;
+
+type Consulta = { query(sql: string, params?: unknown[]): Promise<{ rows: Array<Record<string, unknown>> }> };
+
+/**
+ * Toma anuncios pendientes (función de la base, sin que dos trabajadores tomen el mismo), los revisa y guarda el
+ * resultado. Si algo falla con uno, queda «procesando» y se reintenta; a los 3 intentos pasa a revisión humana.
+ */
+export async function revisarAnuncios(
+  db: Consulta,
+  revisar: (spot: { clave: string; formato: string }, prohibidas: string[]) => Promise<{
+    estado: string;
+    motivo: string | null;
+    duracionMs: number | null;
+    transcripcion: string | null;
+    coincidencias: unknown[];
+  }>,
+  log: (msg: string, extra?: Record<string, unknown>) => void = () => {},
+): Promise<number> {
+  const palabras = (await db.query('SELECT palabra FROM palabras_prohibidas WHERE activa')).rows.map((r) => String(r.palabra));
+  let n = 0;
+  for (let i = 0; i < REVISAR.porPasada; i++) {
+    const { rows } = await db.query('SELECT * FROM tomar_anuncio_pendiente()');
+    const a = rows[0];
+    if (!a) break;
+    try {
+      const r = await revisar({ clave: String(a.archivo_clave), formato: String(a.formato) }, palabras);
+      await db.query('SELECT resolver_anuncio($1, $2, $3, $4, $5, $6)', [
+        a.id,
+        r.estado,
+        r.motivo,
+        r.duracionMs,
+        r.transcripcion,
+        JSON.stringify(r.coincidencias),
+      ]);
+      log('anuncio revisado', { anuncio: a.id, estado: r.estado });
+      n++;
+    } catch (e) {
+      log('no se pudo revisar un anuncio', { anuncio: a.id, intento: a.intentos, error: (e as Error).message });
+    }
+  }
+  return n;
+}

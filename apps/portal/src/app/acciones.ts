@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
-import { COOKIE_SESION, api, opcionesCookie, sesionActual } from '@/lib/sesion';
+import { API_URL, COOKIE_SESION, api, opcionesCookie, sesionActual } from '@/lib/sesion';
 
 type ErrorApi = { error?: string; mensaje?: string; faltantes?: Array<{ franjaId: string; fecha: string }> };
 const COOKIE_VOLVER = 'sp_volver';
@@ -141,4 +141,29 @@ export async function cambiarClave(f: FormData) {
   if (r.status === 401) redirect('/ingresar?siguiente=/cuenta/seguridad');
   if (!r.ok) redirect(conError('/cuenta/seguridad', r.datos?.mensaje ?? 'No pudimos cambiar la clave.'));
   redirect('/cuenta/seguridad?ok=clave');
+}
+
+// ── anuncios ─────────────────────────────────────────────────────────────────
+/** Sube el spot a la API con la sesión del anunciante. Devuelve un mensaje para el formulario. */
+export async function subirAnuncio(f: FormData): Promise<{ ok: true } | { ok: false; mensaje: string }> {
+  const token = await sesionActual();
+  if (!token) return { ok: false, mensaje: 'Tu sesión venció. Vuelve a ingresar.' };
+  const archivo = f.get('archivo');
+  if (!(archivo instanceof File) || archivo.size === 0) return { ok: false, mensaje: 'Elige el archivo de tu anuncio.' };
+  const cuerpo = new FormData();
+  cuerpo.set('nombre', texto(f, 'nombre'));
+  cuerpo.set('archivo', archivo, archivo.name);
+  const r = await fetch(`${API_URL}/v1/anuncios`, {
+    method: 'POST',
+    body: cuerpo,
+    headers: { authorization: `Bearer ${token}` },
+    cache: 'no-store',
+    signal: AbortSignal.timeout(120_000),
+  });
+  if (!r.ok) {
+    const e = (await r.json().catch(() => null)) as ErrorApi | null;
+    return { ok: false, mensaje: e?.mensaje ?? 'No pudimos subir el anuncio. Intenta de nuevo.' };
+  }
+  revalidatePath('/cuenta/anuncios');
+  return { ok: true };
 }

@@ -8,6 +8,8 @@ const config: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   transpilePackages: ['@sp/schemas', '@sp/pricing'],
+  // Los spots se suben por una acción del servidor: hasta 60 MB (la API pone el mismo tope).
+  experimental: { serverActions: { bodySizeLimit: '61mb' } },
   async headers() {
     return [
       {

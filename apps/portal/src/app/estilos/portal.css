@@ -237,3 +237,16 @@ body.con-radio footer{padding-bottom:96px}
 .porque-item p{margin:0;color:var(--soft);line-height:1.5}
 .porque-boleto{text-align:center;color:var(--soft);margin:0 0 18px}
 @media (max-width:760px){.porque{grid-template-columns:1fr}}
+
+/* ── mis anuncios ───────────────────────────────────────────────────────── */
+.subir input[type="file"]{padding:10px;cursor:pointer}
+.subir input[type="file"]::file-selector-button{background:var(--mustard);color:var(--ink);border:0;border-radius:999px;padding:8px 14px;font:700 14px var(--f-body);margin-right:12px;cursor:pointer}
+.lista-anuncios{display:grid;gap:14px}
+.tarjeta.anuncio{margin-top:0;display:grid;gap:10px}
+.anuncio-cabeza{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}
+.anuncio-cabeza h3{margin:0 0 4px;font:700 22px/1.15 var(--f-display);text-transform:uppercase}
+.anuncio-motivo{margin:0;color:var(--cream)}
+.anuncio-medio{width:100%;max-width:520px;accent-color:var(--mustard)}
+video.anuncio-medio{max-height:240px;border-radius:12px;background:#000}
+.tarjeta.anuncio details summary{cursor:pointer;color:var(--soft)}
+.tarjeta.anuncio details p{color:var(--soft);margin:8px 0 0}

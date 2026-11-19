@@ -59,6 +59,7 @@ jobs:
       # La parrilla y el tarifario de ejemplo se cargan sobre la base real, dos veces (la segunda no debe cambiar nada).
       - run: pnpm cargar-parrilla && pnpm cargar-parrilla
       - run: pnpm cargar-tarifario-ejemplo && pnpm cargar-tarifario-ejemplo
+      - run: pnpm cargar-palabras && pnpm cargar-palabras
       # Criterio de PT-3: 50 reservas simultáneas sobre el último cupo, solo una gana (necesita conexiones reales).
       - name: Concurrencia del inventario
         run: pnpm --filter @sp/inventory exec vitest run test/concurrencia.pg.test.ts

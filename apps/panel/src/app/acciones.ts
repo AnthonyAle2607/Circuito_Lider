@@ -79,3 +79,16 @@ export async function editarFranja(f: FormData) {
   revalidatePath('/parrilla');
   redirect(`${volver}&aviso=${encodeURIComponent('Franja guardada.')}#f-${id}`);
 }
+
+/** Revisión humana de un spot: aprobar, o rechazar con el motivo que leerá el cliente. */
+export async function decidirAnuncio(f: FormData) {
+  const id = texto(f, 'id');
+  const decision = texto(f, 'decision') === 'aprobar' ? 'aprobar' : 'rechazar';
+  const r = await apiEquipo(`/v1/panel/anuncios/${encodeURIComponent(id)}/decision`, {
+    method: 'POST',
+    body: JSON.stringify({ decision, motivo: texto(f, 'motivo') }),
+  });
+  if (!r.ok) redirect(`/anuncios?error=${encodeURIComponent(await mensajeDe(r))}`);
+  revalidatePath('/anuncios');
+  redirect(`/anuncios?aviso=${encodeURIComponent(decision === 'aprobar' ? 'Anuncio aprobado.' : 'Anuncio rechazado; el cliente ve el motivo.')}`);
+}

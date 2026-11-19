@@ -14,7 +14,8 @@
     "db:migrate": "pnpm --filter @sp/db migrate",
     "iniciar": "node scripts/iniciar.mjs",
     "cargar-parrilla": "pnpm --filter @sp/catalogo cargar",
-    "cargar-tarifario-ejemplo": "pnpm --filter @sp/catalogo cargar-tarifario-ejemplo"
+    "cargar-tarifario-ejemplo": "pnpm --filter @sp/catalogo cargar-tarifario-ejemplo",
+    "cargar-palabras": "pnpm --filter @sp/spots cargar-palabras"
   },
   "devDependencies": {
     "@types/node": "^22.10.7",

@@ -17,6 +17,9 @@ export default async function Inicio() {
       <p style={{ marginTop: 24 }}>
         <Link href="/parrilla" style={{ display: 'inline-block', padding: '12px 20px', borderRadius: 999, background: c.acento, color: c.fondo, fontWeight: 600, textDecoration: 'none' }}>
           Parrilla y cupos
+        </Link>{' '}
+        <Link href="/anuncios" style={{ display: 'inline-block', padding: '12px 20px', borderRadius: 999, border: `1px solid ${c.acento}`, color: c.acento, fontWeight: 600, textDecoration: 'none' }}>
+          Revisión de anuncios
         </Link>
       </p>
       <section style={{ marginTop: 40, padding: 16, background: c.superficie, borderRadius: 8 }}>

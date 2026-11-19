@@ -9,6 +9,7 @@ Archivos `NNNN_nombre.sql`, aplicados en orden por `pnpm db:migrate` (runner en 
 - PT-2: `0004_parrilla_editable`. PT-3: `0005_inventario_y_precios` (tarifario, cotizaciones, pedidos, cupos, reservas).
 - Panel del anunciante: `0006_panel_anunciante` (datos de la empresa, cambio de nombre y clave).
 - Vitrina: `0007_vitrina` (señal en vivo y descripción de cada emisora).
+- PT-6: `0008_anuncios` (spots subidos, su revisión automática y humana, palabras prohibidas).
 - Siguen: pagos, spots y revisión, programación, agente de ventas.
 - Cada migración que añade tablas actualiza `packages/db/src/schema.ts` en el mismo cambio.
 - Los roles `app_api` y `app_worker` los crea `0001` sin acceso; los permisos van en cada migración (`GRANT` mínimos).

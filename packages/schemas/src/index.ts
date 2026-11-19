@@ -3,6 +3,7 @@ import { z } from 'zod';
 export * from './cuentas';
 export * from './catalogo';
 export * from './ventas';
+export * from './anuncios';
 
 /** Contratos compartidos por la API, el portal y el panel. Cada ruta valida su entrada y su salida con estos esquemas. */
 

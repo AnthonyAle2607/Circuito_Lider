@@ -10,12 +10,13 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@sp/spots": "workspace:^",
     "bullmq": "^5.34.0",
     "ioredis": "^5.4.2",
     "pg": "^8.13.1"
   },
   "devDependencies": {
-    "tsx": "^4.19.2",
-    "@types/pg": "^8.11.10"
+    "@types/pg": "^8.11.10",
+    "tsx": "^4.19.2"
   }
 }
