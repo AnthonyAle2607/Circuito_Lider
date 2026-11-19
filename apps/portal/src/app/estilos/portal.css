@@ -61,3 +61,54 @@ button.btn[disabled]{opacity:.5;cursor:not-allowed}
 .grid.real{min-width:820px}
 .cot-error{margin-top:12px}
 .cot-nota{color:var(--soft);font-size:14px;margin-top:8px}
+
+/* panel del anunciante: menú a la izquierda, contenido a la derecha; en teléfonos el menú es una fila deslizable */
+.panel-cuenta{padding-top:40px}
+.panel-rejilla{display:grid;grid-template-columns:240px minmax(0,1fr);gap:40px;align-items:start}
+.panel-lado{position:sticky;top:96px;display:grid;gap:20px}
+.panel-quien{display:grid;gap:2px}
+.panel-quien b{font:700 22px/1.15 var(--f-display);text-transform:uppercase;overflow-wrap:anywhere}
+.panel-quien span:last-child{color:var(--soft)}
+.menu-cuenta{display:grid;gap:4px}
+.menu-cuenta a{display:block;padding:10px 14px;border-radius:12px;border:2px solid transparent;font-weight:500;color:var(--cream);text-decoration:none}
+.menu-cuenta a:hover{border-color:var(--line)}
+.menu-cuenta a[aria-current="page"]{background:var(--mustard);color:var(--ink)}
+.btn.salir{width:100%;justify-content:center}
+.panel-cuerpo h1{font-size:clamp(34px,4.5vw,56px);margin-top:0}
+.panel-cuerpo .intro{margin-bottom:24px}
+.sub{font:700 22px/1.2 var(--f-display);text-transform:uppercase;letter-spacing:.02em;margin:32px 0 12px}
+.nota{color:var(--soft)}
+.cifras{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.cifra{display:grid;gap:6px;text-decoration:none;color:inherit}
+.cifra b{font:700 40px/1 var(--f-display)}
+.cifra small{color:var(--soft)}
+.cifra:hover,.atajos a:hover{border-color:var(--mustard)}
+.cifra.alerta{border-color:var(--mustard)}
+.vacio p{margin-top:0}
+.puntos{margin:0 0 20px;padding-left:20px;display:grid;gap:6px;color:var(--soft)}
+.atajos{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.atajos a{display:grid;gap:4px;text-decoration:none;color:inherit}
+.atajos span{color:var(--soft);font-size:15px}
+.formulario{max-width:720px}
+.campo input[disabled]{opacity:.7}
+@media (max-width:900px){
+  .panel-rejilla{grid-template-columns:minmax(0,1fr);gap:20px}
+  .panel-lado{position:static;gap:12px}
+  .menu-cuenta{display:flex;overflow-x:auto;gap:6px;padding-bottom:4px;scrollbar-width:thin}
+  .menu-cuenta a{white-space:nowrap;padding:8px 12px;border-color:var(--line)}
+  .panel-lado form{order:3}
+  .btn.salir{width:auto}
+  .cifras,.atajos{grid-template-columns:1fr}
+}
+
+/* acceso a la cuenta en la cabecera: siempre visible, también en teléfonos */
+.acceso-top{display:flex;gap:12px;align-items:center}
+.acceso-top .entrar{font:500 14px var(--f-body);color:var(--cream);text-decoration:none}
+.acceso-top .entrar:hover{text-decoration:underline}
+@media (max-width:860px){.acceso-top{margin-left:auto}}
+.acceso-top .solo-corto{display:none}
+@media (max-width:560px){.acceso-top .crear,.acceso-top .solo-ancho{display:none}.acceso-top .solo-corto{display:inline}.acceso-top{gap:10px}}
+.cifras .tarjeta,.atajos .tarjeta{margin-top:0}
+.panel-lado,.panel-cuerpo{min-width:0}
+.panel-cuerpo{padding:0}
+.acceso-top .btn{white-space:nowrap}

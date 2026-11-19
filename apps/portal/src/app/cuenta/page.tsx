@@ -1,58 +1,98 @@
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
-import { ResumenPedido, Yo } from '@sp/schemas';
-import { salir } from '../acciones';
-import { dinero } from '@/lib/fechas';
-import { api, exigirSesion } from '@/lib/sesion';
+import { ResumenPanel, Yo } from '@sp/schemas';
+import { dinero, fechaCorta } from '@/lib/fechas';
+import { api } from '@/lib/sesion';
 
 export const dynamic = 'force-dynamic';
-export const metadata = { title: 'Mis pedidos · Invermedia Radio', robots: { index: false } };
+export const metadata = { title: 'Mi panel · Invermedia Radio', robots: { index: false } };
 
-const ESTADOS: Record<string, string> = { reservado: 'Reservado · falta pagar', pagado: 'Pagado', cancelado: 'Cancelado', vencido: 'Vencido' };
-
-export default async function Cuenta() {
-  await exigirSesion('/cuenta');
-  const [yo, pedidos] = await Promise.all([api('/v1/cuentas/yo', { conSesion: true }), api('/v1/pedidos', { conSesion: true })]);
-  if (yo.status === 401 || pedidos.status === 401) redirect('/ingresar?siguiente=/cuenta');
+export default async function Resumen() {
+  const [yo, res] = await Promise.all([api('/v1/cuentas/yo', { conSesion: true }), api('/v1/cuentas/resumen', { conSesion: true })]);
+  if (yo.status === 401 || res.status === 401) redirect('/ingresar?siguiente=/cuenta');
   const y = Yo.parse(yo.datos);
-  const lista = ResumenPedido.array().parse(pedidos.datos);
+  const s = ResumenPanel.parse(res.datos);
+  const vence = s.porPagar.venceAt
+    ? new Date(s.porPagar.venceAt).toLocaleString('es-VE', { timeZone: 'America/Caracas', dateStyle: 'medium', timeStyle: 'short' })
+    : null;
 
   return (
-    <main className="pagina">
-      <div className="wrap" style={{ maxWidth: 900 }}>
-        <span className="label">{y.anunciante.empresa}</span>
-        <h1>Mis pedidos</h1>
-        <p className="intro">Hola, {y.usuario.nombre}.</p>
-        {!y.usuario.correoVerificado && (
-          <div className="aviso ejemplo">Confirma tu correo con el enlace que te enviamos: lo necesitas para reservar.</div>
-        )}
-        {lista.length === 0 ? (
-          <div className="tarjeta">
-            <p style={{ marginTop: 0 }}>Todavía no tienes pedidos.</p>
-            <Link className="btn primary" href="/#cotizar">
-              Cotizar mi pauta <span className="arrow">→</span>
-            </Link>
-          </div>
-        ) : (
-          <div className="lista-pedidos">
-            {lista.map((p) => (
-              <Link key={p.id} href={`/cuenta/pedidos/${p.id}`} className="tarjeta">
-                <span>
-                  <span className="label">Pedido {p.id.slice(0, 8)}</span>
-                  <br />
-                  <b>{p.emisiones} emisiones</b> · {dinero(p.totalCentimos, p.moneda)}
-                </span>
-                <span className={`estado ${p.estado}`}>{ESTADOS[p.estado]}</span>
-              </Link>
-            ))}
-          </div>
-        )}
-        <form action={salir} className="acciones">
-          <button className="btn" type="submit">
-            Cerrar sesión
-          </button>
-        </form>
+    <>
+      <h1>Hola, {y.usuario.nombre.split(' ')[0]}</h1>
+      <p className="intro">Aquí ves tus campañas, lo que falta pagar y cuándo suena tu próximo anuncio.</p>
+
+      <div className="cifras">
+        <Link href="/cuenta/campanas" className="tarjeta cifra">
+          <span className="label">Campañas en curso</span>
+          <b>{s.campanasActivas}</b>
+        </Link>
+        <Link href="/cuenta/campanas" className="tarjeta cifra">
+          <span className="label">Emisiones por sonar</span>
+          <b>{s.emisionesPorSonar}</b>
+        </Link>
+        <Link href="/cuenta/pagos" className={`tarjeta cifra${s.porPagar.pedidos ? ' alerta' : ''}`}>
+          <span className="label">Por pagar</span>
+          <b>{s.porPagar.pedidos ? dinero(s.porPagar.totalCentimos, s.porPagar.moneda ?? 'USD') : '—'}</b>
+          {vence && <small>Antes del {vence}</small>}
+        </Link>
       </div>
-    </main>
+
+      <h2 className="sub">Próximas emisiones</h2>
+      {s.proximas.length === 0 ? (
+        <div className="tarjeta vacio">
+          <p>Todavía no tienes emisiones programadas.</p>
+          <Link className="btn primary" href="/#cotizar">
+            Cotizar mi pauta <span className="arrow">→</span>
+          </Link>
+        </div>
+      ) : (
+        <div className="tarjeta">
+          <div className="tabla-caja">
+            <table className="tabla">
+              <thead>
+                <tr>
+                  <th>Fecha</th>
+                  <th>Hora</th>
+                  <th>Programa</th>
+                  <th>Dónde</th>
+                  <th>Espacio</th>
+                </tr>
+              </thead>
+              <tbody>
+                {s.proximas.map((e) => (
+                  <tr key={`${e.pedidoId}-${e.fecha}-${e.inicio}-${e.programa}`}>
+                    <td>
+                      <Link href={`/cuenta/pedidos/${e.pedidoId}`}>{fechaCorta(e.fecha)}</Link>
+                    </td>
+                    <td>
+                      {e.inicio}–{e.fin === '24:00' ? '00:00' : e.fin}
+                    </td>
+                    <td>{e.programa}</td>
+                    <td>{e.donde}</td>
+                    <td>{e.estado === 'confirmada' ? 'Confirmado' : 'Retenido'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      <h2 className="sub">Atajos</h2>
+      <div className="atajos">
+        <Link className="tarjeta" href="/#cotizar">
+          <b>Nueva campaña</b>
+          <span>Elige emisoras y horas en la parrilla.</span>
+        </Link>
+        <Link className="tarjeta" href="/cuenta/anuncios">
+          <b>Mis anuncios</b>
+          <span>Tus spots y su revisión.</span>
+        </Link>
+        <Link className="tarjeta" href="/cuenta/empresa">
+          <b>Datos de la empresa</b>
+          <span>{y.anunciante.idFiscal ? 'Revisa o corrige tus datos.' : 'Completa tus datos de facturación.'}</span>
+        </Link>
+      </div>
+    </>
   );
 }

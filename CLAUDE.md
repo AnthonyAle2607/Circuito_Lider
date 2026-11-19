@@ -121,4 +121,8 @@ evento que tenga quien lo consuma (el correo de verificación, con n8n).
   confirmación de correo con botón, ingreso, reserva con términos, mis pedidos, detalle y cancelación. Sesión del
   anunciante en cookie HttpOnly `sp_sesion`; las llamadas a la API van desde el servidor del portal (acciones).
   Probado de punta a punta con un usuario nuevo en el navegador.
-- Siguiente: **PT-5 · Pagos** (pasarela con pago alojado, transferencia, conciliación) y **PT-5b · Agente vendedor**.
+- **PT-4b · Panel del anunciante** (2026-11-19): `/cuenta` con menú (resumen, campañas, anuncios, pagos, certificados,
+  empresa, perfil y clave), `GET /v1/cuentas/resumen`, `PUT /v1/cuentas/empresa`, `PUT /v1/cuentas/perfil`,
+  `POST /v1/cuentas/clave` (vía `cambiar_clave_usuario()`: la API sigue sin escribir `password_hash` directo). Anuncios,
+  pagos en línea y certificados muestran qué llegará; se llenan con PT-5, PT-6 y PT-7.
+- Siguiente: **PT-6 · Spots y validador** (reglas en `config/spots.yaml`), **PT-5 · Pagos** y **PT-5b · Agente vendedor**.

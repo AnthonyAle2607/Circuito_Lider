@@ -11,6 +11,7 @@ import { rutasCuentas } from './routes/cuentas';
 import { rutasPanelCatalogo } from './routes/panel/catalogo';
 import { rutasPanelVentas } from './routes/panel/ventas';
 import { rutasPedidos } from './routes/pedidos';
+import { rutasMiPanel } from './routes/mi-panel';
 import { rutasSesionEquipo } from './routes/panel/sesion';
 import { rutasSalud, type Comprobaciones } from './routes/salud';
 
@@ -57,6 +58,7 @@ export async function buildApp(op: Opciones): Promise<FastifyInstance> {
     await rutasPanelCatalogo(app, op.db);
     await rutasCotizaciones(app, { db: op.db, terminosVersion: op.terminosVersion ?? TERMINOS_POR_DEFECTO, limiteCotizar: limites.cotizar ?? 30 });
     await rutasPedidos(app, op.db);
+    await rutasMiPanel(app, op.db, { limiteAcceso: limites.acceso });
     await rutasPanelVentas(app, op.db);
   }
   return app;

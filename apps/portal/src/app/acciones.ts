@@ -97,3 +97,48 @@ export async function cancelarPedido(f: FormData) {
   revalidatePath('/cuenta');
   redirect(volver);
 }
+
+// ── panel del anunciante ─────────────────────────────────────────────────────
+const opcional = (f: FormData, k: string) => texto(f, k) || null;
+
+export async function guardarEmpresa(f: FormData) {
+  const r = await api<ErrorApi>('/v1/cuentas/empresa', {
+    method: 'PUT',
+    conSesion: true,
+    body: JSON.stringify({
+      empresa: texto(f, 'empresa'),
+      pais: texto(f, 'pais'),
+      zonaHoraria: texto(f, 'zonaHoraria'),
+      idFiscal: opcional(f, 'idFiscal'),
+      sector: opcional(f, 'sector'),
+      sitioWeb: opcional(f, 'sitioWeb'),
+      telefono: opcional(f, 'telefono'),
+      direccion: opcional(f, 'direccion'),
+    }),
+  });
+  if (r.status === 401) redirect('/ingresar?siguiente=/cuenta/empresa');
+  if (!r.ok) redirect(conError('/cuenta/empresa', r.datos?.mensaje ?? 'No pudimos guardar los datos.'));
+  revalidatePath('/cuenta', 'layout');
+  redirect('/cuenta/empresa?ok=1');
+}
+
+export async function guardarPerfil(f: FormData) {
+  const r = await api<ErrorApi>('/v1/cuentas/perfil', { method: 'PUT', conSesion: true, body: JSON.stringify({ nombre: texto(f, 'nombre') }) });
+  if (r.status === 401) redirect('/ingresar?siguiente=/cuenta/seguridad');
+  if (!r.ok) redirect(conError('/cuenta/seguridad', r.datos?.mensaje ?? 'No pudimos guardar tu nombre.'));
+  revalidatePath('/cuenta', 'layout');
+  redirect('/cuenta/seguridad?ok=perfil');
+}
+
+export async function cambiarClave(f: FormData) {
+  const nueva = String(f.get('nueva') ?? '');
+  if (nueva !== String(f.get('repetir') ?? '')) redirect(conError('/cuenta/seguridad', 'La clave nueva y su repetición no coinciden.'));
+  const r = await api<ErrorApi>('/v1/cuentas/clave', {
+    method: 'POST',
+    conSesion: true,
+    body: JSON.stringify({ actual: String(f.get('actual') ?? ''), nueva }),
+  });
+  if (r.status === 401) redirect('/ingresar?siguiente=/cuenta/seguridad');
+  if (!r.ok) redirect(conError('/cuenta/seguridad', r.datos?.mensaje ?? 'No pudimos cambiar la clave.'));
+  redirect('/cuenta/seguridad?ok=clave');
+}

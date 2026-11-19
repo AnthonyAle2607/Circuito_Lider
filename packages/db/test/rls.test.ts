@@ -60,6 +60,21 @@ describe('RLS por anunciante', () => {
     ).rejects.toThrow(/permission denied/);
   });
 
+  it('el cambio de clave solo pasa por la función, con hash Argon2id y dentro de la propia cuenta', async () => {
+    const HASH = '$argon2id$v=19$m=19456,t=2,p=1$prueba';
+    const idDe = async (cuenta: string) => (await withTenant(b.db, cuenta, (t) => t.selectFrom('usuarios').select('id').executeTakeFirstOrThrow())).id;
+    const ana = await idDe(A);
+    const beto = await idDe(B);
+    const cambiar = (cuenta: string | null, usuario: string, hash: string) => {
+      const q = sql<{ ok: boolean }>`select cambiar_clave_usuario(${usuario}::uuid, ${hash}) as ok`;
+      return cuenta ? withTenant(b.db, cuenta, (t) => q.execute(t)) : withSistema(b.db, (t) => q.execute(t));
+    };
+    expect((await cambiar(A, ana, HASH)).rows[0]!.ok).toBe(true);
+    expect((await cambiar(A, beto, HASH)).rows[0]!.ok).toBe(false);
+    await expect(cambiar(A, ana, 'clave-en-texto-plano')).rejects.toThrow(/Argon2id/);
+    await expect(cambiar(null, ana, HASH)).rejects.toThrow(/withTenant/);
+  });
+
   it('rechaza un anunciante que no es uuid (no se puede inyectar en el contexto)', async () => {
     await expect(withTenant(b.db, "x' or '1'='1", async () => {})).rejects.toThrow(/uuid/);
   });

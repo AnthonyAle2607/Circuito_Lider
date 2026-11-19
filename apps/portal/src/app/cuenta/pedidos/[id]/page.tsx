@@ -27,10 +27,10 @@ export default async function VerPedido({ params, searchParams }: { params: Prom
   const hecho = p.estado === 'pagado' ? 2 : p.estado === 'reservado' ? 1 : 0;
 
   return (
-    <main className="pagina">
-      <div className="wrap" style={{ maxWidth: 900 }}>
+    <>
+      <div>
         <span className="label">
-          <Link href="/cuenta">← Mis pedidos</Link> · Pedido {p.id.slice(0, 8)}
+          <Link href="/cuenta/campanas">← Campañas</Link> · Pedido {p.id.slice(0, 8)}
         </span>
         <h1>{q.nuevo ? '¡Reservado!' : 'Tu pedido'}</h1>
         <p className="intro">
@@ -94,6 +94,6 @@ export default async function VerPedido({ params, searchParams }: { params: Prom
           </form>
         )}
       </div>
-    </main>
+    </>
   );
 }

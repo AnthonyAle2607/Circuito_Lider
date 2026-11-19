@@ -26,6 +26,12 @@ export interface AnunciantesTabla {
   zona_horaria: Generated<string>;
   estado: Generated<EstadoCuenta>;
   creado_at: Generated<Date>;
+  id_fiscal: string | null;
+  sector: string | null;
+  sitio_web: string | null;
+  telefono: string | null;
+  direccion: string | null;
+  actualizado_at: Date | null;
 }
 
 export interface UsuariosTabla {

@@ -1,24 +1,8 @@
 import Link from 'next/link';
+import { PAISES } from '@/lib/paises';
 import { registrarse } from '../acciones';
 
 export const metadata = { title: 'Crear cuenta · Invermedia Radio' };
-
-/** Países de origen más probables primero; se acepta cualquier código ISO de dos letras. */
-const PAISES: Array<[string, string]> = [
-  ['US', 'Estados Unidos'],
-  ['ES', 'España'],
-  ['CO', 'Colombia'],
-  ['PA', 'Panamá'],
-  ['MX', 'México'],
-  ['CL', 'Chile'],
-  ['PE', 'Perú'],
-  ['AR', 'Argentina'],
-  ['DO', 'República Dominicana'],
-  ['VE', 'Venezuela'],
-  ['IT', 'Italia'],
-  ['PT', 'Portugal'],
-  ['CA', 'Canadá'],
-];
 
 export default async function Registro({ searchParams }: { searchParams: Promise<{ siguiente?: string; error?: string }> }) {
   const q = await searchParams;

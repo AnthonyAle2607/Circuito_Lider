@@ -161,12 +161,27 @@ export async function rutasCuentas(app: FastifyInstance, op: OpcionesCuentas): P
           'anunciantes.empresa',
           'anunciantes.pais',
           'anunciantes.zona_horaria',
+          'anunciantes.id_fiscal',
+          'anunciantes.sector',
+          'anunciantes.sitio_web',
+          'anunciantes.telefono',
+          'anunciantes.direccion',
         ])
         .where('usuarios.id', '=', p.usuarioId)
         .executeTakeFirstOrThrow();
       return {
         usuario: { id: fila.id, nombre: fila.nombre, email: fila.email, correoVerificado: fila.correo_verificado_at !== null },
-        anunciante: { id: fila.anunciante_id, empresa: fila.empresa, pais: fila.pais, zonaHoraria: fila.zona_horaria },
+        anunciante: {
+          id: fila.anunciante_id,
+          empresa: fila.empresa,
+          pais: fila.pais,
+          zonaHoraria: fila.zona_horaria,
+          idFiscal: fila.id_fiscal,
+          sector: fila.sector,
+          sitioWeb: fila.sitio_web,
+          telefono: fila.telefono,
+          direccion: fila.direccion,
+        },
       };
     });
   });
