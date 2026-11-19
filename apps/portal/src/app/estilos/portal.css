@@ -176,3 +176,64 @@ button.btn[disabled]{opacity:.5;cursor:not-allowed}
 body.con-radio .sup{bottom:calc(max(18px,env(safe-area-inset-bottom,0px)) + 84px)}
 body.con-radio footer{padding-bottom:96px}
 @media (max-width:560px){.radio-volumen{display:none}.radio-barra{left:12px;right:12px;max-width:none}}
+
+/* ── rediseño 2026-11-19: opción B (tienda) dentro del diseño Parrilla · Invermedia ─────────────── */
+/* Todo oscuro como el original: nada de bloques blancos. */
+.mi-pauta{white-space:nowrap}
+.mi-pauta .cuenta{display:inline-grid;place-items:center;min-width:22px;height:22px;margin-left:6px;border-radius:999px;background:var(--ink);color:var(--cream);font:700 12px/1 var(--f-mono)}
+
+.buscador{display:grid;grid-template-columns:repeat(3,minmax(0,1fr)) auto;gap:6px;align-items:stretch;max-width:860px;margin:28px auto 0;background:var(--ink2);border:2px solid var(--line);border-radius:22px;padding:8px;text-align:left}
+.buscador label{display:grid;gap:6px;padding:10px 14px;border-radius:14px;font:500 11px/1 var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--soft)}
+.buscador label+label{border-left:1px solid var(--line);border-radius:0}
+.buscador select{background:transparent;color:var(--cream);border:0;font:700 17px/1.2 var(--f-body);padding:0;cursor:pointer}
+.buscador select option{background:var(--ink2);color:var(--cream)}
+.buscador .btn{align-self:center;justify-content:center}
+@media (max-width:760px){.buscador{grid-template-columns:1fr}.buscador label+label{border-left:0;border-top:1px solid var(--line)}}
+
+.tienda .tienda-filtros{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 0 20px}
+.tienda .tienda-filtros .sep{width:1px;height:28px;background:var(--line);margin:0 4px}
+.tienda-rejilla{display:flex;flex-wrap:wrap;gap:24px;align-items:flex-start}
+.productos{flex:999 1 620px;min-width:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px}
+.producto{display:flex;flex-direction:column;background:var(--ink2);border:2px solid var(--line);border-radius:24px;overflow:hidden}
+.producto.en-pauta{border-color:var(--mustard)}
+.producto .pc{width:auto;height:170px;border-radius:0;border:0}
+.producto .pc h3{font-size:34px;line-height:1}
+.producto-info{display:flex;flex-direction:column;gap:6px;padding:14px 16px 16px;flex:1}
+.producto-info .when{font:500 13px var(--f-mono);color:var(--mustard)}
+.producto-info p{margin:4px 0 0;color:var(--soft);font-size:14px;line-height:1.45}
+.producto-pie{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:auto;padding-top:12px}
+.producto-pie b{font:700 20px/1 var(--f-display)}
+.producto-pie small{color:var(--soft)}
+.producto-pie .btn{padding:9px 14px;font-size:14px;white-space:nowrap}
+
+.tu-pauta{flex:1 1 300px;min-width:0;position:sticky;top:88px;display:grid;gap:12px;background:var(--ink2);border:2px solid var(--mustard);border-radius:24px;padding:20px}
+.tu-pauta ul{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.tu-pauta li{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;border-bottom:1px solid var(--line);padding-bottom:10px}
+.tu-pauta li span{display:grid;gap:2px}
+.tu-pauta li small{color:var(--soft);font-size:13px}
+.tu-pauta .quitar{background:none;border:0;color:var(--soft);font-size:22px;line-height:1;cursor:pointer;padding:0 4px}
+.tu-pauta .quitar:hover{color:var(--cream)}
+.tu-pauta-opciones{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.tu-pauta-opciones label{display:grid;gap:4px;font:500 11px/1 var(--f-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--soft)}
+.tu-pauta-opciones select{background:var(--ink);color:var(--cream);border:2px solid var(--line);border-radius:10px;padding:7px 6px;font:500 14px var(--f-body)}
+.tu-pauta-total{display:flex;justify-content:space-between;align-items:baseline;font:700 18px/1 var(--f-display);text-transform:uppercase}
+.tu-pauta-total b{font-size:38px;color:var(--mustard)}
+.tu-pauta .btn.primary{justify-content:center}
+.tu-pauta .ajustar{color:var(--cream);font-size:14px;text-align:center}
+.tu-pauta .aviso{margin:0}
+@media (max-width:900px){.tu-pauta{position:static}}
+
+.como-fila .pasos{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.como-fila .pasos li{background:var(--ink2);border:2px solid var(--line);border-radius:24px;padding:22px;display:grid;gap:8px;align-content:start}
+.como-fila .pasos .n{font:900 54px/1 var(--f-display);color:var(--mustard)}
+.como-fila .pasos h3{font:700 24px/1.1 var(--f-display);text-transform:uppercase;margin:0}
+.como-fila .pasos p{margin:0;color:var(--soft);line-height:1.5}
+@media (max-width:900px){.como-fila .pasos{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.como-fila .pasos{grid-template-columns:1fr}}
+
+.porque{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-bottom:40px}
+.porque-item{background:var(--ink2);border:2px solid var(--line);border-radius:24px;padding:22px}
+.porque-item h3{font:700 24px/1.1 var(--f-display);text-transform:uppercase;margin:0 0 8px}
+.porque-item p{margin:0;color:var(--soft);line-height:1.5}
+.porque-boleto{text-align:center;color:var(--soft);margin:0 0 18px}
+@media (max-width:760px){.porque{grid-template-columns:1fr}}

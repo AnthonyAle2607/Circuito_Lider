@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { BotonMiPauta } from './Pauta';
 
 /** La cabecera del diseño. El acceso a la cuenta queda fuera del menú para que se vea también en teléfonos. */
 export function Cabecera({ conSesion }: { conSesion: boolean }) {
@@ -14,7 +15,7 @@ export function Cabecera({ conSesion }: { conSesion: boolean }) {
           <span className="isub">Radio</span>
         </Link>
         <nav className="main" aria-label="Secciones">
-          <Link href="/#como">Cómo funciona</Link>
+          <Link href="/#espacios">Espacios</Link>
           <Link href="/#paquetes">Paquetes</Link>
           <Link href="/emisoras">Emisoras en vivo</Link>
           <Link href="/parrilla">Parrilla</Link>
@@ -34,10 +35,7 @@ export function Cabecera({ conSesion }: { conSesion: boolean }) {
               </Link>
             </>
           )}
-          <Link className="btn primary" href="/#cotizar">
-            <span className="solo-ancho">Cotizar mi pauta</span>
-            <span className="solo-corto">Cotizar</span>
-          </Link>
+          <BotonMiPauta />
         </div>
       </div>
     </header>

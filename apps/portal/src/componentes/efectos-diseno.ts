@@ -169,14 +169,15 @@ document.querySelectorAll(".carousel-hint button").forEach(b=>b.onclick=()=>caro
 /* programas */
 const PROGS=[["ENCENDIDOS","L–V · 06:00–09:00","Nacional","v1"],["CONVOCADOS","L–V · 11:00–13:00","Nacional","v2"],["AL AIRE","L–V · 17:00–18:00","Nacional","v3"],["MÁXIMO VOLUMEN","L–V · 09:00–11:00","Caracas","v4"],["BATITA EN LÍDER","L–V · 13:00–15:00","Caracas","v5"],["EL BRUNCH","L–V · 10:00–12:00","Mérida","v1"],["CAMBIO DE LUCES","L–V · 15:00–17:00","Mérida","v2"],["EL 3 PACK","L–V · 15:15–16:15","Caracas","v4"],["PLAY HOUSE LÍDER","Vie y sáb · 21:00–01:00","Caracas","v3"],["TIEMPO DE JUEGO","Sáb y dom · 09:00–12:00","Mérida","v5"]];
 const card=([n,w,s,v])=>`<div class="pc ${v}"><div class="tag"><span>${s}</span><span class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span></div><h3>${n}</h3><span class="when">${w}</span></div>`;
-$("#prow").innerHTML=PROGS.map(card).join("").repeat(2);
-carousels.progs=makeCarousel($("#progs"),{speed:45,dir:-1});
+// Rediseño 2026-11-19: el carrusel de programas dio paso a la tienda (React). Si vuelve, se arma solo.
+if($("#progs")){$("#prow").innerHTML=PROGS.map(card).join("").repeat(2);
+carousels.progs=makeCarousel($("#progs"),{speed:45,dir:-1});}
 
 /* emisiones */
 const EM=[["06:42","Caracas 94.9","ENCENDIDOS"],["06:42","Maracaibo 100.5","ENCENDIDOS"],["07:15","Valencia 106.7","ENCENDIDOS"],["09:30","Caracas 94.9","Máximo Volumen"],["10:20","Mérida 92.3","El Brunch"],["12:15","Barquisimeto 94.9","CONVOCADOS"],["12:15","Puerto Ordaz 100.3","CONVOCADOS"],["15:40","Mérida 92.3","Cambio de Luces"],["17:38","Puerto La Cruz 100.5","AL AIRE"],["17:38","San Cristóbal 91.1","AL AIRE"]];
 const tk=([h,e,p])=>`<div class="tk2"><b>${h}</b><span>${e}</span><span style="color:var(--soft)">${p}</span><span class="ok">Al aire · 30 s</span></div>`;
-$("#tr1").innerHTML=EM.map(tk).join("").repeat(2);$("#tr2").innerHTML=EM.slice().reverse().map(tk).join("").repeat(2);
-carousels.tk1=makeCarousel($("#tk1"),{speed:38,dir:-1});carousels.tk2=makeCarousel($("#tk2"),{speed:32,dir:1});
+if($("#tk1")){$("#tr1").innerHTML=EM.map(tk).join("").repeat(2);$("#tr2").innerHTML=EM.slice().reverse().map(tk).join("").repeat(2);
+carousels.tk1=makeCarousel($("#tk1"),{speed:38,dir:-1});carousels.tk2=makeCarousel($("#tk2"),{speed:32,dir:1});}
 
 /* aparición al entrar */
 const io=observador(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");io.unobserve(e.target)}}),{threshold:.2});
@@ -184,14 +185,18 @@ document.querySelectorAll(".rv,#board,#cmp").forEach(el=>io.observe(el));
 
 /* manifiesto */
 const letters=[];document.querySelectorAll("#manifest .w").forEach(w=>{const t=w.textContent;w.textContent="";[...t].forEach(ch=>{const s=document.createElement("span");s.className="l";s.textContent=ch;w.appendChild(s);letters.push(s)})});
-const stepsBox=$("#steps"),rail=stepsBox.querySelector(".rail"),stepEls=[...stepsBox.querySelectorAll(".step")];
+// Manifiesto y pasos animados son opcionales: el rediseño los quitó de la portada.
+const stepsBox=$("#steps"),rail=stepsBox?.querySelector(".rail"),stepEls=stepsBox?[...stepsBox.querySelectorAll(".step")]:[];
+if($("#manifest")&&stepsBox){
 function onScroll(){const vh=innerHeight;const m=$("#manifest").getBoundingClientRect();const pm=Math.min(1,Math.max(0,(vh*.85-m.top)/(m.height+vh*.35)));const on=reduce?letters.length:Math.round(pm*letters.length);letters.forEach((s,i)=>s.classList.toggle("on",i<on));
  const r=stepsBox.getBoundingClientRect();rail.style.setProperty("--fill",Math.min(100,Math.max(0,(vh*.55-r.top)/r.height*100))+"%");
  stepEls.forEach(s=>{const b=s.getBoundingClientRect();s.classList.toggle("act",b.top<vh*.6&&b.bottom>vh*.3)})}
 let ticking=false;enVentana("scroll",()=>{if(!ticking){ticking=true;raf(()=>{onScroll();ticking=false})}},{passive:true});onScroll();
+}
 
 /* mini interfaces de los pasos */
-const u1=$("#u1");ST.forEach(s=>{const e=document.createElement("span");e.textContent=`${s.c} ${s.f}`;u1.appendChild(e)});
+const u1=$("#u1");
+if(u1){ST.forEach(s=>{const e=document.createElement("span");e.textContent=`${s.c} ${s.f}`;u1.appendChild(e)});
 const u2=$("#u2");for(let r=0;r<6;r++)for(let d=0;d<7;d++){const i=document.createElement("i");if(d<5&&(r<3||r===5))i.className="nat";u2.appendChild(i)}
 const u3w=$("#u3w");for(let i=0;i<46;i++)u3w.appendChild(document.createElement("span"));
 const u4=$("#u4");[["02/12 06:42","Caracas 94.9"],["02/12 06:42","Maracaibo 100.5"],["02/12 12:15","Valencia 106.7"],["02/12 17:38","Caracas 94.9"],["03/12 06:51","Valencia 106.7"]].forEach(([a,b])=>{const d=document.createElement("div");d.innerHTML=`<span>${a}</span><span>${b}</span>`;u4.appendChild(d)});
@@ -203,6 +208,7 @@ const players={
 const running={};const pio=observador(es=>es.forEach(e=>{const k=e.target.dataset.s;if(e.isIntersecting&&!running[k]&&!reduce)running[k]=players[k]();else if(!e.isIntersecting&&running[k]){clearInterval(running[k]);running[k]=null}}),{threshold:.35});
 stepEls.forEach(s=>pio.observe(s));
 if(reduce){[...u1.children].slice(0,3).forEach(x=>x.classList.add("on"));[...$("#u3").children].forEach(x=>x.classList.add("on"));[...u4.children].forEach(x=>x.classList.add("on"));$("#u4n").textContent="126"}
+}
 
 /* círculo: gira solo, se arrastra para girarlo, no se frena con el cursor */
 (function wheel(){
@@ -220,7 +226,7 @@ if(reduce){[...u1.children].slice(0,3).forEach(x=>x.classList.add("on"));[...$("
 })();
 
 /* boleto: arrastra el talón hasta arrancarlo */
-(function(){const t=$("#ticket"),s=$("#stub");let x0=0,y0=0,drag=false,moved=false;
+(function(){const t=$("#ticket"),s=$("#stub");if(!t||!s)return;let x0=0,y0=0,drag=false,moved=false;
  const tear=()=>{if(t.classList.contains("torn"))return;s.style.transform="";s.classList.add("fall");t.classList.add("torn");const r=t.getBoundingClientRect();sparks(t,r.width-170,r.height/2)};
  s.addEventListener("pointerdown",e=>{if(t.classList.contains("torn"))return;drag=true;moved=false;x0=e.clientX;y0=e.clientY;s.classList.add("drag");try{s.setPointerCapture(e.pointerId)}catch(_){}});
  s.addEventListener("pointermove",e=>{if(!drag)return;const dx=Math.max(0,e.clientX-x0),dy=e.clientY-y0;if(Math.hypot(dx,dy)>4)moved=true;s.style.transition="none";s.style.transform=`translate(${dx}px,${dy*.3}px) rotate(${dx/7}deg)`;if(dx>90)tear()});

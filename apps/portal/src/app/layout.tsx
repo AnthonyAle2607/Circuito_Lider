@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { Cabecera } from '@/componentes/Cabecera';
 import { Pie } from '@/componentes/Pie';
+import { PautaProvider } from '@/componentes/Pauta';
 import { RadioProvider } from '@/componentes/Radio';
 import { leerMarca } from '@/lib/marca';
 import { sesionActual } from '@/lib/sesion';
@@ -35,9 +36,11 @@ export default async function Marco({ children }: { children: ReactNode }) {
       </head>
       <body>
         <RadioProvider>
+          <PautaProvider>
           <Cabecera conSesion={conSesion} />
           {children}
           <Pie />
+          </PautaProvider>
         </RadioProvider>
       </body>
     </html>
