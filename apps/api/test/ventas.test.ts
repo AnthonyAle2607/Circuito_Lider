@@ -49,7 +49,7 @@ describe('disponibilidad', () => {
   it('publica el tarifario vigente para que el portal muestre el precio mientras se elige', async () => {
     const r = await m.app.inject('/v1/tarifario');
     expect(r.statusCode).toBe(200);
-    expect(r.json()).toMatchObject({ version: 1, moneda: 'USD', esEjemplo: true, duraciones: [30, 45, 60] });
+    expect(r.json()).toMatchObject({ version: 1, moneda: 'USD', esEjemplo: true, duraciones: [30, 40] });
   });
 });
 
@@ -151,7 +151,7 @@ describe('cancelar y vencer', () => {
   it('cancelar devuelve el cupo; no se cancela dos veces', async () => {
     const a = await m.anunciante();
     const fecha = proximo(1, 8);
-    const c = Cotizacion.parse((await cotizar({ duracionSegundos: 60, emisiones: [{ franjaId: maximoLunes, fecha }] })).json());
+    const c = Cotizacion.parse((await cotizar({ duracionSegundos: 40, emisiones: [{ franjaId: maximoLunes, fecha }] })).json());
     const p = Pedido.parse((await reservar(c.id, a.auth)).json());
     const r = await m.app.inject({ method: 'POST', url: `/v1/pedidos/${p.id}/cancelar`, headers: a.auth });
     expect(Pedido.parse(r.json())).toMatchObject({ estado: 'cancelado', reservas: [{ estado: 'liberada' }] });
@@ -163,7 +163,7 @@ describe('cancelar y vencer', () => {
   it('el trabajo de vencimiento libera las reservas sin pagar cuyo plazo pasó (con el rol de los trabajos)', async () => {
     const a = await m.anunciante();
     const fecha = proximo(1, 9);
-    const c = Cotizacion.parse((await cotizar({ duracionSegundos: 45, emisiones: [{ franjaId: maximoLunes, fecha }] })).json());
+    const c = Cotizacion.parse((await cotizar({ duracionSegundos: 40, emisiones: [{ franjaId: maximoLunes, fecha }] })).json());
     const p = Pedido.parse((await reservar(c.id, a.auth)).json());
     await m.q(`UPDATE pedidos SET reserva_vence_at = now() - interval '1 minute' WHERE id = $1`, [p.id]);
     await m.b.comoWorker();
@@ -179,22 +179,22 @@ describe('cancelar y vencer', () => {
 });
 
 describe('aprobación de ventas', () => {
-  /** 60 emisiones de 60 s en cadena: USD 6.000 − 10 % = USD 5.400, sobre el umbral de USD 5.000. */
+  /** 80 emisiones de 40 s en cadena: USD 6.400 − 10 % = USD 5.760, sobre el umbral de USD 5.000. */
   const grande = () => ({
-    duracionSegundos: 60,
-    emisiones: Array.from({ length: 12 }, (_, s) => [1, 2, 3, 4, 5].map((d) => ({ dia: d, s }))).flat(),
+    duracionSegundos: 40,
+    emisiones: Array.from({ length: 16 }, (_, s) => [1, 2, 3, 4, 5].map((d) => ({ dia: d, s }))).flat(),
   });
   async function cotizacionGrande() {
     const ids = new Map<number, string>();
     for (const d of [1, 2, 3, 4, 5]) ids.set(d, await franja('ENCENDIDOS', d));
     const g = grande();
-    const r = await cotizar({ duracionSegundos: g.duracionSegundos, emisiones: g.emisiones.map((e) => ({ franjaId: ids.get(e.dia)!, fecha: proximo(e.dia, e.s + 10) })) });
+    const r = await cotizar({ duracionSegundos: g.duracionSegundos, emisiones: g.emisiones.map((e) => ({ franjaId: ids.get(e.dia)!, fecha: proximo(e.dia, e.s + 4) })) });
     return Cotizacion.parse(r.json());
   }
 
   it('sobre el umbral espera a ventas; aprobada, se reserva', async () => {
     const c = await cotizacionGrande();
-    expect(c).toMatchObject({ estado: 'en_aprobacion', requiereAprobacion: true, totalCentimos: 540_000 });
+    expect(c).toMatchObject({ estado: 'en_aprobacion', requiereAprobacion: true, totalCentimos: 576_000 });
     const a = await m.anunciante();
     expect((await reservar(c.id, a.auth)).json().error).toBe('pendiente_aprobacion');
     const ventas = await m.sesionEquipo(['ventas']);

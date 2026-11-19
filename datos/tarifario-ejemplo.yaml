@@ -10,15 +10,14 @@ reserva_horas: 24                 # cuánto se retienen los espacios sin pagar (
 umbral_aprobacion_centimos: 500000  # desde USD 5.000 una persona de ventas aprueba antes de reservar
 notas: Tarifario de ejemplo para desarrollo. Reemplazar por el real.
 
+# 2026-11-19: spots de 30 y 40 s, porque el máximo que se puede subir es 40 s (config/spots.yaml).
 tarifas:
   # En cadena: el spot suena en las 10 emisoras a la vez.
   - { alcance: nacional, duracion_segundos: 30, precio_centimos: 6000 }
-  - { alcance: nacional, duracion_segundos: 45, precio_centimos: 8000 }
-  - { alcance: nacional, duracion_segundos: 60, precio_centimos: 10000 }
+  - { alcance: nacional, duracion_segundos: 40, precio_centimos: 8000 }
   # Local: solo en una emisora.
   - { alcance: local, duracion_segundos: 30, precio_centimos: 1500 }
-  - { alcance: local, duracion_segundos: 45, precio_centimos: 2000 }
-  - { alcance: local, duracion_segundos: 60, precio_centimos: 2500 }
+  - { alcance: local, duracion_segundos: 40, precio_centimos: 2000 }
 
 descuentos:
   - { min_emisiones: 20, descuento_bps: 500 }    # 5 %

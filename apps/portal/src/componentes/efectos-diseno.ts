@@ -255,13 +255,13 @@ document.querySelectorAll(".sug").forEach(c=>c.querySelectorAll("button").forEac
   const m=document.createElement("div");m.className="bm t";m.innerHTML=html;pm.appendChild(m);scroll()});return busy}
  function user(t){const m=document.createElement("div");m.className="bm u";m.textContent=t;pm.appendChild(m);scroll()}
  const A={
-  comprar:"Es así: <b>1)</b> eliges emisoras y horas en la parrilla, <b>2)</b> subes tu spot de 30 a 60 s, <b>3)</b> una persona lo revisa y pagas en línea, <b>4)</b> recibes la prueba de cada emisión. <a href=\"#como\">Ver los pasos</a>",
+  comprar:"Es así: <b>1)</b> eliges emisoras y horas en la parrilla, <b>2)</b> subes tu spot de 30 o 40 s, <b>3)</b> una persona lo revisa y pagas en línea, <b>4)</b> recibes la prueba de cada emisión. <a href=\"#como\">Ver los pasos</a>",
   precios:"El precio sale al instante en el <a href=\"#cotizar\">cotizador</a>: eliges emisoras, horas y semanas y ves el total. Los <a href=\"#paquetes\">paquetes</a> son un buen punto de partida.",
   exterior:"¡Sí! La plataforma está pensada para anunciantes fuera de Venezuela. Los medios de pago y las monedas se confirman antes del lanzamiento.",
   emisoras:"Son 10 emisoras de Circuito Líder: Caracas 94.9, Valencia 106.7, Maracaibo 100.5, Barquisimeto 94.9, Mérida 92.3, San Cristóbal 91.1, El Vigía 100.1, Puerto Ordaz 100.3, Puerto La Cruz 100.5 y Margarita 97.3.",
   certificado:"Cada emisión aparece en tu panel con hora y emisora, y al cerrar la campaña te llega el certificado de transmisión. 📄",
   normativa:"Una persona escucha tu spot y lo revisa según la normativa de CONATEL. Si algo no cumple, te decimos qué cambiar antes de programarlo.",
-  formatos:"Hoy vendemos comerciales grabados de 30 a 60 segundos. La mención en vivo del locutor y el patrocinio de programas llegan después.",
+  formatos:"Hoy vendemos comerciales grabados de 30 o 40 segundos. La mención en vivo del locutor y el patrocinio de programas llegan después.",
   persona:"Te paso con el equipo de ventas 🙌. Te escriben por correo o WhatsApp para armar la pauta contigo. <i>(Los datos de contacto se definen antes del lanzamiento.)</i>",
   hola:"¡Hola! 👋 Soy Toño. Pregúntame cómo comprar, precios, emisoras o el certificado.",
   gracias:"¡Con gusto! Si necesitas algo más, aquí estoy. 📻"};

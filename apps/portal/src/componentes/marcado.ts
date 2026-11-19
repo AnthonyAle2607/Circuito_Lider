@@ -40,7 +40,7 @@ export const ANTES_DE_VENTA = String.raw`  <section class="hero">
           <div><h3>Marca las horas</h3><p>La programación real, hora por hora. Las franjas en rojo son programas en cadena: suenan en las diez emisoras a la vez.</p></div>
           <div class="ui" aria-hidden="true"><div class="bar"><span class="t">Lun – Dom · 06:00 a 12:00</span><span class="t" id="u2c">0 franjas</span></div><div class="mini" id="u2"></div></div></div>
         <div class="step" data-s="3"><span class="n">3</span>
-          <div><h3>Sube y revisamos</h3><p>Tu comercial de 30 a 60 segundos. Una persona lo revisa según la normativa de CONATEL antes de programarlo.</p></div>
+          <div><h3>Sube y revisamos</h3><p>Tu comercial de 30 o 40 segundos. Una persona lo revisa según la normativa de CONATEL antes de programarlo.</p></div>
           <div class="ui" aria-hidden="true"><div class="bar"><span>spot_navidad_30s.mp3</span><span class="t">30 s</span></div><div class="wav" id="u3w"></div>
             <ul class="checks" id="u3"><li>Duración exacta<b>✓</b></li><li>Volumen sin saturar<b>✓</b></li><li>Normativa CONATEL · revisión humana<b>✓</b></li><li>Pago confirmado<b>✓</b></li></ul></div></div>
         <div class="step" data-s="4"><span class="n">4</span>
@@ -111,7 +111,7 @@ export const DESPUES_DE_VENTA = String.raw`  <!-- SUGERENCIAS -->
     <div class="wrap">
       <div class="sec-head rv"><span class="label">Preguntas</span><h2>Antes de comprar</h2></div>
       <details><summary>¿Puedo comprar desde fuera de Venezuela?</summary><p>Sí. La plataforma está pensada para anunciantes en el exterior. Los medios de pago y las monedas se confirman antes del lanzamiento.</p></details>
-      <details><summary>¿Qué vendemos hoy?</summary><p>Comerciales grabados de 30 a 60 segundos en las diez emisoras de Circuito Líder. La mención en vivo del locutor y el patrocinio de programas llegan después.</p></details>
+      <details><summary>¿Qué vendemos hoy?</summary><p>Comerciales grabados de 30 o 40 segundos en las diez emisoras de Circuito Líder. La mención en vivo del locutor y el patrocinio de programas llegan después.</p></details>
       <details><summary>¿Qué pasa si mi spot no cumple la normativa?</summary><p>Te avisamos con el motivo y lo que hay que cambiar antes de programarlo.</p></details>
       <details><summary>¿Cómo sé que salió al aire?</summary><p>Cada emisión aparece en tu panel y al final recibes un certificado con fecha, hora y emisora.</p></details>
       <details><summary>Prefiero que alguien me ayude.</summary><p>El equipo de ventas arma la pauta contigo por correo o WhatsApp.</p></details>
