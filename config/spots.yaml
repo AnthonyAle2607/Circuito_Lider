@@ -1,0 +1,10 @@
+# Reglas de revisión de los spots que suben los clientes (PT-6). Decisiones de Anthony del 2026-11-19.
+#
+# Duración: lo que pase del máximo se rechaza al instante (es un dato exacto, no necesita revisión).
+duracion_maxima_segundos: 40
+formatos_aceptados: [mp4, mp3, wav]
+
+# Palabras prohibidas: la lista inicial está en datos/palabras-prohibidas.yaml y luego se edita desde el panel.
+# Una coincidencia NO rechaza el spot: lo manda a revisión humana con la palabra y el segundo donde aparece,
+# porque la transcripción puede equivocarse (música de fondo, jerga, nombres propios).
+al_encontrar_palabra: revision

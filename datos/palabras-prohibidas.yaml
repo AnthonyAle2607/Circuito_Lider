@@ -1,0 +1,119 @@
+# Lista inicial de palabras prohibidas en los spots (2026-11-19). 100 entradas.
+# Se carga una vez en la base; después el equipo la edita desde el panel.
+#
+# Cómo se compara (PT-6):
+#  - La transcripción y la lista se pasan a minúsculas y sin tildes ni diéresis («güevón» = «guevon»).
+#  - Se busca la palabra entera, no un pedazo: «puta» no marca «computadora» ni «disputa».
+#  - Las frases de varias palabras se buscan tal cual.
+#  - Una coincidencia manda el spot a revisión humana (config/spots.yaml); no lo rechaza.
+#
+# Quedaron fuera a propósito palabras con un sentido común e inocente que darían falsas alarmas a cada rato
+# (huevo, concha, bicho, paja, bolas, cola, perra, polvo, joda). Si el equipo quiere vigilarlas, las agrega en el panel.
+
+groserias:
+  - coño
+  - coñazo
+  - carajo
+  - verga
+  - vergación
+  - mierda
+  - cagar
+  - cagada
+  - cagado
+  - joder
+  - jodido
+  - jodida
+  - puta
+  - puto
+  - putada
+  - putamadre
+  - hostia
+  - cojones
+  - cojonudo
+  - pinga
+  - pingazo
+  - arrecho
+  - arrechera
+  - culo
+  - güevo
+  - chingar
+  - chingada
+  - pajúo
+  - cagón
+  - putero
+
+insultos:
+  - pendejo
+  - pendeja
+  - pendejada
+  - gilipollas
+  - cabrón
+  - cabrona
+  - malparido
+  - malparida
+  - hijueputa
+  - hijoputa
+  - hijo de puta
+  - hija de puta
+  - mamagüevo
+  - huevón
+  - güevón
+  - webón
+  - comemierda
+  - caraculo
+  - careverga
+  - coñoetumadre
+  - conchetumadre
+  - chupapinga
+  - bastardo
+  - mamón
+  - imbécil
+  - zorra
+  - marico
+  - marica
+  - maricón
+  - mariconada
+  - cachapera
+  - mamaguevada
+
+sexual:
+  - coger
+  - cogida
+  - culear
+  - follar
+  - follando
+  - porno
+  - pornografía
+  - pornográfico
+  - xxx
+  - orgía
+  - orgasmo
+  - eyacular
+  - masturbar
+  - masturbación
+  - pajero
+  - prostituta
+  - escort
+  - cuca
+  - chocha
+  - totona
+  - teta
+  - tetas
+  - tetona
+  - mamada
+  - felación
+  - erótico
+  - erótica
+  - semen
+
+ingles:
+  - fuck
+  - fucking
+  - shit
+  - bitch
+  - asshole
+  - motherfucker
+  - dick
+  - pussy
+  - porn
+  - cunt
