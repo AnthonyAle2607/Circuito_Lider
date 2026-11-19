@@ -112,6 +112,8 @@ export interface EmisorasTabla {
   zona_horaria: Generated<string>;
   activa: Generated<boolean>;
   creado_at: Generated<Date>;
+  stream_url: string | null;
+  descripcion: string | null;
 }
 
 export interface ProgramasTabla {

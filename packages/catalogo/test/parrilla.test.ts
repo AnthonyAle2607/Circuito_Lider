@@ -85,3 +85,30 @@ describe('consultas (con el rol de la API)', () => {
     expect(await parrillaDeEmisora(b.db, 'atlantis')).toBeNull();
   });
 });
+
+describe('vitrina: señal en vivo y descripciones', () => {
+  it('todas las emisoras traen su señal https y su descripción, y los programas la suya', async () => {
+    await b.comoApi();
+    const e = await listarEmisoras(b.db);
+    const p = (await parrillaDeEmisora(b.db, 'caracas'))!;
+    await b.comoDueno();
+    expect(e.every((x) => x.streamUrl?.startsWith('https://') && x.descripcion)).toBe(true);
+    expect(e.find((x) => x.slug === 'caracas')!.streamUrl).toBe('https://acp4.lorini.net:15020/stream');
+    expect(p.programas.every((x) => x.descripcion)).toBe(true);
+  });
+
+  it('volver a cargar completa lo que falta pero respeta lo que el equipo cambió', async () => {
+    await b.pg.query(`UPDATE emisoras SET descripcion = 'Texto del equipo', stream_url = NULL WHERE slug = 'valencia'`);
+    await b.pg.query(`UPDATE programas SET descripcion = 'Corregida' WHERE nombre = 'ENCENDIDOS'`);
+    await cargarParrilla(b.db, archivo);
+    const { rows } = await b.pg.query<{ descripcion: string; stream_url: string }>(`SELECT descripcion, stream_url FROM emisoras WHERE slug = 'valencia'`);
+    expect(rows[0]).toEqual({ descripcion: 'Texto del equipo', stream_url: 'https://acp4.lorini.net:15028/stream' });
+    const { rows: pr } = await b.pg.query<{ descripcion: string }>(`SELECT descripcion FROM programas WHERE nombre = 'ENCENDIDOS'`);
+    expect(pr[0]!.descripcion).toBe('Corregida');
+  });
+
+  it('rechaza una señal que no es https', () => {
+    const malo = { ...archivo, emisoras: [{ ...archivo.emisoras[0]!, stream: 'http://inseguro.example/stream' }, ...archivo.emisoras.slice(1)] };
+    expect(ArchivoParrilla.safeParse(malo).success).toBe(false);
+  });
+});

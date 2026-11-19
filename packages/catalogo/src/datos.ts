@@ -11,6 +11,7 @@ const FranjaArchivo = z
 const ProgramaArchivo = z.object({
   nombre: z.string().min(1).max(160),
   locutores: z.string().max(300).optional(),
+  descripcion: z.string().min(1).max(1000).optional(),
   franjas: z.array(FranjaArchivo).min(1),
 });
 
@@ -26,6 +27,9 @@ export const ArchivoParrilla = z
           nombre: z.string().min(1),
           ciudad: z.string().min(1),
           frecuencia: z.string().regex(/^[0-9]{2,3}\.[0-9] FM$/),
+          /** Señal en vivo (Icecast/HTTP). Solo https: el portal no puede cargar audio inseguro. */
+          stream: z.string().regex(/^https:\/\/\S+$/, 'la señal debe ser https://').max(300).optional(),
+          descripcion: z.string().min(1).max(1000).optional(),
         }),
       )
       .min(1),

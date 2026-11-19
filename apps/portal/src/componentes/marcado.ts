@@ -54,7 +54,7 @@ export const ANTES_DE_VENTA = String.raw`  <section class="hero">
   <section class="ringsec band-w" id="emisoras">
     <div class="wrap ring-wrap">
       <div class="sec-head rv" style="margin:0"><span class="label">Cobertura</span><h2>Una compra. <span class="tape">Diez emisoras.</span></h2><p>Los programas en cadena nacional suenan en todo el circuito al mismo tiempo. Las franjas locales, solo donde las elijas. Arrastra el círculo para girarlo.</p>
-        <div class="ctas" style="justify-content:flex-start"><a class="btn m" href="#paquetes">Ver paquetes <span class="arrow">→</span></a></div></div>
+        <div class="ctas" style="justify-content:flex-start"><a class="btn m" href="#paquetes">Ver paquetes <span class="arrow">→</span></a><a class="btn" href="/emisoras">Escuchar en vivo</a></div></div>
       <div class="wheel" id="wheel" aria-label="Las diez emisoras de Circuito Líder">
         <div class="orbit" id="orbit"></div>
         <div class="dial" aria-hidden="true"><div class="face"></div><div class="tk" id="ticks"></div><div class="needle"></div><div class="knob"></div><span class="cnt">10 emisoras FM</span></div>

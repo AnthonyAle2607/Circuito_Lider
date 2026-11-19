@@ -15,29 +15,84 @@ circuito: Circuito Líder
 segundos_por_hora: 240
 
 emisoras:
-  - { slug: caracas,        nombre: Líder Caracas,        ciudad: Caracas,        frecuencia: 94.9 FM }
-  - { slug: valencia,       nombre: Líder Valencia,       ciudad: Valencia,       frecuencia: 106.7 FM }
-  - { slug: merida,         nombre: Líder Mérida,         ciudad: Mérida,         frecuencia: 92.3 FM }
-  - { slug: san-cristobal,  nombre: Líder San Cristóbal,  ciudad: San Cristóbal,  frecuencia: 91.1 FM }
-  - { slug: barquisimeto,   nombre: Líder Barquisimeto,   ciudad: Barquisimeto,   frecuencia: 94.9 FM }
-  - { slug: maracaibo,      nombre: Líder Maracaibo,      ciudad: Maracaibo,      frecuencia: 100.5 FM }
-  - { slug: puerto-ordaz,   nombre: Líder Puerto Ordaz,   ciudad: Puerto Ordaz,   frecuencia: 100.3 FM }
-  - { slug: el-vigia,       nombre: Líder El Vigía,       ciudad: El Vigía,       frecuencia: 100.1 FM }
-  - { slug: puerto-la-cruz, nombre: Líder Puerto La Cruz, ciudad: Puerto La Cruz, frecuencia: 100.5 FM }
-  # Añadida el 2026-11-18: el reproductor de circuitolider.com ya la lista, pero su página de programación no publica
-  # programas. Se supone que lleva la cadena nacional, como las demás Líder (confirmar con la emisora).
-  - { slug: margarita,      nombre: Líder Margarita,      ciudad: Margarita,      frecuencia: 97.3 FM }
+  # stream: señal en vivo que usa el reproductor de circuitolider.com (Icecast, AAC 64 kbps), revisada el 2026-11-18.
+  # descripcion: texto PROVISIONAL redactado por Invermedia con lo que publica la web; confirmarlo con Circuito Líder.
+  # Margarita se añadió el 2026-11-18: su página no publica programas; se supone que lleva la cadena nacional.
+  - slug: caracas
+    nombre: Líder Caracas
+    ciudad: Caracas
+    frecuencia: 94.9 FM
+    stream: https://acp4.lorini.net:15020/stream
+    descripcion: "La señal Líder de la capital: pop y rock en inglés y español y los éxitos del momento. Además de la cadena nacional, es la emisora con más programas propios del circuito, de lunes a domingo."
+  - slug: valencia
+    nombre: Líder Valencia
+    ciudad: Valencia
+    frecuencia: 106.7 FM
+    stream: https://acp4.lorini.net:15028/stream
+    descripcion: "Líder en Valencia: pop y rock en inglés y español y los éxitos del momento, con los programas en cadena nacional de lunes a viernes."
+  - slug: merida
+    nombre: Líder Mérida
+    ciudad: Mérida
+    frecuencia: 92.3 FM
+    stream: https://acp4.lorini.net:15022/stream
+    descripcion: "Líder en Mérida: pop y rock en inglés y español, la cadena nacional y programas propios de la ciudad entre semana y los fines de semana."
+  - slug: san-cristobal
+    nombre: Líder San Cristóbal
+    ciudad: San Cristóbal
+    frecuencia: 91.1 FM
+    stream: https://acp4.lorini.net:15024/stream
+    descripcion: "Líder en San Cristóbal: pop y rock en inglés y español y los éxitos del momento, con los programas en cadena nacional de lunes a viernes."
+  - slug: barquisimeto
+    nombre: Líder Barquisimeto
+    ciudad: Barquisimeto
+    frecuencia: 94.9 FM
+    stream: https://acp4.lorini.net:15026/stream
+    descripcion: "Líder en Barquisimeto: pop y rock en inglés y español y los éxitos del momento, con los programas en cadena nacional de lunes a viernes."
+  - slug: maracaibo
+    nombre: Líder Maracaibo
+    ciudad: Maracaibo
+    frecuencia: 100.5 FM
+    stream: https://acp4.lorini.net:15030/stream
+    descripcion: "Líder en Maracaibo: pop y rock en inglés y español, la cadena nacional entre semana y programa propio los fines de semana."
+  - slug: puerto-ordaz
+    nombre: Líder Puerto Ordaz
+    ciudad: Puerto Ordaz
+    frecuencia: 100.3 FM
+    stream: https://acp4.lorini.net:15032/stream
+    descripcion: "Líder en Puerto Ordaz: pop y rock en inglés y español y los éxitos del momento, con los programas en cadena nacional de lunes a viernes."
+  - slug: el-vigia
+    nombre: Líder El Vigía
+    ciudad: El Vigía
+    frecuencia: 100.1 FM
+    stream: https://acp4.lorini.net:15034/stream
+    descripcion: "Líder en El Vigía: pop y rock en inglés y español y los éxitos del momento, con los programas en cadena nacional de lunes a viernes."
+  - slug: puerto-la-cruz
+    nombre: Líder Puerto La Cruz
+    ciudad: Puerto La Cruz
+    frecuencia: 100.5 FM
+    stream: https://acp4.lorini.net:15036/stream
+    descripcion: "Líder en Puerto La Cruz: pop y rock en inglés y español y los éxitos del momento, con los programas en cadena nacional de lunes a viernes."
+  - slug: margarita
+    nombre: Líder Margarita
+    ciudad: Margarita
+    frecuencia: 97.3 FM
+    stream: https://acp4.lorini.net:15050/stream
+    descripcion: "Líder en la isla de Margarita: pop y rock en inglés y español, entretenimiento y deportes."
 
+# descripcion de programas: PROVISIONAL, solo con lo que se sabe (horario, alcance, conductores); confirmar con la emisora.
 # Programas en cadena: suenan a la vez en las diez emisoras («Hora Nacional»).
 nacionales:
   - nombre: ENCENDIDOS
     locutores: Angélica Gómez, Jesús Berbín, Kate Ramos
+    descripcion: "La mañana en cadena nacional: suena a la vez en las diez emisoras Líder mientras el país arranca el día."
     franjas: [{ dias: [1, 2, 3, 4, 5], inicio: "06:00", fin: "09:00" }]
   - nombre: CONVOCADOS
     locutores: Guillermo Arcay, Eduardo Pino, Carlos Marcano
+    descripcion: "El mediodía en cadena nacional, a la vez en las diez emisoras Líder."
     franjas: [{ dias: [1, 2, 3, 4, 5], inicio: "11:00", fin: "13:00" }]
   - nombre: AL AIRE
     locutores: Auri Castillo, Abel Saraiba
+    descripcion: "La tarde en cadena nacional, a la vez en las diez emisoras Líder, a la hora de la salida del trabajo."
     franjas: [{ dias: [1, 2, 3, 4, 5], inicio: "17:00", fin: "18:00" }]
 
 # Programas locales: solo en su emisora.
@@ -45,35 +100,45 @@ locales:
   caracas:
     - nombre: Máximo Volumen
       locutores: Máximo Ferro
+      descripcion: "Programa propio de Caracas a media mañana, entre ENCENDIDOS y CONVOCADOS."
       franjas: [{ dias: [1, 2, 3, 4, 5], inicio: "09:00", fin: "11:00" }]
     - nombre: Batita en Líder
       locutores: Batita González
+      descripcion: "Programa propio de Caracas para el comienzo de la tarde."
       franjas: [{ dias: [1, 2, 3, 4, 5], inicio: "13:00", fin: "15:00" }]
     - nombre: El 3 Pack
       locutores: Estella Guerrero
+      descripcion: "Programa propio de Caracas a media tarde."
       franjas: [{ dias: [1, 2, 3, 4, 5], inicio: "15:15", fin: "16:15" }]
     - nombre: Venezuela Subterránea
       locutores: DJ 13
+      descripcion: "Espacio semanal de Caracas, los miércoles en la noche."
       franjas: [{ dias: [3], inicio: "21:00", fin: "22:00" }]
     - nombre: Play House Líder
       locutores: DJ Turntable
+      descripcion: "Sesión nocturna con DJ en Caracas, viernes y sábado hasta la madrugada."
       franjas:
         - { dias: [5, 6], inicio: "21:00", fin: "24:00" }
         - { dias: [6, 7], inicio: "00:00", fin: "01:00" }
     - nombre: Más que To2
       locutores: Randy Alvarado
+      descripcion: "Programa de fin de semana por la mañana."
       franjas: [{ dias: [6, 7], inicio: "09:00", fin: "10:00" }]
   merida:
     - nombre: El Brunch
       locutores: Scarlett Vergara
+      descripcion: "Programa propio de Mérida a media mañana."
       franjas: [{ dias: [1, 2, 3, 4, 5], inicio: "10:00", fin: "12:00" }]
     - nombre: Cambio de Luces
       locutores: Leo Colella
+      descripcion: "Programa propio de Mérida para la tarde."
       franjas: [{ dias: [1, 2, 3, 4, 5], inicio: "15:00", fin: "17:00" }]
     - nombre: Tiempo de Juego
       locutores: Carlos Rangel
+      descripcion: "Programa de Mérida para las mañanas del fin de semana."
       franjas: [{ dias: [6, 7], inicio: "09:00", fin: "12:00" }]
   maracaibo:
     - nombre: Más que To2
       locutores: Randy Alvarado
+      descripcion: "Programa de fin de semana por la mañana."
       franjas: [{ dias: [6, 7], inicio: "09:00", fin: "10:00" }]

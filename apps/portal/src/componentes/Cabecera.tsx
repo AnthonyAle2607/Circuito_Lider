@@ -16,6 +16,7 @@ export function Cabecera({ conSesion }: { conSesion: boolean }) {
         <nav className="main" aria-label="Secciones">
           <Link href="/#como">Cómo funciona</Link>
           <Link href="/#paquetes">Paquetes</Link>
+          <Link href="/emisoras">Emisoras en vivo</Link>
           <Link href="/parrilla">Parrilla</Link>
         </nav>
         <div className="acceso-top">

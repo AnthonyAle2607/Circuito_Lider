@@ -9,6 +9,9 @@ export interface Emisora {
   nombre: string;
   ciudad: string;
   frecuencia: string;
+  /** Señal en vivo, o null si todavía no se conoce. */
+  streamUrl: string | null;
+  descripcion: string | null;
 }
 
 export interface Franja {
@@ -26,6 +29,7 @@ export interface ProgramaEnParrilla {
   nombre: string;
   alcance: 'nacional' | 'local';
   locutores: string | null;
+  descripcion: string | null;
   franjas: Franja[];
 }
 
@@ -41,7 +45,7 @@ const hhmm = (t: string) => t.slice(0, 5);
 export async function listarEmisoras(db: Db): Promise<Emisora[]> {
   return db
     .selectFrom('emisoras')
-    .select(['id', 'slug', 'nombre', 'ciudad', 'frecuencia'])
+    .select(['id', 'slug', 'nombre', 'ciudad', 'frecuencia', 'stream_url as streamUrl', 'descripcion'])
     .where('activa', '=', true)
     .orderBy('ciudad')
     .execute();
@@ -54,7 +58,7 @@ export async function listarEmisoras(db: Db): Promise<Emisora[]> {
 export async function parrillaDeEmisora(db: Db, slug: string, op: { soloActivas?: boolean } = {}): Promise<Parrilla | null> {
   const e = await db
     .selectFrom('emisoras')
-    .select(['id', 'slug', 'nombre', 'ciudad', 'frecuencia', 'circuito_id', 'zona_horaria'])
+    .select(['id', 'slug', 'nombre', 'ciudad', 'frecuencia', 'stream_url as streamUrl', 'descripcion', 'circuito_id', 'zona_horaria'])
     .where('slug', '=', slug)
     .where('activa', '=', true)
     .executeTakeFirst();
@@ -68,6 +72,7 @@ export async function parrillaDeEmisora(db: Db, slug: string, op: { soloActivas?
       'p.nombre',
       'p.alcance',
       'p.locutores',
+      'p.descripcion as programa_descripcion',
       'f.id',
       'f.dia_semana',
       sql<string>`f.hora_inicio::text`.as('hora_inicio'),
@@ -89,7 +94,7 @@ export async function parrillaDeEmisora(db: Db, slug: string, op: { soloActivas?
   for (const r of filas) {
     let p = programas.get(r.programa_id);
     if (!p) {
-      p = { id: r.programa_id, nombre: r.nombre, alcance: r.alcance, locutores: r.locutores, franjas: [] };
+      p = { id: r.programa_id, nombre: r.nombre, alcance: r.alcance, locutores: r.locutores, descripcion: r.programa_descripcion, franjas: [] };
       programas.set(r.programa_id, p);
     }
     p.franjas.push({

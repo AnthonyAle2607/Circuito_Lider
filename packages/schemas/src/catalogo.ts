@@ -6,6 +6,9 @@ export const Emisora = z.object({
   nombre: z.string(),
   ciudad: z.string(),
   frecuencia: z.string(),
+  /** Señal en vivo (https), o null si todavía no se conoce. */
+  streamUrl: z.string().nullable().default(null),
+  descripcion: z.string().nullable().default(null),
 });
 export type Emisora = z.infer<typeof Emisora>;
 
@@ -32,6 +35,7 @@ export const Parrilla = z.object({
       nombre: z.string(),
       alcance: z.enum(['nacional', 'local']),
       locutores: z.string().nullable(),
+      descripcion: z.string().nullable().default(null),
       franjas: z.array(Franja),
     }),
   ),

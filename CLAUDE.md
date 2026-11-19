@@ -125,4 +125,8 @@ evento que tenga quien lo consuma (el correo de verificación, con n8n).
   empresa, perfil y clave), `GET /v1/cuentas/resumen`, `PUT /v1/cuentas/empresa`, `PUT /v1/cuentas/perfil`,
   `POST /v1/cuentas/clave` (vía `cambiar_clave_usuario()`: la API sigue sin escribir `password_hash` directo). Anuncios,
   pagos en línea y certificados muestran qué llegará; se llenan con PT-5, PT-6 y PT-7.
+- **PT-4c · Vitrina** (2026-11-19): `/emisoras` y `/emisoras/[slug]` con señal en vivo (reproductor en el layout raíz,
+  `componentes/Radio.tsx`: sigue sonando al navegar), qué suena ahora y después (`lib/vivo.ts`, hora de Caracas) y la
+  ficha de cada programa. Migración `0007_vitrina` (`emisoras.stream_url`, `emisoras.descripcion`); los textos de
+  `datos/circuito-lider.yaml` son PROVISIONALES y el cargador solo completa lo que falta.
 - Siguiente: **PT-6 · Spots y validador** (reglas en `config/spots.yaml`), **PT-5 · Pagos** y **PT-5b · Agente vendedor**.

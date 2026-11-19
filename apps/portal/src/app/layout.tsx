@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { Cabecera } from '@/componentes/Cabecera';
 import { Pie } from '@/componentes/Pie';
+import { RadioProvider } from '@/componentes/Radio';
 import { leerMarca } from '@/lib/marca';
 import { sesionActual } from '@/lib/sesion';
 // Tipografías empaquetadas con el portal (@fontsource): el visitante no se conecta a Google y compilar no
@@ -33,9 +34,11 @@ export default async function Marco({ children }: { children: ReactNode }) {
         <script dangerouslySetInnerHTML={{ __html: "document.documentElement.classList.add('js')" }} />
       </head>
       <body>
-        <Cabecera conSesion={conSesion} />
-        {children}
-        <Pie />
+        <RadioProvider>
+          <Cabecera conSesion={conSesion} />
+          {children}
+          <Pie />
+        </RadioProvider>
       </body>
     </html>
   );

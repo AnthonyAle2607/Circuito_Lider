@@ -112,3 +112,67 @@ button.btn[disabled]{opacity:.5;cursor:not-allowed}
 .panel-lado,.panel-cuerpo{min-width:0}
 .panel-cuerpo{padding:0}
 .acceso-top .btn{white-space:nowrap}
+
+/* ── vitrina de emisoras ─────────────────────────────────────────────────── */
+.rejilla-emisoras{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
+.tarjeta.emisora{display:grid;gap:8px;align-content:start;margin-top:0}
+.emisora-cabeza{display:flex;align-items:baseline;gap:6px}
+.emisora-cabeza .frecuencia,.ficha-dial .frecuencia{font:700 54px/1 var(--f-display);color:var(--mustard)}
+.emisora-cabeza .fm,.ficha-dial .fm{font:700 14px/1 var(--f-mono);letter-spacing:.1em;color:var(--soft)}
+.tarjeta.emisora h2{font:700 26px/1.1 var(--f-display);text-transform:uppercase;margin:0}
+.al-aire{margin:4px 0 0;display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-weight:500}
+.despues{margin:0;color:var(--soft);font-size:14px}
+.tarjeta.emisora .acciones{margin-top:8px;justify-content:space-between}
+.ver{color:var(--cream);font-weight:500;text-decoration:none}
+.ver:hover{text-decoration:underline}
+
+.vivo-btn{display:inline-flex;align-items:center;gap:8px}
+.vivo-btn.compacto{padding:10px 16px;font-size:14px}
+.punto{width:10px;height:10px;border-radius:50%;background:currentColor;opacity:.5;flex:none}
+.punto.on{background:var(--red);opacity:1;animation:latido 1.2s ease-in-out infinite}
+@keyframes latido{50%{transform:scale(.6);opacity:.5}}
+@media (prefers-reduced-motion:reduce){.punto.on{animation:none}}
+
+.ficha-cabeza{display:grid;grid-template-columns:auto minmax(0,1fr);gap:32px;align-items:center;margin:16px 0 28px}
+.ficha-dial{width:180px;height:180px;border-radius:50%;border:3px solid var(--line);display:grid;place-content:center;justify-items:center;gap:6px;background:var(--ink2)}
+.ficha-cabeza h1{margin-top:0}
+.ficha-cabeza .intro{margin-bottom:8px}
+.ahora-despues{grid-template-columns:repeat(2,minmax(0,1fr))}
+.ahora-despues .cifra b{font-size:30px;text-transform:uppercase}
+.rejilla-programas{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+.tarjeta.programa{margin-top:0;display:grid;gap:8px;align-content:start}
+.tarjeta.programa p{margin:0}
+.tarjeta.programa.al-aire-ahora{border-color:var(--mustard)}
+.programa-cabeza{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.programa-cabeza h3{font:700 22px/1.15 var(--f-display);text-transform:uppercase;margin:0}
+.horarios{list-style:none;margin:0;padding:0;font:500 14px/1.6 var(--f-mono);color:var(--mustard)}
+.conducen{color:var(--soft);font-size:14px}
+.llamada{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap;margin-top:40px}
+.llamada h2{font:700 28px/1.1 var(--f-display);text-transform:uppercase;margin:0 0 6px}
+.llamada p{margin:0;color:var(--soft)}
+.otras-emisoras{display:flex;flex-wrap:wrap;gap:8px}
+.otras-emisoras a{border:2px solid var(--line);border-radius:999px;padding:8px 14px;color:var(--cream);text-decoration:none;font-size:14px}
+.otras-emisoras a:hover{border-color:var(--mustard)}
+.otras-emisoras b{color:var(--mustard);margin-right:4px}
+@media (max-width:640px){
+  .ficha-cabeza{grid-template-columns:1fr;gap:16px}
+  .ficha-dial{width:120px;height:120px}
+  .ficha-dial .frecuencia{font-size:38px}
+  .ahora-despues{grid-template-columns:1fr}
+}
+
+/* reproductor fijo abajo: sigue sonando al navegar */
+.radio-barra{position:fixed;left:max(16px,env(safe-area-inset-left,0px));bottom:max(16px,env(safe-area-inset-bottom,0px));z-index:45;display:flex;align-items:center;gap:12px;background:var(--ink2);border:2px solid var(--mustard);border-radius:18px;padding:10px 12px;max-width:min(460px,calc(100vw - 32px));box-shadow:0 12px 30px #00000066}
+.radio-boton{width:46px;height:46px;border-radius:50%;border:0;background:var(--mustard);color:var(--ink);font:700 16px/1 var(--f-body);cursor:pointer;flex:none}
+.radio-info{display:grid;gap:2px;min-width:0}
+.radio-info a{color:var(--cream);text-decoration:none;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.radio-info a b{color:var(--mustard);margin-right:4px}
+.radio-info small{color:var(--soft);font-size:12px}
+.radio-vivo{font:700 11px/1 var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--soft)}
+.radio-barra.sonando .radio-vivo{color:var(--red)}
+.radio-volumen{width:90px;accent-color:var(--mustard)}
+.radio-cerrar{background:none;border:0;color:var(--soft);font-size:24px;line-height:1;cursor:pointer;padding:4px 6px}
+.radio-cerrar:hover{color:var(--cream)}
+body.con-radio .sup{bottom:calc(max(18px,env(safe-area-inset-bottom,0px)) + 84px)}
+body.con-radio footer{padding-bottom:96px}
+@media (max-width:560px){.radio-volumen{display:none}.radio-barra{left:12px;right:12px;max-width:none}}

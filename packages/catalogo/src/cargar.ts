@@ -1,4 +1,4 @@
-import type { Kysely, Transaction } from 'kysely';
+import { sql, type Kysely, type Transaction } from 'kysely';
 import type { Database } from '@sp/db';
 import { segundosEstimados, type ArchivoParrilla } from './datos';
 
@@ -30,6 +30,17 @@ export async function cargarParrilla(db: Kysely<Database>, a: ArchivoParrilla): 
         .returning('id')
         .executeTakeFirst();
       if (r) nuevo.emisoras++;
+      // Señal y descripción: se completan si faltan; si el equipo ya las cambió, se respetan.
+      if (e.stream || e.descripcion) {
+        await t
+          .updateTable('emisoras')
+          .set({
+            stream_url: sql<string | null>`coalesce(stream_url, ${e.stream ?? null})`,
+            descripcion: sql<string | null>`coalesce(descripcion, ${e.descripcion ?? null})`,
+          })
+          .where('slug', '=', e.slug)
+          .execute();
+      }
       const fila = await t.selectFrom('emisoras').select('id').where('slug', '=', e.slug).executeTakeFirstOrThrow();
       idEmisora.set(e.slug, fila.id);
     }
@@ -51,6 +62,9 @@ export async function cargarParrilla(db: Kysely<Database>, a: ArchivoParrilla): 
       let q = t.selectFrom('programas').select('id').where('circuito_id', '=', circuito.id).where('nombre', '=', p.nombre);
       q = emisoraId ? q.where('emisora_id', '=', emisoraId) : q.where('emisora_id', 'is', null);
       const programa = await q.executeTakeFirstOrThrow();
+      if (p.descripcion) {
+        await t.updateTable('programas').set({ descripcion: sql<string | null>`coalesce(descripcion, ${p.descripcion})` }).where('id', '=', programa.id).execute();
+      }
       nuevo.franjas += await cargarFranjas(t, programa.id, p, a.segundos_por_hora);
     };
 
