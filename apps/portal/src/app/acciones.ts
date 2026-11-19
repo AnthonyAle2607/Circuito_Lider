@@ -167,3 +167,18 @@ export async function subirAnuncio(f: FormData): Promise<{ ok: true } | { ok: fa
   revalidatePath('/cuenta/anuncios');
   return { ok: true };
 }
+
+/** Elige qué anuncio suena en un pedido (solo anuncios aprobados). */
+export async function asignarAnuncio(f: FormData) {
+  const pedido = texto(f, 'pedido');
+  const r = await api<ErrorApi>(`/v1/pedidos/${encodeURIComponent(pedido)}/anuncio`, {
+    method: 'PUT',
+    conSesion: true,
+    body: JSON.stringify({ anuncioId: texto(f, 'anuncio') }),
+  });
+  const ruta = `/cuenta/pedidos/${pedido}`;
+  if (r.status === 401) redirect(`/ingresar?siguiente=${encodeURIComponent(ruta)}`);
+  if (!r.ok) redirect(conError(ruta, r.datos?.mensaje ?? 'No pudimos asignar el anuncio.'));
+  revalidatePath(ruta);
+  redirect(`${ruta}?anuncio=1`);
+}

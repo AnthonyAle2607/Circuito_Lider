@@ -250,3 +250,24 @@ body.con-radio footer{padding-bottom:96px}
 video.anuncio-medio{max-height:240px;border-radius:12px;background:#000}
 .tarjeta.anuncio details summary{cursor:pointer;color:var(--soft)}
 .tarjeta.anuncio details p{color:var(--soft);margin:8px 0 0}
+
+/* ── certificados ───────────────────────────────────────────────────────── */
+.dia-certificados .sub{text-transform:capitalize}
+.certificado{background:var(--ink2);border:2px solid var(--mustard);border-radius:24px;padding:28px;display:grid;gap:18px;max-width:760px}
+.certificado h1{margin:6px 0 4px;font-size:clamp(30px,4vw,46px)}
+.certificado header p{margin:0;font-size:18px}
+.certificado dl{margin:0;display:grid;gap:10px}
+.certificado dl div{display:grid;grid-template-columns:220px minmax(0,1fr);gap:12px;border-bottom:1px solid var(--line);padding-bottom:10px}
+.certificado dt{font:500 12px/1.4 var(--f-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--soft)}
+.certificado dd{margin:0}
+.certificado .mono{font:500 13px/1.4 var(--f-mono);overflow-wrap:anywhere}
+@media (max-width:560px){.certificado dl div{grid-template-columns:1fr;gap:2px}}
+/* Al imprimir (o guardar como PDF): solo el certificado, en blanco y negro legible. */
+@media print{
+  header.top,footer,.panel-lado,.sin-imprimir,.radio-barra,.sup{display:none!important}
+  body{background:#fff!important;color:#000!important}
+  .panel-rejilla{display:block}
+  .certificado{border:2px solid #000;color:#000;background:#fff}
+  .certificado dt,.certificado .nota{color:#333}
+  .certificado dl div{border-color:#999}
+}

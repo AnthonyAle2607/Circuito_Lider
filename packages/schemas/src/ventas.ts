@@ -79,11 +79,13 @@ export const Pedido = z.object({
   totalCentimos: z.number().int(),
   reservaVenceAt: z.string(),
   creadoAt: z.string(),
+  /** El spot asignado a la campaña (PT-7); null mientras el cliente no elija uno. */
+  anuncioId: z.string().nullable().default(null),
   reservas: z.array(z.object({ franjaId: z.string(), fecha: z.string(), segundos: z.number().int(), estado: z.enum(['retenida', 'confirmada', 'liberada']) })),
 });
 export type Pedido = z.infer<typeof Pedido>;
 
-export const ResumenPedido = Pedido.omit({ reservas: true }).extend({ emisiones: z.number().int() });
+export const ResumenPedido = Pedido.omit({ reservas: true, anuncioId: true }).extend({ emisiones: z.number().int() });
 export type ResumenPedido = z.infer<typeof ResumenPedido>;
 
 // ── panel de ventas ─────────────────────────────────────────────────────────
@@ -91,3 +93,5 @@ export const DecisionAprobacion = z.object({
   decision: z.enum(['aprobar', 'rechazar']),
   motivo: z.string().trim().min(3).max(1000),
 });
+
+export const AsignarAnuncio = z.object({ anuncioId: z.string().uuid() });

@@ -15,3 +15,6 @@ __pycache__/
 respaldos/
 .claude/
 .next-*/
+
+# Audio grabado de las emisoras (PT-7): local, nunca al repositorio.
+grabaciones/

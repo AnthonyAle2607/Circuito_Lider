@@ -79,6 +79,19 @@ importers:
         specifier: ^4.19.2
         version: 4.23.15
 
+  apps/grabador:
+    dependencies:
+      pg:
+        specifier: ^8.13.1
+        version: 8.23.1
+    devDependencies:
+      '@types/pg':
+        specifier: ^8.11.10
+        version: 8.23.1
+      tsx:
+        specifier: ^4.19.2
+        version: 4.23.15
+
   apps/panel:
     dependencies:
       '@sp/schemas':
@@ -149,6 +162,9 @@ importers:
 
   apps/workers:
     dependencies:
+      '@sp/huella':
+        specifier: workspace:^
+        version: link:../../packages/huella
       '@sp/spots':
         specifier: workspace:^
         version: link:../../packages/spots
@@ -227,6 +243,8 @@ importers:
       tsx:
         specifier: ^4.19.2
         version: 4.23.15
+
+  packages/huella: {}
 
   packages/inventory:
     dependencies:

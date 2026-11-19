@@ -10,6 +10,7 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@sp/huella": "workspace:^",
     "@sp/spots": "workspace:^",
     "bullmq": "^5.34.0",
     "ioredis": "^5.4.2",

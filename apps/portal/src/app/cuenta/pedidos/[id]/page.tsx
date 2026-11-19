@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
-import { Cotizacion, Pedido } from '@sp/schemas';
-import { cancelarPedido } from '../../../acciones';
+import { Anuncio, Certificado, Cotizacion, Pedido } from '@sp/schemas';
+import { asignarAnuncio, cancelarPedido } from '../../../acciones';
 import { dinero, fechaCorta } from '@/lib/fechas';
 import { api, exigirSesion } from '@/lib/sesion';
 
@@ -13,7 +13,7 @@ const ESTADOS: Record<string, string> = { reservado: 'Reservado · falta pagar',
 /** Los pasos del pedido. En PT-4 llegan hasta la reserva; pago, spot y emisiones se encienden en sus PT. */
 const PASOS = ['Reservado', 'Pagado', 'Spot aprobado', 'Programado', 'Al aire', 'Certificado'];
 
-export default async function VerPedido({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ nuevo?: string; error?: string }> }) {
+export default async function VerPedido({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ nuevo?: string; error?: string; anuncio?: string }> }) {
   const { id } = await params;
   const q = await searchParams;
   if (!/^[0-9a-f-]{36}$/i.test(id)) notFound();
@@ -24,7 +24,18 @@ export default async function VerPedido({ params, searchParams }: { params: Prom
   const p = Pedido.parse(r.datos);
   const c = Cotizacion.parse((await api(`/v1/cotizaciones/${p.cotizacionId}`)).datos);
   const vence = new Date(p.reservaVenceAt).toLocaleString('es-VE', { timeZone: 'America/Caracas', dateStyle: 'medium', timeStyle: 'short' });
-  const hecho = p.estado === 'pagado' ? 2 : p.estado === 'reservado' ? 1 : 0;
+  const [ra, rc] = await Promise.all([api('/v1/anuncios', { conSesion: true }), api(`/v1/certificados?pedido=${p.id}`, { conSesion: true })]);
+  const anuncios = ra.ok ? Anuncio.array().parse(ra.datos) : [];
+  const aprobados = anuncios.filter((a) => a.estado === 'aprobado');
+  const asignado = anuncios.find((a) => a.id === p.anuncioId) ?? null;
+  const certificados = rc.ok ? Certificado.array().parse(rc.datos) : [];
+  const vigente = p.estado === 'reservado' || p.estado === 'pagado';
+  // Pasos que ya se cumplen: reservado, pagado, spot asignado y aprobado, al aire y certificado.
+  const listos = new Set<string>();
+  if (vigente || p.estado === 'pagado') listos.add('Reservado');
+  if (p.estado === 'pagado') listos.add('Pagado');
+  if (asignado) listos.add('Spot aprobado');
+  if (certificados.length) ['Programado', 'Al aire', 'Certificado'].forEach((x) => listos.add(x));
 
   return (
     <>
@@ -45,13 +56,53 @@ export default async function VerPedido({ params, searchParams }: { params: Prom
         )}
 
         <ol className="tarjeta" style={{ display: 'flex', flexWrap: 'wrap', gap: 8, listStyle: 'none', margin: '0 0 16px', padding: 16 }} aria-label="Avance del pedido">
-          {PASOS.map((paso, i) => (
-            <li key={paso} className={`estado ${i < hecho ? 'reservado' : ''}`} aria-current={i === hecho - 1 ? 'step' : undefined}>
-              {i < hecho ? '✓ ' : ''}
+          {PASOS.map((paso) => (
+            <li key={paso} className={`estado ${listos.has(paso) ? 'reservado' : ''}`}>
+              {listos.has(paso) ? '✓ ' : ''}
               {paso}
             </li>
           ))}
         </ol>
+
+        {q.anuncio && <div className="aviso ok" role="status">Listo: este es el anuncio que sonará en la campaña.</div>}
+        <div className="tarjeta asignar-anuncio">
+          <h2 className="sub" style={{ marginTop: 0 }}>Anuncio de esta campaña</h2>
+          {asignado ? (
+            <p style={{ margin: 0 }}>
+              Sonará <b>{asignado.nombre}</b> ({asignado.formato.toUpperCase()}).{' '}
+              {certificados.length > 0 && (
+                <Link href="/cuenta/certificados">
+                  {certificados.length} {certificados.length === 1 ? 'emisión certificada' : 'emisiones certificadas'} →
+                </Link>
+              )}
+            </p>
+          ) : (
+            <p style={{ margin: 0 }}>Elige qué anuncio suena. Así sabremos qué buscar en la grabación de cada emisora para certificarlo.</p>
+          )}
+          {vigente && aprobados.length > 0 && (
+            <form action={asignarAnuncio} className="acciones">
+              <input type="hidden" name="pedido" value={p.id} />
+              <label className="campo" style={{ margin: 0, flex: '1 1 260px' }}>
+                <span className="label">{asignado ? 'Cambiar por' : 'Anuncio aprobado'}</span>
+                <select name="anuncio" defaultValue={asignado?.id ?? aprobados[0]!.id}>
+                  {aprobados.map((a) => (
+                    <option key={a.id} value={a.id}>
+                      {a.nombre}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <button className="btn primary" type="submit">
+                {asignado ? 'Cambiar anuncio' : 'Usar este anuncio'}
+              </button>
+            </form>
+          )}
+          {vigente && aprobados.length === 0 && (
+            <p className="nota" style={{ marginBottom: 0 }}>
+              Todavía no tienes anuncios aprobados. <Link href="/cuenta/anuncios">Sube uno aquí</Link>.
+            </p>
+          )}
+        </div>
 
         <div className="tarjeta">
           <div className="tabla-caja">

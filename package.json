@@ -15,7 +15,8 @@
     "iniciar": "node scripts/iniciar.mjs",
     "cargar-parrilla": "pnpm --filter @sp/catalogo cargar",
     "cargar-tarifario-ejemplo": "pnpm --filter @sp/catalogo cargar-tarifario-ejemplo",
-    "cargar-palabras": "pnpm --filter @sp/spots cargar-palabras"
+    "cargar-palabras": "pnpm --filter @sp/spots cargar-palabras",
+    "grabar": "pnpm --filter @sp/grabador grabar"
   },
   "devDependencies": {
     "@types/node": "^22.10.7",

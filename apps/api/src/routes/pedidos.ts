@@ -28,6 +28,7 @@ export async function leerPedido(t: Transaction<Database>, id: string): Promise<
     moneda: p.moneda,
     totalCentimos: p.total_centimos,
     reservaVenceAt: p.reserva_vence_at.toISOString(),
+    anuncioId: p.anuncio_id ?? null,
     creadoAt: p.creado_at.toISOString(),
     reservas: reservas.map((r) => ({ franjaId: r.franja_id, fecha: r.fecha, segundos: r.segundos, estado: r.estado })),
   };

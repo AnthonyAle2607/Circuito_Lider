@@ -235,6 +235,8 @@ export interface PedidosTabla {
   terminos_version: string;
   terminos_aceptados_at: Date;
   creado_at: Generated<Date>;
+  /** El spot que suena en esta campaña (PT-7). */
+  anuncio_id: Generated<string | null>;
   actualizado_at: Ahora;
 }
 
@@ -288,6 +290,34 @@ export interface PalabrasProhibidasTabla {
   creado_at: Generated<Date>;
 }
 
+export interface GrabacionesTabla {
+  id: Generated<string>;
+  emisora_id: string;
+  archivo: string;
+  inicio_at: Date;
+  fin_at: Date;
+  bytes: number;
+  analizada_at: Date | null;
+  borrada_at: Date | null;
+  creado_at: Generated<Date>;
+}
+
+export interface CertificadosTabla {
+  id: Generated<string>;
+  anunciante_id: string;
+  pedido_id: string;
+  anuncio_id: string;
+  reserva_id: string | null;
+  emisora_id: string;
+  grabacion_id: string;
+  emitido_at: Date;
+  duracion_ms: number;
+  parecido: string;
+  clip_clave: string;
+  clip_sha256: Buffer;
+  creado_at: Generated<Date>;
+}
+
 export interface Database {
   anunciantes: AnunciantesTabla;
   usuarios: UsuariosTabla;
@@ -311,4 +341,6 @@ export interface Database {
   reservas: ReservasTabla;
   anuncios: AnunciosTabla;
   palabras_prohibidas: PalabrasProhibidasTabla;
+  grabaciones: GrabacionesTabla;
+  certificados: CertificadosTabla;
 }

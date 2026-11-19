@@ -5,6 +5,7 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { almacenS3, configS3DelEntorno, leerReglas, revisarSpot, transcriptorDelEntorno } from '@sp/spots';
 import { COLAS, LATIDO, LIBERAR, REVISAR, latir, liberarReservas, revisarAnuncios } from './colas';
+import { DETECTAR, detectarEmisiones } from './detectar';
 
 const redisUrl = process.env.REDIS_URL;
 const dbUrl = process.env.DATABASE_URL_WORKER;
@@ -30,6 +31,9 @@ const reglas = leerReglas(resolve(dirname(fileURLToPath(import.meta.url)), '../.
 const transcriptor = transcriptorDelEntorno();
 const herramientas = s3 ? { almacen: almacenS3(s3), transcriptor } : null;
 if (herramientas) await cola.upsertJobScheduler('revisar-anuncios', { every: REVISAR.cadaMs }, { name: REVISAR.trabajo });
+// PT-7: detección de emisiones en los bloques que deja el grabador (pnpm grabar), en GRABACIONES_DIR.
+const grabaciones = resolve(dirname(fileURLToPath(import.meta.url)), '../../..', process.env.GRABACIONES_DIR ?? 'grabaciones');
+if (herramientas) await cola.upsertJobScheduler('detectar-emisiones', { every: DETECTAR.cadaMs }, { name: DETECTAR.trabajo });
 log('revisión de anuncios', { almacen: Boolean(s3), transcriptor: transcriptor?.nombre ?? 'ninguno (todo a revisión humana)' });
 
 const trabajador = new Worker(
@@ -39,6 +43,9 @@ const trabajador = new Worker(
     if (job.name === LIBERAR.trabajo) {
       const n = await liberarReservas(db);
       if (n > 0) log('reservas vencidas liberadas', { pedidos: n });
+    }
+    if (job.name === DETECTAR.trabajo && herramientas) {
+      await detectarEmisiones({ db, almacen: herramientas.almacen, ruta: (a) => resolve(grabaciones, a), log });
     }
     if (job.name === REVISAR.trabajo && herramientas) {
       await revisarAnuncios(db, (spot, prohibidas) => revisarSpot(herramientas, spot, reglas, prohibidas), log);

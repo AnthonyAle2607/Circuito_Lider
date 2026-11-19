@@ -134,4 +134,9 @@ evento que tenga quien lo consuma (el correo de verificación, con n8n).
   (`WHISPER_BIN`, `WHISPER_MODEL`) y busca `palabras_prohibidas` (`pnpm cargar-palabras`); una coincidencia o la falta de
   transcripción lo mandan a revisión humana en el panel (`/anuncios`, rol revisor). Migración `0008_anuncios`: la API no
   cambia estados; lo hacen `resolver_anuncio()` (trabajos) y `decidir_anuncio()` (revisor).
-- Siguiente: instalar whisper.cpp y su modelo; **PT-5 · Pagos**, **PT-7 · Grabación y certificado** y **PT-5b · Agente vendedor**.
+- **PT-7 · Grabación y certificado** (2026-11-19): `apps/grabador` (`pnpm grabar`) copia el streaming de cada emisora en
+  bloques de 1 h (sin recomprimir) a `GRABACIONES_DIR` y los anota en `grabaciones`; borra el audio a los 30 días.
+  El trabajo `detectar-emisiones` busca con la huella acústica propia (`@sp/huella`) los spots asignados a cada pedido
+  en sus franjas, recorta el momento (±3 s) a MinIO y crea el certificado con `certificar_emision()`: `certificados` es
+  inmutable (no se edita ni borra). Portal: asignar anuncio en el pedido, `/cuenta/certificados` y certificado imprimible.
+- Siguiente: **PT-5 · Pagos**, **PT-5b · Agente vendedor**, recuperar clave.

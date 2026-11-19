@@ -9,6 +9,7 @@ import type { Almacen } from '@sp/spots';
 import { manejarErrores } from './plugins/errores';
 import { rutasAnuncios } from './routes/anuncios';
 import { rutasCatalogo } from './routes/catalogo';
+import { rutasCertificados } from './routes/certificados';
 import { rutasCotizaciones } from './routes/cotizaciones';
 import { rutasCuentas } from './routes/cuentas';
 import { rutasPanelCatalogo } from './routes/panel/catalogo';
@@ -68,6 +69,7 @@ export async function buildApp(op: Opciones): Promise<FastifyInstance> {
     await rutasPedidos(app, op.db);
     await rutasMiPanel(app, op.db, { limiteAcceso: limites.acceso });
     if (op.almacen) await rutasAnuncios(app, { db: op.db, almacen: op.almacen, formatos: op.formatosSpot ?? ['mp4', 'mp3', 'wav'] });
+    if (op.almacen) await rutasCertificados(app, { db: op.db, almacen: op.almacen });
     await rutasPanelVentas(app, op.db);
   }
   return app;
