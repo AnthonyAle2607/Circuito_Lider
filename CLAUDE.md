@@ -17,7 +17,7 @@ El mapa interactivo del plan está en `vault/proyectos/sistema-de-pautas/floorpl
 | Solo contenedores y migraciones | `pnpm iniciar --sin-apps` |
 | Tipos | `pnpm typecheck` |
 | Pruebas | `pnpm test` |
-| Compilar el portal sin pisar el `next dev` | `NEXT_DIST_DIR=.next-prueba pnpm --filter @sp/portal exec next build` |
+| Compilar el portal sin pisar el `next dev` | `NEXT_DIST_DIR=.next-ci pnpm --filter @sp/portal build` (después `git checkout apps/portal/tsconfig.json`) |
 | Migraciones | `pnpm db:migrate` |
 | Cargar o completar la parrilla de Circuito Líder (no pisa lo corregido en el panel) | `pnpm cargar-parrilla` |
 | Cargar el tarifario de EJEMPLO (solo si no hay ninguno) | `pnpm cargar-tarifario-ejemplo` |
@@ -114,9 +114,9 @@ evento que tenga quien lo consuma (el correo de verificación, con n8n).
   `GET /v1/pedidos`, `GET /v1/pedidos/:id`, `POST /v1/pedidos/:id/cancelar`; panel: aprobaciones y `PUT /v1/panel/tarifario`.
   Reservar toma el cupo con un UPDATE condicionado: 50 reservas simultáneas sobre el último cupo, gana una (probado en
   Postgres real, también en la CI). El trabajo `liberar-reservas` vence cada minuto los pedidos sin pagar (P3).
-- **PT-4 · Portal del cliente:** hecho con el diseño **Parrilla · Invermedia** (elegido el 2026-11-17). La decoración de
-  la maqueta se conserva tal cual (`componentes/marcado.ts` + `componentes/efectos-diseno.ts`, apagable al salir de la
-  página); paquetes y cotizador son React sobre la parrilla y el tarifario reales (`componentes/Venta.tsx`, con
+- **PT-4 · Portal del cliente:** hecho con el diseño **Parrilla · Invermedia** (elegido el 2026-11-17). Las secciones
+  fijas están en `componentes/inicio/`, los efectos en `componentes/animacion/` (apagables al salir de la página);
+  tienda, paquetes y cotizador son React sobre la parrilla y el tarifario reales (`componentes/venta/`, con
   `GET /v1/tarifario` y `@sp/pricing` para el precio en vivo; el que vale lo calcula la API). Cuenta: registro,
   confirmación de correo con botón, ingreso, reserva con términos, mis pedidos, detalle y cancelación. Sesión del
   anunciante en cookie HttpOnly `sp_sesion`; las llamadas a la API van desde el servidor del portal (acciones).
@@ -139,4 +139,10 @@ evento que tenga quien lo consuma (el correo de verificación, con n8n).
   El trabajo `detectar-emisiones` busca con la huella acústica propia (`@sp/huella`) los spots asignados a cada pedido
   en sus franjas, recorta el momento (±3 s) a MinIO y crea el certificado con `certificar_emision()`: `certificados` es
   inmutable (no se edita ni borra). Portal: asignar anuncio en el pedido, `/cuenta/certificados` y certificado imprimible.
+- **PT-4e · Rediseño profesional y auditoría** (2026-11-23): secciones claras y oscuras alternadas, fotos sin velos,
+  una sola cinta (héroe), CSS en diez archivos por pieza con tokens semánticos (`app/estilos/`), portada en componentes
+  React (sin HTML insertado), efectos tipados. Auditoría: redirección abierta por `/\` cerrada, middleware para
+  enlaces a `/cuenta/*`, refresco de anuncios con tope de 3 min, lunes calculados en el servidor. Archivos largos
+  partidos: `Venta.tsx`, `schema.ts` (por dominio), `routes/cotizaciones/`. Ver `docs/arquitectura-portal.md` y
+  `docs/diseno-portal.md`.
 - Siguiente: **PT-5 · Pagos**, **PT-5b · Agente vendedor**, recuperar clave.

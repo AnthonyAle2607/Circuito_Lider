@@ -1,15 +1,7 @@
 'use client';
 
-import { createContext, useContext, useMemo, useState, type ReactNode } from 'react';
-import { proximosLunes } from '@/lib/fechas';
-
-/** Filtros de la tienda: los fija el buscador del héroe o los botones de la propia tienda. */
-export interface Filtros {
-  /** 'todo' = todo; 'cadena' = solo en cadena; un slug = esa ciudad (sus locales y la cadena). */
-  donde: string;
-  /** 'cualquiera' | 'mananas' | 'tardes' | 'finde' */
-  cuando: string;
-}
+import { createContext, useContext, useState, type ReactNode } from 'react';
+import type { Filtros } from './venta/datos';
 
 interface Pauta {
   /** Franjas elegidas (ids). La tienda, los paquetes y la parrilla del cotizador editan la misma selección. */
@@ -37,9 +29,11 @@ export function usePauta(): Pauta {
   return p;
 }
 
-/** Vive en el layout raíz: la cabecera («Mi pauta») y la portada comparten la selección. */
-export function PautaProvider({ children }: { children: ReactNode }) {
-  const lunesOpciones = useMemo(() => proximosLunes(6), []);
+/**
+ * Vive en el layout raíz: la cabecera («Mi pauta») y la portada comparten la selección. Los lunes posibles los
+ * calcula el servidor y llegan como prop: así el servidor y el navegador no discrepan cerca de la medianoche.
+ */
+export function PautaProvider({ children, lunesOpciones }: { children: ReactNode; lunesOpciones: string[] }) {
   const [elegidas, setElegidasRaw] = useState<Set<string>>(new Set());
   const [duracion, setDuracion] = useState(30);
   const [semanas, setSemanas] = useState(2);

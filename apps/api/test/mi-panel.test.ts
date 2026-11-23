@@ -68,10 +68,12 @@ describe('resumen del panel', () => {
     const s = await resumen(a.auth);
     expect(s).toMatchObject({ campanasActivas: 1, emisionesPorSonar: 2, porPagar: { pedidos: 1, totalCentimos: c.totalCentimos, moneda: 'USD' } });
     expect(s.porPagar.venceAt).not.toBeNull();
-    expect(s.proximas.map((x) => [x.fecha, x.programa, x.donde])).toEqual([
+    // Ordenadas por fecha. Cuál va primero depende del día en que corre la prueba (un lunes, el martes llega antes).
+    const esperadas = [
       [proximo(1, 1), 'Máximo Volumen', 'Caracas'],
       [proximo(2, 1), 'ENCENDIDOS', 'En cadena nacional'],
-    ]);
+    ].sort((x, y) => x[0]!.localeCompare(y[0]!));
+    expect(s.proximas.map((x) => [x.fecha, x.programa, x.donde])).toEqual(esperadas);
     expect((await resumen(otro.auth)).campanasActivas).toBe(0);
   });
 

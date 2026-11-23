@@ -1,0 +1,56 @@
+/* Cotizador hora por hora (venta/Cotizador.tsx): dial que suena, emisoras, parrilla y total con odómetro. */
+.tuner { display: flex; align-items: center; gap: 12px 18px; flex-wrap: wrap; background: var(--superficie); border: 1px solid var(--borde); border-radius: var(--radio); padding: 12px 18px; margin-bottom: 14px; }
+.tuner .band { font: 500 12px var(--f-dato); color: var(--texto-suave); letter-spacing: 0.1em; }
+.tuner b { font: 600 44px/1 var(--f-titulo); font-variant-numeric: tabular-nums; min-width: 3.6ch; color: var(--naranja); }
+.tuner .tc { font: 500 13px/1.3 var(--f-dato); text-transform: uppercase; letter-spacing: 0.06em; min-width: 16ch; }
+.tuner .tc small { display: block; color: var(--texto-suave); text-transform: none; letter-spacing: 0; }
+.tuner canvas { flex: 1; min-width: 140px; height: 42px; display: block; }
+
+.stations { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+.chipbtn { min-height: 40px; font: 500 13px/1 var(--f-dato); padding: 11px 14px; border: 1px solid var(--borde); background: var(--superficie); color: var(--texto); cursor: pointer; border-radius: 999px; }
+.chipbtn span { color: var(--texto-suave); margin-left: 6px; }
+.chipbtn[aria-pressed='true'] { background: var(--naranja); color: var(--morado); border-color: var(--naranja); }
+.chipbtn[aria-pressed='true'] span { color: var(--morado-2); }
+
+/* Parrilla: filas por programa y horario, columnas por día. */
+.grid-box { position: relative; overflow-x: auto; border: 1px solid var(--borde); border-radius: var(--radio); background: var(--superficie); }
+table.grid { border-collapse: collapse; min-width: 820px; width: 100%; font: 12px var(--f-dato); table-layout: fixed; }
+.grid th { font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; padding: 12px 6px; border-bottom: 1px solid var(--borde); text-align: left; color: var(--texto-suave); }
+.grid th:first-child { width: 190px; padding-left: 14px; }
+.grid td { border-top: 1px solid var(--borde); border-left: 1px solid var(--borde); height: 36px; padding: 0; }
+.grid td.vacia { background: #00000022; }
+.grid .prog { font: 500 12px/1.2 var(--f-dato); color: var(--texto-suave); padding: 8px 10px 8px 14px; border-left: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.grid .prog b { display: block; font: 700 13px/1.25 var(--f-texto); color: var(--texto); overflow: hidden; text-overflow: ellipsis; }
+.cell { display: block; width: 100%; height: 100%; border: 0; background: transparent; cursor: pointer; text-align: left; padding: 4px 6px; font: 11px/1.2 var(--f-dato); color: var(--texto-suave); }
+.cell:hover { background: var(--superficie-2); }
+.cell.nat { color: var(--naranja); font-weight: 700; }
+.cell[aria-pressed='true'] { background: #fff; color: var(--morado); }
+.cell.nat[aria-pressed='true'] { background: var(--naranja); color: var(--morado); }
+.cot-nota { color: var(--texto-suave); font-size: 14px; margin-top: 8px; }
+.cot-error { margin-top: 12px; }
+
+/* Total: panel blanco con opciones, odómetro y el botón de mantener. */
+.quote { display: flex; justify-content: space-between; align-items: center; gap: 18px 32px; flex-wrap: wrap; margin-top: 16px; padding: 20px 24px; border-radius: var(--radio); background: #fff; color: #1e0e29; color-scheme: light; }
+.quote .big { font: 600 56px/1 var(--f-titulo); font-variant-numeric: tabular-nums; }
+.quote-total { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
+.quote .ex { border-color: #c9bad6; color: #5c5266; }
+.qopts { display: flex; gap: 16px; flex-wrap: wrap; align-items: end; }
+.qopts label { display: grid; gap: 4px; font: 500 11px var(--f-titulo); text-transform: uppercase; letter-spacing: 1.5px; color: #5c5266; }
+.qopts select { font: 14px var(--f-texto); padding: 9px 10px; border: 1px solid #c9bad6; background: #fff; color: #1e0e29; border-radius: 8px; }
+.qsum { font: 13px var(--f-dato); color: #5c5266; }
+
+/* Odómetro (efectos/piezas.ts). */
+.odo { display: inline-flex; overflow: hidden; height: 1em; line-height: 1em; vertical-align: bottom; }
+.odo .c { display: flex; flex-direction: column; transition: transform 0.7s var(--curva); }
+.odo .c span, .odo .s { height: 1em; line-height: 1em; display: block; }
+
+/* Mantener para cotizar (venta/useMantener.ts): se llena mientras se presiona. */
+.hold { position: relative; overflow: hidden; font: 700 15px/1 var(--f-texto); padding: 18px 26px; border-radius: var(--radio-chico); border: 2px solid var(--naranja); background: transparent; color: var(--morado); cursor: pointer; user-select: none; -webkit-user-select: none; touch-action: none; min-width: 240px; }
+.hold .fill { position: absolute; inset: 0; background: var(--naranja); transform-origin: left; transform: scaleX(var(--p, 0)); }
+.hold .lbl { position: relative; z-index: 1; }
+.hold.done { background: var(--naranja); }
+.hold[disabled] { opacity: 0.5; cursor: not-allowed; }
+
+/* Chispas al agregar (efectos/piezas.ts). */
+.spark { position: absolute; width: 12px; height: 3px; margin-top: -1.5px; background: var(--naranja); border-radius: 2px; pointer-events: none; z-index: 5; transform-origin: 0 50%; transform: rotate(var(--a)) translateX(4px); animation: chispa 0.5s var(--curva) forwards; }
+@keyframes chispa { to { transform: rotate(var(--a)) translateX(30px) scaleX(0.2); opacity: 0; } }

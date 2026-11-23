@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { Cabecera } from '@/componentes/Cabecera';
 import { Pie } from '@/componentes/Pie';
 import { PautaProvider } from '@/componentes/Pauta';
+import { proximosLunes } from '@/lib/fechas';
 import { RadioProvider } from '@/componentes/Radio';
 import { leerMarca } from '@/lib/marca';
 import { sesionActual } from '@/lib/sesion';
@@ -13,12 +14,20 @@ import '@fontsource/oswald/700.css';
 import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
-import '@fontsource/roboto/800.css';
 import '@fontsource/roboto-mono/400.css';
 import '@fontsource/roboto-mono/500.css';
 import '@fontsource/roboto-mono/700.css';
-import './estilos/parrilla.css';
-import './estilos/portal.css';
+// Estilos por pieza (ver docs/arquitectura-portal.md). tokens.css primero: define los temas claro y oscuro.
+import './estilos/tokens.css';
+import './estilos/base.css';
+import './estilos/marco.css';
+import './estilos/heroe.css';
+import './estilos/tienda.css';
+import './estilos/secciones.css';
+import './estilos/cotizador.css';
+import './estilos/tono.css';
+import './estilos/cuenta.css';
+import './estilos/emisoras.css';
 
 export function generateMetadata() {
   const m = leerMarca();
@@ -28,18 +37,13 @@ export function generateMetadata() {
 export default async function Marco({ children }: { children: ReactNode }) {
   const conSesion = Boolean(await sesionActual());
   return (
-    // suppressHydrationWarning: el script del <head> añade la clase «js» antes de que React hidrate (es a propósito).
-    <html lang="es" suppressHydrationWarning>
-      <head>
-        {/* Las piezas que aparecen al hacer scroll se ocultan solo si hay JavaScript (patrón de la maqueta). */}
-        <script dangerouslySetInnerHTML={{ __html: "document.documentElement.classList.add('js')" }} />
-      </head>
+    <html lang="es">
       <body>
         <RadioProvider>
-          <PautaProvider>
-          <Cabecera conSesion={conSesion} />
-          {children}
-          <Pie />
+          <PautaProvider lunesOpciones={proximosLunes(6)}>
+            <Cabecera conSesion={conSesion} />
+            {children}
+            <Pie />
           </PautaProvider>
         </RadioProvider>
       </body>

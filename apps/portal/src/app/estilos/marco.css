@@ -1,0 +1,59 @@
+/* Marco común a todas las páginas: cabecera, pie, reproductor fijo y espera de carga. */
+
+/* Cabecera oscura de marca, fija arriba. */
+body::before { content: ''; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 20; background: var(--morado); }
+header.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 19; background: var(--fondo); color: var(--texto); border-bottom: 1px solid var(--borde); }
+header.top .wrap { display: flex; align-items: center; gap: 28px; height: var(--cabecera); }
+.logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+.imark { display: inline-block; background: #fff; color: var(--morado-2); font: 700 14px/0.92 var(--f-titulo); letter-spacing: 1px; padding: 5px 7px 4px; border-radius: 4px; }
+.isub { font: 600 20px/1 var(--f-titulo); letter-spacing: 2px; color: var(--naranja); text-transform: uppercase; }
+nav.main { display: flex; gap: 26px; margin-left: auto; font: 500 14px var(--f-texto); }
+nav.main a { color: var(--texto-suave); text-decoration: none; }
+nav.main a:hover { color: var(--texto); }
+.acceso-top { display: flex; gap: 12px; align-items: center; }
+.acceso-top .btn { padding: 10px 16px; font-size: 14px; white-space: nowrap; }
+.acceso-top .entrar { font: 500 14px var(--f-texto); text-decoration: none; }
+.acceso-top .entrar:hover { text-decoration: underline; }
+.mi-pauta .cuenta { display: inline-grid; place-items: center; min-width: 22px; height: 22px; margin-left: 4px; border-radius: 999px; background: var(--morado); color: #fff; font: 700 12px/1 var(--f-dato); }
+@media (max-width: 860px) { nav.main { display: none; } .acceso-top { margin-left: auto; } }
+@media (max-width: 560px) { .acceso-top .crear { display: none; } .acceso-top { gap: 10px; } }
+
+/* Pie. */
+footer.pie { background: var(--fondo); color: var(--texto-suave); padding-block: 30px; font: 13px/1.6 var(--f-dato); border-top: 1px solid var(--borde); }
+footer.pie .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+footer.pie a { color: var(--texto); }
+
+/* Reproductor fijo abajo: sigue sonando al navegar. */
+.radio-barra { position: fixed; left: max(16px, env(safe-area-inset-left, 0px)); bottom: max(16px, env(safe-area-inset-bottom, 0px)); z-index: 45; display: flex; align-items: center; gap: 12px; background: var(--fondo); color: var(--texto); border: 1px solid var(--borde-fuerte); border-radius: var(--radio); padding: 10px 12px; max-width: min(460px, calc(100vw - 32px)); box-shadow: 0 12px 30px #00000040; }
+.radio-boton { width: 46px; height: 46px; border-radius: 50%; border: 0; background: var(--naranja); color: var(--morado); font: 700 16px/1 var(--f-texto); cursor: pointer; flex: none; }
+.radio-info { display: grid; gap: 2px; min-width: 0; }
+.radio-info a { text-decoration: none; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.radio-info a b { color: var(--naranja); margin-right: 4px; }
+.radio-info small { color: var(--texto-suave); font-size: 12px; }
+.radio-vivo { font: 700 11px/1 var(--f-dato); letter-spacing: 0.12em; text-transform: uppercase; color: var(--texto-suave); }
+.radio-barra.sonando .radio-vivo { color: var(--naranja); }
+.radio-volumen { width: 90px; accent-color: var(--naranja); }
+.radio-cerrar { background: none; border: 0; color: var(--texto-suave); font-size: 24px; line-height: 1; cursor: pointer; padding: 4px 6px; }
+.radio-cerrar:hover { color: var(--texto); }
+body.con-radio .sup { bottom: calc(max(18px, env(safe-area-inset-bottom, 0px)) + 84px); }
+body.con-radio footer.pie { padding-bottom: 96px; }
+@media (max-width: 560px) { .radio-volumen { display: none; } .radio-barra { left: 12px; right: 12px; max-width: none; } }
+
+/* Botón «en vivo» (emisoras y cotizador) y su punto que late. */
+.vivo-btn.compacto { padding: 10px 16px; font-size: 14px; }
+.punto { width: 10px; height: 10px; border-radius: 50%; background: currentColor; opacity: 0.5; flex: none; }
+.punto.on { background: var(--naranja); opacity: 1; animation: latido 1.2s ease-in-out infinite; }
+@keyframes latido { 50% { transform: scale(0.6); opacity: 0.5; } }
+
+/* Espera mientras carga (loading.tsx): una onda que no hace saltar la página. */
+.cargando { display: grid; place-items: center; gap: 14px; min-height: 40vh; text-align: center; color: var(--texto-suave); }
+.cargando .onda { display: flex; gap: 5px; align-items: flex-end; height: 36px; }
+.cargando .onda i { width: 7px; height: 100%; border-radius: 4px; background: var(--naranja); animation: onda 1s ease-in-out infinite; }
+.cargando .onda i:nth-child(2) { animation-delay: 0.12s; }
+.cargando .onda i:nth-child(3) { animation-delay: 0.24s; }
+.cargando .onda i:nth-child(4) { animation-delay: 0.36s; }
+.cargando .onda i:nth-child(5) { animation-delay: 0.48s; }
+@keyframes onda { 0%, 100% { transform: scaleY(0.3); } 50% { transform: scaleY(1); } }
+
+/* Fotos (next/image con fill): la caja manda el tamaño. */
+.foto { position: relative; display: block; overflow: hidden; background: var(--superficie-2); }

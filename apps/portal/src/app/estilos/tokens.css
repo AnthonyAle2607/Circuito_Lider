@@ -1,0 +1,64 @@
+/* Tokens del portal (ver docs/diseno-portal.md). Marca Invermedia: morado #2E123E/#3E1A52, naranja #FE6B00,
+   Oswald para títulos, Roboto para texto, Roboto Mono para datos. Colores planos: nada de degradados.
+
+   Los componentes usan solo los tokens semánticos (--fondo, --superficie, --texto…). Cada sección elige su tema con
+   .clara (por defecto) u .oscura, y todo lo de dentro se adapta solo. */
+:root {
+  --morado: #2e123e;
+  --morado-2: #3e1a52;
+  --morado-3: #52266b;
+  --morado-linea: #5e3a75;
+  --naranja: #fe6b00;
+  --naranja-hover: #e55f00;
+  --naranja-suave: #ffe9d9;
+  --naranja-oscuro: #9a3d00; /* naranja legible sobre fondo claro (contraste 6:1) */
+
+  --font-oswald: 'Oswald';
+  --font-roboto: 'Roboto';
+  --font-roboto-mono: 'Roboto Mono';
+  --f-titulo: var(--font-oswald), 'Arial Narrow', sans-serif;
+  --f-texto: var(--font-roboto), system-ui, sans-serif;
+  --f-dato: var(--font-roboto-mono), ui-monospace, Consolas, monospace;
+
+  --radio: 16px;
+  --radio-chico: 10px;
+  --curva: cubic-bezier(0.16, 1, 0.3, 1);
+  --cabecera: 68px;
+}
+
+/* Tema claro: para comprar y leer. */
+:root,
+.clara {
+  --fondo: #f6f3f8;
+  --superficie: #ffffff;
+  --superficie-2: #efe9f3;
+  --texto: #1e0e29;
+  --texto-suave: #5c5266;
+  --borde: #e2d9e9;
+  --borde-fuerte: #c9bad6;
+  --acento-texto: var(--naranja-oscuro);
+  color-scheme: light;
+}
+
+/* Secciones claras sobre blanco (alternan con las de --fondo): las tarjetas pasan a papel. */
+.clara.alterna {
+  --fondo: #ffffff;
+  --superficie: #f6f3f8;
+}
+
+/* Tema oscuro de marca: héroe, cobertura, cotizador, cierre, cabecera, pie, radio y Toño. */
+.oscura,
+header.top,
+footer.pie,
+.radio-barra,
+.sup {
+  --fondo: var(--morado);
+  --superficie: var(--morado-2);
+  --superficie-2: var(--morado-3);
+  --texto: #ffffff;
+  --texto-suave: #d9cce2;
+  --borde: var(--morado-linea);
+  --borde-fuerte: #7a5493;
+  --acento-texto: var(--naranja);
+  color-scheme: dark;
+}

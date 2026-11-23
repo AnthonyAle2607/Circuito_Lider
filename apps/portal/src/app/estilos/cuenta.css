@@ -1,0 +1,99 @@
+/* Páginas internas: formularios (ingresar, registro), cotización, panel del anunciante, anuncios y certificados. */
+.pagina { padding-block: 56px 96px; min-height: 70vh; }
+.pagina h1 { font-size: clamp(32px, 4.5vw, 52px); margin: 10px 0 8px; }
+.pagina .intro { color: var(--texto-suave); max-width: 62ch; margin: 0 0 32px; font-size: 18px; }
+.angosta { max-width: 520px; }
+.sub { font: 600 20px/1.2 var(--f-titulo); text-transform: uppercase; letter-spacing: 0.5px; margin: 32px 0 12px; }
+
+.tarjeta { background: var(--superficie); border: 1px solid var(--borde); border-radius: var(--radio); padding: 24px; }
+.tarjeta + .tarjeta { margin-top: 16px; }
+.acciones { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin-top: 20px; }
+
+/* Formularios. */
+.formulario { max-width: 720px; }
+.campo { display: grid; gap: 6px; margin-bottom: 16px; }
+.campo label { font: 500 12px/1.3 var(--f-titulo); letter-spacing: 1.5px; text-transform: uppercase; color: var(--texto-suave); }
+.campo input, .campo select { width: 100%; min-height: 44px; background: var(--superficie); color: var(--texto); border: 1px solid var(--borde-fuerte); border-radius: var(--radio-chico); padding: 11px 14px; font: inherit; }
+.campo input:focus, .campo select:focus { border-color: var(--naranja); outline: none; box-shadow: 0 0 0 3px var(--naranja-suave); }
+.campo input[disabled] { opacity: 0.7; }
+.campo small { color: var(--texto-suave); }
+.fila-campos { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.marca-chk { display: flex; gap: 10px; align-items: flex-start; margin: 16px 0; }
+.marca-chk input { width: 20px; height: 20px; accent-color: var(--naranja); margin-top: 3px; }
+@media (max-width: 560px) { .fila-campos { grid-template-columns: 1fr; } }
+
+/* Tablas y totales. */
+.tabla-caja { overflow-x: auto; }
+.tabla { width: 100%; border-collapse: collapse; font-size: 15px; }
+.tabla th { text-align: left; font: 500 12px/1.3 var(--f-titulo); letter-spacing: 1.5px; text-transform: uppercase; color: var(--texto-suave); padding: 10px 8px; border-bottom: 2px solid var(--borde); }
+.tabla td { padding: 10px 8px; border-bottom: 1px solid var(--borde); vertical-align: top; }
+.tabla .num { text-align: right; font-family: var(--f-dato); white-space: nowrap; }
+.totales { display: grid; gap: 6px; margin-top: 20px; font-size: 17px; }
+.totales div { display: flex; justify-content: space-between; gap: 16px; }
+.totales .gran { font: 600 32px/1 var(--f-titulo); margin-top: 6px; }
+.lista-pedidos { display: grid; gap: 12px; }
+.lista-pedidos a { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; align-items: center; text-decoration: none; }
+.lista-pedidos a:hover { border-color: var(--naranja); }
+
+/* Panel del anunciante: menú a la izquierda; en teléfonos, fila deslizable. */
+.panel-cuenta { padding-top: 40px; }
+.panel-rejilla { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 40px; align-items: start; }
+.panel-lado { position: sticky; top: calc(var(--cabecera) + 28px); display: grid; gap: 20px; min-width: 0; }
+.panel-cuerpo { min-width: 0; }
+.panel-cuerpo h1 { font-size: clamp(30px, 4vw, 46px); margin-top: 0; }
+.panel-quien { display: grid; gap: 2px; }
+.panel-quien b { font: 600 22px/1.15 var(--f-titulo); text-transform: uppercase; overflow-wrap: anywhere; }
+.panel-quien span:last-child { color: var(--texto-suave); }
+.menu-cuenta { display: grid; gap: 2px; }
+.menu-cuenta a { display: block; padding: 10px 14px; border-radius: var(--radio-chico); font-weight: 500; text-decoration: none; color: var(--texto-suave); }
+.menu-cuenta a:hover { background: var(--superficie-2); color: var(--texto); }
+.menu-cuenta a[aria-current='page'] { background: var(--morado); color: #fff; }
+.btn.salir { width: 100%; }
+.cifras, .atajos { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.cifras .tarjeta, .atajos .tarjeta { margin-top: 0; }
+.cifra, .atajos a { display: grid; gap: 6px; text-decoration: none; color: inherit; }
+.cifra b { font: 600 38px/1 var(--f-titulo); }
+.cifra small, .atajos span { color: var(--texto-suave); font-size: 15px; }
+.cifra:hover, .atajos a:hover, .cifra.alerta { border-color: var(--naranja); }
+.vacio p { margin-top: 0; }
+.puntos { margin: 0 0 20px; padding-left: 20px; display: grid; gap: 6px; color: var(--texto-suave); }
+@media (max-width: 900px) {
+  .panel-rejilla { grid-template-columns: minmax(0, 1fr); gap: 20px; }
+  .panel-lado { position: static; gap: 12px; }
+  .menu-cuenta { display: flex; overflow-x: auto; gap: 6px; padding-bottom: 4px; }
+  .menu-cuenta a { white-space: nowrap; padding: 8px 12px; border: 1px solid var(--borde); }
+  .panel-lado form { order: 3; }
+  .btn.salir { width: auto; }
+  .cifras, .atajos { grid-template-columns: 1fr; }
+}
+
+/* Mis anuncios. */
+.subir input[type='file'] { padding: 10px; cursor: pointer; }
+.subir input[type='file']::file-selector-button { background: var(--naranja); color: var(--morado); border: 0; border-radius: 8px; padding: 8px 14px; font: 700 14px var(--f-texto); margin-right: 12px; cursor: pointer; }
+.lista-anuncios { display: grid; gap: 14px; }
+.tarjeta.anuncio { margin-top: 0; display: grid; gap: 10px; }
+.anuncio-cabeza { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; flex-wrap: wrap; }
+.anuncio-cabeza h3 { margin: 0 0 4px; font-size: 20px; }
+.anuncio-motivo { margin: 0; }
+.anuncio-medio { width: 100%; max-width: 520px; accent-color: var(--naranja); }
+video.anuncio-medio { max-height: 240px; border-radius: var(--radio-chico); background: #000; }
+.tarjeta.anuncio details summary { cursor: pointer; color: var(--texto-suave); }
+.tarjeta.anuncio details p { color: var(--texto-suave); margin: 8px 0 0; }
+
+/* Certificados (también al imprimir o guardar como PDF). */
+.dia-certificados .sub { text-transform: capitalize; }
+.certificado { background: var(--superficie); border: 1px solid var(--borde); border-top: 4px solid var(--naranja); border-radius: var(--radio); padding: 28px; display: grid; gap: 18px; max-width: 760px; }
+.certificado h1 { margin: 6px 0 4px; font-size: clamp(28px, 4vw, 42px); }
+.certificado header p { margin: 0; font-size: 18px; }
+.certificado dl { margin: 0; display: grid; gap: 10px; }
+.certificado dl div { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 12px; border-bottom: 1px solid var(--borde); padding-bottom: 10px; }
+.certificado dt { font: 500 12px/1.4 var(--f-titulo); letter-spacing: 1.5px; text-transform: uppercase; color: var(--texto-suave); }
+.certificado dd { margin: 0; }
+.certificado .mono { font: 500 13px/1.4 var(--f-dato); overflow-wrap: anywhere; }
+@media (max-width: 560px) { .certificado dl div { grid-template-columns: 1fr; gap: 2px; } }
+@media print {
+  header.top, footer.pie, .panel-lado, .sin-imprimir, .radio-barra, .sup { display: none !important; }
+  body { background: #fff !important; color: #000 !important; }
+  .panel-rejilla { display: block; }
+  .certificado { border: 2px solid #000; color: #000; background: #fff; }
+}

@@ -5,7 +5,8 @@ import { redirect } from 'next/navigation';
 export const API_URL = process.env.API_URL ?? 'http://127.0.0.1:4100';
 
 /** El token de la API vive solo del lado del servidor del portal, en una cookie HttpOnly que el navegador no puede leer. */
-export const COOKIE_SESION = 'sp_sesion';
+import { COOKIE_SESION } from './cookie-sesion';
+export { COOKIE_SESION };
 
 export const opcionesCookie = (maxAge: number) => ({
   httpOnly: true,

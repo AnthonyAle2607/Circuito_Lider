@@ -1,0 +1,49 @@
+/* Vitrina de emisoras (/emisoras) y ficha de cada emisora (/emisoras/[slug]). Fotos a color, sin velos. */
+.rejilla-emisoras { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 16px; }
+.tarjeta.emisora { display: grid; gap: 8px; align-content: start; margin-top: 0; padding: 0 20px 20px; overflow: hidden; }
+.tarjeta.emisora .emisora-foto { height: 140px; margin: 0 -20px 8px; }
+.emisora-cabeza { display: flex; align-items: baseline; gap: 6px; }
+.frecuencia { font: 600 44px/1 var(--f-titulo); color: var(--acento-texto); }
+.fm { font: 700 13px/1 var(--f-dato); letter-spacing: 0.1em; color: var(--texto-suave); }
+.tarjeta.emisora h2 { font-size: 22px; }
+.al-aire { margin: 4px 0 0; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; font-weight: 500; }
+.despues { margin: 0; color: var(--texto-suave); font-size: 14px; }
+.tarjeta.emisora .acciones { margin-top: 8px; justify-content: space-between; }
+.ver { font-weight: 500; text-decoration: none; }
+.ver:hover { text-decoration: underline; }
+
+.llamada { display: flex; justify-content: space-between; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 40px; border-top: 4px solid var(--naranja); }
+.llamada h2 { font-size: 26px; margin: 0 0 6px; }
+.llamada p { margin: 0; color: var(--texto-suave); }
+
+/* Ficha: foto ancha arriba, dial con la frecuencia, ahora/después y programas. */
+.ficha-banner { position: relative; margin: 12px 0 0; height: 260px; border-radius: var(--radio); overflow: hidden; }
+.ficha-banner .foto { position: absolute; inset: 0; }
+.ficha-banner figcaption { position: absolute; left: 16px; bottom: 16px; background: var(--morado); color: #fff; font: 700 12px/1 var(--f-dato); letter-spacing: 0.1em; text-transform: uppercase; padding: 8px 12px; border-radius: 999px; }
+.ficha-cabeza { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 32px; align-items: center; margin: 24px 0 28px; }
+.ficha-cabeza h1 { margin-top: 0; }
+.ficha-cabeza .intro { margin-bottom: 8px; }
+.ficha-dial { width: 170px; height: 170px; border-radius: 50%; border: 6px solid var(--naranja); display: grid; place-content: center; justify-items: center; gap: 6px; background: var(--morado); }
+.ficha-dial .frecuencia { color: #fff; font-size: 50px; }
+.ficha-dial .fm { color: #d9cce2; }
+.ahora-despues { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.ahora-despues .cifra b { font-size: 28px; text-transform: uppercase; }
+.rejilla-programas { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
+.tarjeta.programa { margin-top: 0; display: grid; gap: 8px; align-content: start; }
+.tarjeta.programa p { margin: 0; }
+.tarjeta.programa.al-aire-ahora { border-color: var(--naranja); box-shadow: inset 0 0 0 1px var(--naranja); }
+.programa-cabeza { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; }
+.programa-cabeza h3 { font-size: 20px; }
+.horarios { list-style: none; margin: 0; padding: 0; font: 500 14px/1.6 var(--f-dato); color: var(--acento-texto); }
+.conducen { color: var(--texto-suave); font-size: 14px; }
+.otras-emisoras { display: flex; flex-wrap: wrap; gap: 8px; }
+.otras-emisoras a { border: 1px solid var(--borde-fuerte); border-radius: 999px; padding: 8px 14px; text-decoration: none; font-size: 14px; background: var(--superficie); }
+.otras-emisoras a:hover { border-color: var(--naranja); }
+.otras-emisoras b { color: var(--acento-texto); margin-right: 4px; }
+@media (max-width: 640px) {
+  .ficha-banner { height: 180px; }
+  .ficha-cabeza { grid-template-columns: 1fr; gap: 16px; }
+  .ficha-dial { width: 120px; height: 120px; border-width: 4px; }
+  .ficha-dial .frecuencia { font-size: 36px; }
+  .ahora-despues { grid-template-columns: 1fr; }
+}

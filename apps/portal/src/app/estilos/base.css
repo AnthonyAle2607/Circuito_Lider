@@ -1,0 +1,57 @@
+/* Base: reinicio, tipografía, contenedor, secciones, encabezados y botones. */
+*,
+*::before,
+*::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: calc(var(--cabecera) + 12px); }
+body { margin: 0; background: var(--fondo); color: var(--texto); font: 400 17px/1.6 var(--f-texto); overflow-x: hidden; }
+a { color: inherit; }
+img { max-width: 100%; }
+:focus-visible { outline: 2px solid var(--naranja); outline-offset: 3px; }
+h1, h2, h3 { font-family: var(--f-titulo); text-transform: uppercase; letter-spacing: 0.5px; line-height: 1.05; margin: 0; text-wrap: balance; }
+h1 { font-weight: 700; }
+h2 { font-size: clamp(30px, 3.6vw, 46px); font-weight: 600; }
+h3 { font-weight: 600; }
+h2 em, h1 em { font-style: normal; color: var(--acento-texto); }
+
+.wrap { max-width: 1220px; margin: 0 auto; padding-inline: max(16px, env(safe-area-inset-left, 0px)) max(16px, env(safe-area-inset-right, 0px)); }
+.seccion { padding-block: 88px; background: var(--fondo); color: var(--texto); position: relative; }
+@media (max-width: 760px) { .seccion { padding-block: 64px; } }
+
+/* Encabezado de sección: sobretítulo, título con una palabra de acento y bajada. */
+.encabezado { display: grid; gap: 14px; max-width: 760px; margin-bottom: 40px; }
+.encabezado.centrado { text-align: center; margin-inline: auto; justify-items: center; }
+.encabezado p { margin: 0; color: var(--texto-suave); font-size: 18px; max-width: 60ch; }
+.sobretitulo, .label { font: 500 13px/1.3 var(--f-titulo); letter-spacing: 2px; text-transform: uppercase; color: var(--acento-texto); }
+.nota { color: var(--texto-suave); }
+.ex { display: inline-block; font: 500 10px var(--f-dato); letter-spacing: 0.08em; text-transform: uppercase; color: var(--texto-suave); border: 1px solid var(--borde-fuerte); border-radius: 999px; padding: 3px 8px; vertical-align: middle; }
+
+/* Botones planos. min-height 44 px para dedos. */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; font: 500 15px/1 var(--f-texto); padding: 13px 22px; border-radius: var(--radio-chico); border: 2px solid var(--borde-fuerte); color: var(--texto); background: transparent; cursor: pointer; text-decoration: none; transition: background 0.2s, border-color 0.2s, color 0.2s; }
+.btn:hover { border-color: var(--texto); }
+.btn.primary { background: var(--naranja); border-color: var(--naranja); color: var(--morado); font-weight: 700; }
+.btn.primary:hover { background: var(--naranja-hover); border-color: var(--naranja-hover); }
+.btn.contorno { border-color: var(--texto); }
+.btn.quieto { background: var(--superficie-2); border-color: var(--borde); }
+.btn[disabled] { opacity: 0.5; cursor: not-allowed; }
+.btn .arrow { transition: transform 0.2s var(--curva); }
+.btn:hover .arrow { transform: translateX(3px); }
+.ctas { display: flex; gap: 12px; flex-wrap: wrap; }
+
+/* Chips y estados. */
+.chip { display: inline-block; font: 500 12px/1.2 var(--f-dato); letter-spacing: 0.04em; border-radius: 999px; padding: 5px 10px; }
+.chip-cadena { background: var(--naranja-suave); color: var(--naranja-oscuro); }
+.chip-local { background: var(--superficie-2); color: var(--texto-suave); }
+.estado { display: inline-block; padding: 3px 10px; border-radius: 999px; font: 700 12px/1.6 var(--f-dato); letter-spacing: 0.06em; text-transform: uppercase; background: var(--superficie-2); color: var(--texto); }
+.estado.reservado, .estado.vigente { background: var(--naranja); color: var(--morado); }
+.estado.pagado { background: var(--morado); color: #fff; }
+.estado.cancelado, .estado.vencido, .estado.vencida, .estado.rechazada { background: transparent; border: 1px solid var(--borde-fuerte); color: var(--texto-suave); }
+
+/* Avisos dentro de formularios y páginas. */
+.aviso { border-radius: var(--radio-chico); padding: 12px 16px; margin-bottom: 16px; font-weight: 500; border: 1px solid var(--borde); background: var(--superficie); }
+.aviso.error { background: var(--naranja-suave); border-color: var(--naranja); color: #5a2300; }
+.aviso.ok { border-color: var(--borde-fuerte); }
+.aviso.ejemplo { background: var(--naranja); border-color: var(--naranja); color: var(--morado); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}

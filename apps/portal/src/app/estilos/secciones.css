@@ -1,0 +1,79 @@
+/* Secciones informativas de la portada: cómo funciona, cobertura, paquetes, por qué, preguntas y cierre. */
+
+/* Cómo funciona: fotos a la izquierda, pasos a la derecha. */
+.como { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 56px; align-items: center; }
+.como-fotos { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.como-fotos .foto { border-radius: var(--radio); height: 190px; }
+.como-fotos .como-foto-grande { grid-column: span 2; height: 300px; }
+.pasos { list-style: none; margin: 0; padding: 0; display: grid; gap: 22px; }
+.pasos li { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 16px; align-items: start; }
+.pasos .n { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; border: 2px solid var(--naranja); font: 600 18px/1 var(--f-titulo); color: var(--acento-texto); }
+.pasos h3 { font-size: 20px; margin-top: 2px; }
+.pasos p { margin: 4px 0 0; color: var(--texto-suave); }
+@media (max-width: 900px) { .como { grid-template-columns: 1fr; gap: 36px; } .como-fotos { order: 2; } }
+
+/* Cobertura: texto y el círculo de emisoras (efectos/circulo.ts). */
+.cobertura { overflow: hidden; }
+.cobertura-rejilla { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 40px; align-items: center; }
+.cobertura .encabezado { margin: 0; }
+.wheel { position: relative; width: min(440px, 78%); aspect-ratio: 1; margin: 56px auto; cursor: grab; touch-action: none; user-select: none; }
+.wheel.dragging { cursor: grabbing; }
+.wheel .orbit { position: absolute; inset: 0; border-radius: 50%; border: 1px dashed #ffffff55; }
+.wheel .orbit .st { position: absolute; width: 0; height: 0; }
+.wheel .orbit .st span { position: absolute; left: 0; top: 0; translate: -50% -50%; font: 500 12px/1.2 var(--f-dato); text-align: center; background: #fff; color: var(--morado); border-radius: 12px; padding: 8px 11px; white-space: nowrap; }
+.wheel .orbit .st span b { display: block; font: 700 20px var(--f-titulo); color: var(--naranja-oscuro); }
+.dial { position: absolute; inset: 27%; border-radius: 50%; background: var(--morado); border: 6px solid var(--naranja); display: grid; place-items: center; }
+.dial .face { position: absolute; inset: 6%; border-radius: 50%; background: #fff; }
+.dial .tk { position: absolute; inset: 6%; border-radius: 50%; }
+.dial .tk i { position: absolute; left: 50%; top: 4%; width: 2px; height: 8%; background: #8a7c96; transform-origin: 50% 575%; }
+.dial .tk i.m { width: 3px; height: 11%; background: var(--morado); }
+.dial .needle { position: absolute; left: 50%; top: 14%; width: 3px; height: 36%; background: var(--naranja); transform-origin: 50% 100%; translate: -50% 0; animation: sintoniza 9s var(--curva) infinite; }
+@keyframes sintoniza { 0%, 18% { transform: rotate(-70deg); } 30%, 48% { transform: rotate(15deg); } 60%, 78% { transform: rotate(80deg); } 90%, 100% { transform: rotate(-70deg); } }
+.dial .knob { position: absolute; width: 30%; height: 30%; border-radius: 50%; background: var(--morado); border: 5px solid var(--naranja); }
+.dial .cnt { position: absolute; bottom: 16%; font: 700 11px var(--f-dato); letter-spacing: 0.08em; text-transform: uppercase; color: var(--morado); }
+@media (max-width: 860px) { .cobertura-rejilla { grid-template-columns: 1fr; } }
+
+/* Paquetes: foto a color arriba, sin velos; el recomendado lleva borde naranja. */
+.conmutador { display: flex; width: max-content; margin: 0 auto 32px; background: var(--superficie-2); border-radius: 999px; padding: 4px; gap: 4px; }
+.conmutador button { border: 0; background: none; font: 500 14px var(--f-texto); color: var(--texto-suave); padding: 10px 20px; min-height: 40px; border-radius: 999px; cursor: pointer; }
+.conmutador button[aria-pressed='true'] { background: var(--morado); color: #fff; }
+.paquetes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; align-items: stretch; }
+.paquete { display: flex; flex-direction: column; background: var(--superficie); border: 1px solid var(--borde); border-radius: var(--radio); overflow: hidden; }
+.paquete.destacado { border: 2px solid var(--naranja); }
+.paquete-foto { height: 180px; }
+.paquete-cuerpo { display: flex; flex-direction: column; gap: 12px; padding: 24px; flex: 1; }
+.paquete-cuerpo .sobretitulo { display: flex; justify-content: space-between; gap: 8px; align-items: center; }
+.recomendado { font: 700 11px/1 var(--f-dato); letter-spacing: 0.06em; background: var(--naranja); color: var(--morado); border-radius: 6px; padding: 6px 8px; }
+.paquete h3 { font-size: 28px; }
+.paquete-cuerpo > p { margin: 0; color: var(--texto-suave); }
+.paquete-precio { color: var(--texto-suave); font-size: 14px; }
+.paquete-precio b { font: 600 40px/1 var(--f-titulo); color: var(--texto); margin-right: 4px; }
+.paquete ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; font-size: 15px; }
+.paquete li { display: flex; gap: 10px; }
+.paquete li::before { content: ''; flex: none; width: 7px; height: 7px; margin-top: 9px; border-radius: 50%; background: var(--naranja); }
+.paquete .btn { margin-top: auto; width: 100%; }
+@media (max-width: 900px) { .paquetes { grid-template-columns: 1fr; } }
+
+/* Por qué aquí. */
+.razones { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
+.razon { background: var(--superficie); border: 1px solid var(--borde); border-radius: var(--radio); padding: 26px; display: grid; gap: 10px; align-content: start; }
+.razon .n { font: 500 13px var(--f-dato); color: var(--acento-texto); }
+.razon h3 { font-size: 22px; }
+.razon p { margin: 0; color: var(--texto-suave); }
+@media (max-width: 760px) { .razones { grid-template-columns: 1fr; } }
+
+/* Preguntas: encabezado a la izquierda y respuestas a la derecha en escritorio. */
+.faq { display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); gap: 48px; align-items: start; }
+.faq details { border-bottom: 1px solid var(--borde); padding: 20px 0; }
+.faq details:first-child { border-top: 1px solid var(--borde); }
+.faq summary { cursor: pointer; font: 500 18px var(--f-texto); list-style: none; display: flex; justify-content: space-between; gap: 16px; }
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary::after { content: '+'; font: 600 26px/1 var(--f-titulo); color: var(--acento-texto); transition: transform 0.3s var(--curva); }
+.faq details[open] summary::after { transform: rotate(45deg); }
+.faq details p { color: var(--texto-suave); margin: 10px 0 0; max-width: 64ch; }
+@media (max-width: 860px) { .faq { grid-template-columns: 1fr; gap: 8px; } }
+
+/* Cierre. */
+.final { text-align: center; }
+.final h2 { font-size: clamp(32px, 4.4vw, 56px); max-width: 18ch; margin: 14px auto 28px; }
+.final .ctas { justify-content: center; }

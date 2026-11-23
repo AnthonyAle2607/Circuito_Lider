@@ -8,8 +8,11 @@ import { API_URL, COOKIE_SESION, api, opcionesCookie, sesionActual } from '@/lib
 type ErrorApi = { error?: string; mensaje?: string; faltantes?: Array<{ franjaId: string; fecha: string }> };
 const COOKIE_VOLVER = 'sp_volver';
 const texto = (f: FormData, k: string) => String(f.get(k) ?? '').trim();
-/** Solo se vuelve a rutas internas del portal (evita redirecciones abiertas). */
-const interna = (s: string) => (s.startsWith('/') && !s.startsWith('//') ? s : '/cuenta');
+/**
+ * Solo se vuelve a rutas internas del portal (evita redirecciones abiertas). `//x` y `/\x` los navegadores los leen
+ * como otro dominio: vale una barra seguida de cualquier cosa menos otra barra o una barra invertida.
+ */
+const interna = (s: string) => (/^\/(?![/\\])/.test(s) ? s : '/cuenta');
 const conError = (ruta: string, mensaje: string) => `${ruta}${ruta.includes('?') ? '&' : '?'}error=${encodeURIComponent(mensaje)}`;
 
 // ── cotizar (lo llama el cotizador desde el navegador) ───────────────────────

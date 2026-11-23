@@ -2,7 +2,7 @@ import Link from 'next/link';
 
 export function Pie() {
   return (
-    <footer>
+    <footer className="pie">
       <div className="wrap">
         <span>INVERMEDIA · Radio en Circuito Líder</span>
         <span>

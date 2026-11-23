@@ -98,13 +98,31 @@ export function SubirAnuncio({ maximoSegundos }: { maximoSegundos: number }) {
   );
 }
 
-/** Mientras haya anuncios en proceso, la página se refresca sola cada 4 s para mostrar el resultado. */
+/** Tope del refresco automático: si el trabajador está caído no se consulta la API sin fin. */
+const REFRESCO_MAX_MS = 3 * 60_000;
+
+/** Mientras haya anuncios en proceso, la página se refresca sola cada 4 s (hasta 3 min) para mostrar el resultado. */
 export function RefrescoMientrasProcesa({ activo }: { activo: boolean }) {
   const router = useRouter();
+  const [agotado, setAgotado] = useState(false);
   useEffect(() => {
     if (!activo) return;
-    const id = setInterval(() => router.refresh(), 4000);
+    setAgotado(false);
+    const fin = Date.now() + REFRESCO_MAX_MS;
+    const id = setInterval(() => {
+      if (Date.now() > fin) {
+        clearInterval(id);
+        setAgotado(true);
+        return;
+      }
+      router.refresh();
+    }, 4000);
     return () => clearInterval(id);
   }, [activo, router]);
-  return null;
+  if (!activo || !agotado) return null;
+  return (
+    <p className="aviso" role="status">
+      La revisión está tardando más de lo normal. Recarga la página en unos minutos para ver el resultado.
+    </p>
+  );
 }

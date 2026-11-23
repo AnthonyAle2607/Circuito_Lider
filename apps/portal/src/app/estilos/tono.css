@@ -1,0 +1,55 @@
+/* Toño: mascota y chat de soporte (inicio/Tono.tsx + efectos/tono.ts). Queda en su esquina; no sigue el cursor. */
+.sup { position: fixed; right: max(18px, env(safe-area-inset-right, 0px)); bottom: max(18px, env(safe-area-inset-bottom, 0px)); z-index: 50; display: flex; flex-direction: column; align-items: flex-end; gap: 12px; color: var(--texto); }
+.sup-btn { width: 80px; height: 90px; border: 0; background: transparent; padding: 0; cursor: pointer; position: relative; }
+.sup-btn svg { width: 100%; height: 100%; overflow: visible; display: block; }
+.sup-btn .dot { position: absolute; right: 4px; top: 10px; width: 14px; height: 14px; border-radius: 50%; background: var(--naranja); border: 3px solid var(--morado); }
+.sup-btn[aria-expanded='true'] .dot { display: none; }
+.tono .mbody { animation: flota 2.6s ease-in-out infinite; transform-box: fill-box; transform-origin: 50% 100%; }
+@keyframes flota { 50% { transform: translateY(-5px); } }
+.tono .eye { transform-box: fill-box; transform-origin: center; animation: pestanea 4.2s infinite; }
+@keyframes pestanea { 0%, 94%, 100% { transform: scaleY(1); } 96% { transform: scaleY(0.1); } }
+.tono .ball { animation: antena 1.4s ease-in-out infinite; }
+@keyframes antena { 50% { fill: #fff; } }
+.tono .arm { transform-box: fill-box; transform-origin: 10% 90%; }
+.sup-btn:hover .tono .arm, .tono.wave .arm { animation: saluda 0.9s ease-in-out 2; }
+@keyframes saluda { 25% { transform: rotate(-40deg); } 75% { transform: rotate(10deg); } }
+.tono .mouth { transform-box: fill-box; transform-origin: center; }
+.tono.talk .mouth { animation: habla 0.18s ease-in-out infinite alternate; }
+@keyframes habla { to { transform: scaleY(2.2); } }
+
+.teaser { position: absolute; right: 6px; bottom: 100px; width: max-content; max-width: 240px; background: #fff; color: var(--morado); font: 500 14px/1.3 var(--f-texto); padding: 11px 14px; border-radius: 14px 14px 4px 14px; box-shadow: 0 8px 24px #2e123e33; opacity: 0; transform: translateY(8px); transition: 0.35s var(--curva); pointer-events: none; }
+.teaser.on { opacity: 1; transform: none; pointer-events: auto; cursor: pointer; }
+
+.panel { width: min(370px, calc(100vw - 32px)); height: min(540px, calc(100dvh - 140px)); min-height: 260px; background: var(--fondo); border: 1px solid var(--borde-fuerte); border-radius: var(--radio); display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 18px 40px #00000055; transform-origin: 100% 100%; transition: transform 0.35s var(--curva), opacity 0.25s; }
+.panel[hidden] { display: flex !important; opacity: 0; transform: translateY(16px) scale(0.92); pointer-events: none; visibility: hidden; }
+.ph { display: flex; align-items: center; gap: 10px; padding: 12px 14px; background: var(--naranja); color: var(--morado); }
+.ph .mini { width: 42px; height: 46px; flex: none; }
+.ph .mini svg { width: 100%; height: 100%; overflow: visible; }
+.ph b { display: block; font: 700 20px/1 var(--f-titulo); text-transform: uppercase; }
+.ph span { font: 500 12px var(--f-dato); }
+.ph .x { margin-left: auto; width: 36px; height: 36px; border-radius: 50%; border: 2px solid var(--morado); background: transparent; font: 700 18px var(--f-texto); cursor: pointer; color: var(--morado); }
+.pm { flex: 1; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 8px; scroll-behavior: smooth; }
+.bm { max-width: 86%; padding: 10px 13px; border-radius: 14px; font: 400 14.5px/1.45 var(--f-texto); animation: aparece 0.3s var(--curva) both; }
+@keyframes aparece { from { opacity: 0; transform: translateY(8px); } }
+.bm.t { background: var(--superficie); border-bottom-left-radius: 4px; align-self: flex-start; }
+.bm.u { background: var(--naranja); color: var(--morado); border-bottom-right-radius: 4px; align-self: flex-end; }
+.bm a { color: var(--naranja); font-weight: 700; }
+.bm.typing { display: inline-flex; gap: 4px; padding: 13px 14px; }
+.bm.typing i { width: 7px; height: 7px; border-radius: 50%; background: var(--texto-suave); animation: puntos 1s infinite; }
+.bm.typing i:nth-child(2) { animation-delay: 0.15s; }
+.bm.typing i:nth-child(3) { animation-delay: 0.3s; }
+@keyframes puntos { 50% { transform: translateY(-4px); opacity: 0.4; } }
+.pq { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 14px 10px; max-height: 96px; overflow-y: auto; }
+.pq button { font: 500 12.5px var(--f-texto); border: 1px solid var(--naranja); color: var(--naranja); background: transparent; border-radius: 999px; padding: 7px 11px; cursor: pointer; }
+.pq button:hover { background: var(--naranja); color: var(--morado); }
+.pf { display: flex; gap: 8px; padding: 10px 12px; border-top: 1px solid var(--borde); }
+.pf input { flex: 1; min-width: 0; background: var(--superficie); border: 1px solid var(--borde); border-radius: 999px; padding: 10px 14px; color: var(--texto); font: 400 14px var(--f-texto); }
+.pf input:focus { outline: none; border-color: var(--naranja); }
+.pf button { width: 42px; height: 42px; border-radius: 50%; border: 0; background: var(--naranja); color: var(--morado); font: 700 16px var(--f-texto); cursor: pointer; }
+.pnote { font: 500 10px var(--f-dato); color: var(--texto-suave); text-align: center; padding: 0 0 8px; }
+@media (max-height: 620px) { .panel { min-height: 0; } .pq { max-height: 64px; } }
+@media (max-width: 560px) {
+  .sup-btn { width: 64px; height: 72px; }
+  .teaser { bottom: 82px; max-width: 200px; }
+  .panel { position: fixed; left: max(8px, env(safe-area-inset-left, 0px)); right: max(8px, env(safe-area-inset-right, 0px)); top: max(8px, env(safe-area-inset-top, 0px)); bottom: calc(100px + env(safe-area-inset-bottom, 0px)); width: auto; height: auto; min-height: 0; }
+}

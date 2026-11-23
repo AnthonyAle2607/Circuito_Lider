@@ -1,0 +1,40 @@
+/* Tienda de programas (venta/Tienda.tsx, TarjetaPrograma.tsx, TuPauta.tsx). Tarjetas blancas sobre fondo claro. */
+.tienda-filtros { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 0 0 24px; }
+.filtro { min-height: 40px; font: 500 14px/1 var(--f-texto); padding: 10px 16px; border-radius: 999px; border: 1px solid var(--borde-fuerte); background: var(--superficie); color: var(--texto); cursor: pointer; }
+.filtro:hover { border-color: var(--texto); }
+.filtro[aria-pressed='true'] { background: var(--morado); border-color: var(--morado); color: #fff; }
+.separador { width: 1px; height: 26px; background: var(--borde-fuerte); margin: 0 4px; }
+
+.tienda-rejilla { display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start; }
+.productos { flex: 999 1 620px; min-width: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; position: relative; }
+
+.producto { display: flex; flex-direction: column; gap: 10px; background: var(--superficie); border: 1px solid var(--borde); border-radius: var(--radio); padding: 18px; transition: border-color 0.2s; }
+.producto:hover { border-color: var(--borde-fuerte); }
+.producto.en-pauta { border-color: var(--naranja); box-shadow: inset 0 0 0 1px var(--naranja); }
+.producto-cabeza { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
+.producto-marca { font: 700 12px var(--f-dato); color: var(--acento-texto); }
+.producto h3 { font-size: 22px; }
+.producto-horarios { list-style: none; margin: 0; padding: 0; font: 500 13px/1.6 var(--f-dato); color: var(--texto-suave); }
+.producto-desc { margin: 0; color: var(--texto-suave); font-size: 14px; line-height: 1.5; }
+.producto-pie { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: auto; padding-top: 12px; border-top: 1px solid var(--borde); font-size: 14px; color: var(--texto-suave); }
+.producto-pie b { font: 600 20px/1 var(--f-titulo); color: var(--texto); }
+.producto-pie .btn { padding: 9px 16px; min-height: 40px; font-size: 14px; white-space: nowrap; }
+
+/* «Tu pauta»: resumen fijo al costado con el total en vivo. */
+.tu-pauta { flex: 1 1 300px; min-width: 0; position: sticky; top: calc(var(--cabecera) + 20px); display: grid; gap: 14px; background: var(--superficie); border: 1px solid var(--borde); border-top: 4px solid var(--naranja); border-radius: var(--radio); padding: 22px; }
+.tu-pauta h3 { font-size: 22px; }
+.tu-pauta ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.tu-pauta li { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; border-bottom: 1px solid var(--borde); padding-bottom: 10px; }
+.tu-pauta li span { display: grid; gap: 2px; }
+.tu-pauta li small { color: var(--texto-suave); font-size: 13px; }
+.tu-pauta .quitar { background: none; border: 0; color: var(--texto-suave); font-size: 22px; line-height: 1; cursor: pointer; padding: 0 4px; min-width: 32px; min-height: 32px; }
+.tu-pauta .quitar:hover { color: var(--texto); }
+.tu-pauta-opciones { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.tu-pauta-opciones label { display: grid; gap: 4px; font: 500 11px/1 var(--f-titulo); letter-spacing: 1.5px; text-transform: uppercase; color: var(--texto-suave); }
+.tu-pauta-opciones select { background: var(--superficie); color: var(--texto); border: 1px solid var(--borde-fuerte); border-radius: 8px; padding: 8px 6px; font: 500 14px var(--f-texto); }
+.tu-pauta-total { display: flex; justify-content: space-between; align-items: baseline; font: 600 16px/1 var(--f-titulo); text-transform: uppercase; }
+.tu-pauta-total b { font-size: 36px; }
+.tu-pauta .btn.primary { width: 100%; }
+.tu-pauta .ajustar { font-size: 14px; text-align: center; color: var(--texto-suave); }
+.tu-pauta .aviso { margin: 0; }
+@media (max-width: 900px) { .tu-pauta { position: static; } }

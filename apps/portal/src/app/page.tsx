@@ -1,16 +1,15 @@
 import type { Parrilla } from '@sp/schemas';
-import { Efectos } from '@/componentes/Efectos';
-import { FranjaFotos } from '@/componentes/FranjaFotos';
-import { FINAL, HERO_REDACCION, HERO_TEXTO, MEDIO, TONO } from '@/componentes/marcado';
-import { Buscador, Cotizador, Paquetes, Tienda, type DatosVenta } from '@/componentes/Venta';
+import { Efectos } from '@/componentes/animacion';
+import { Cierre, Cobertura, ComoFunciona, Heroe, Tono } from '@/componentes/inicio';
+import { Buscador, Cotizador, Paquetes, Tienda, type DatosVenta } from '@/componentes/venta';
 import { emisoras, parrilla, tarifario } from '@/lib/api';
 
 export const dynamic = 'force-dynamic';
 
 /**
- * Inicio con el diseño «Parrilla · Invermedia», simplificado con la tienda de la opción B (rediseño 2026-11-19):
- * héroe con buscador y redacción de agentes, tienda de programas con «Tu pauta», cómo funciona en una fila, cobertura,
- * paquetes, cotizador hora por hora con la radio sonando en el dial, por qué aquí, preguntas y cierre.
+ * Portada. Alterna secciones oscuras de marca y claras para comprar (ver docs/diseno-portal.md):
+ * héroe (oscuro) → tienda → cómo funciona → cobertura (oscuro) → paquetes → cotizador (oscuro) → por qué, preguntas
+ * → cierre (oscuro). Los efectos decorativos se arrancan en <Efectos /> y se apagan al salir.
  */
 export default async function Inicio() {
   const lista = await emisoras();
@@ -20,25 +19,18 @@ export default async function Inicio() {
     parrillas: Object.fromEntries(parrillas.filter((p): p is Parrilla => p !== null).map((p) => [p.emisora.slug, p])),
     tarifario: t,
   };
-  const html = (h: string) => <div style={{ display: 'contents' }} dangerouslySetInnerHTML={{ __html: h }} />;
   return (
     <>
       <main id="top">
-        <section className="hero">
-          <div className="wrap">
-            {html(HERO_TEXTO)}
-            <Buscador datos={datos} />
-            <FranjaFotos />
-          </div>
-          {html(HERO_REDACCION)}
-        </section>
+        <Heroe buscador={<Buscador datos={datos} />} />
         <Tienda datos={datos} />
-        {html(MEDIO)}
+        <ComoFunciona />
+        <Cobertura />
         <Paquetes datos={datos} />
         <Cotizador datos={datos} />
-        {html(FINAL)}
+        <Cierre />
       </main>
-      <div dangerouslySetInnerHTML={{ __html: TONO }} />
+      <Tono />
       <Efectos />
     </>
   );
