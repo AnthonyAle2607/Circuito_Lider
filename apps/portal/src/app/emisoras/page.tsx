@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import { BotonVivo } from '@/componentes/Radio';
 import { emisoras, parrilla } from '@/lib/api';
+import { Foto } from '@/componentes/Foto';
+import { CIUDADES, fotoDeRadio } from '@/lib/imagenes';
 import { enAntena } from '@/lib/vivo';
 
 export const dynamic = 'force-dynamic';
@@ -19,6 +21,9 @@ export default async function Emisoras() {
   // Primero Caracas, después el resto por nombre de ciudad (como las devuelve la API).
   const orden = lista.map((e, i) => ({ e, p: parrillas[i] })).sort((a, b) => (a.e.slug === 'caracas' ? -1 : b.e.slug === 'caracas' ? 1 : 0));
 
+  // Las emisoras sin foto de ciudad reciben fotos de radio distintas, en orden.
+  const sinFoto = orden.filter(({ e }) => !CIUDADES[e.slug]).map(({ e }) => e.slug);
+
   return (
     <main className="pagina vitrina">
       <div className="wrap">
@@ -34,6 +39,7 @@ export default async function Emisoras() {
             const a = p ? enAntena(p, ahora) : null;
             return (
               <article key={e.slug} className="tarjeta emisora">
+                <Foto img={CIUDADES[e.slug] ?? fotoDeRadio(sinFoto.indexOf(e.slug))} sizes="(max-width: 560px) 100vw, 280px" className="emisora-foto" />
                 <div className="emisora-cabeza">
                   <span className="frecuencia">{e.frecuencia.replace(' FM', '')}</span>
                   <span className="fm">FM</span>

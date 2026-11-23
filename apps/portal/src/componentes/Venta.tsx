@@ -10,6 +10,8 @@ import { usePauta } from './Pauta';
 import { BotonVivo, useRadio } from './Radio';
 import { dinero, fechaCorta, hoyEnCaracas, sumarDias } from '@/lib/fechas';
 import { horario } from '@/lib/vivo';
+import { CARACAS_AEREA, CIUDADES, IMAGENES, fondoDePrograma, type Imagen } from '@/lib/imagenes';
+import { Foto } from './Foto';
 
 export interface DatosVenta {
   emisoras: Emisora[];
@@ -264,7 +266,9 @@ export function Tienda({ datos }: { datos: DatosVenta }) {
               const todo = n === x.ids.length;
               return (
                 <article key={x.clave} className={`producto${n ? ' en-pauta' : ''}`}>
-                  <div className={`pc ${x.variante}`}>
+                  <div className={`pc ${x.variante} con-foto`}>
+                    <Foto img={fondoDePrograma(x.clave)} sizes="(max-width: 760px) 100vw, 320px" className="pc-foto" />
+                    <span className="velo" aria-hidden="true" />
                     <div className="tag">
                       <span>{x.alcance === 'nacional' ? 'En cadena · 10 emisoras' : `Solo ${x.ciudad}`}</span>
                       <span className="eq" aria-hidden="true">
@@ -422,6 +426,9 @@ function paquetes(franjas: Map<string, Franja>) {
   ];
 }
 
+/** Una foto por paquete: la ciudad, la región andina y el público de todo el país. */
+const FOTO_PAQUETE: Record<string, Imagen> = { ciudad: CARACAS_AEREA, region: CIUDADES.merida ?? IMAGENES.microfonoEstudio, nacional: IMAGENES.publicoLuces };
+
 // ── paquetes: se suman a la pauta ────────────────────────────────────────────
 export function Paquetes({ datos }: { datos: DatosVenta }) {
   const p = usePauta();
@@ -470,6 +477,7 @@ export function Paquetes({ datos }: { datos: DatosVenta }) {
             const pr = precioPlan(pl.ids, mensual ? 4 : 1);
             return (
               <article key={pl.clave} className={`plan${pl.destacado ? ' feat' : ''}`}>
+                <Foto img={FOTO_PAQUETE[pl.clave] ?? IMAGENES.microfonoEstudio} sizes="(max-width: 900px) 100vw, 380px" className="plan-foto" />
                 {pl.destacado && <span className="badge">Recomendado para empezar</span>}
                 <span className="label">{pl.etiqueta}</span>
                 <h3>{pl.nombre}</h3>

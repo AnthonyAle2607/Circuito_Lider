@@ -2,6 +2,8 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { BotonVivo } from '@/componentes/Radio';
 import { emisoras, parrilla } from '@/lib/api';
+import { Foto } from '@/componentes/Foto';
+import { CIUDADES, IMAGENES } from '@/lib/imagenes';
 import { cuando, enAntena, horario } from '@/lib/vivo';
 
 export const dynamic = 'force-dynamic';
@@ -49,6 +51,10 @@ export default async function FichaEmisora({ params }: { params: Promise<{ slug:
           <Link href="/emisoras">← Todas las emisoras</Link>
         </span>
 
+        <figure className="ficha-banner">
+          <Foto img={CIUDADES[e.slug] ?? IMAGENES.microfonoCabina} prioridad sizes="(max-width: 1200px) 100vw, 1150px" posicion="center 40%" />
+          <figcaption>{CIUDADES[e.slug] ? e.ciudad : `En la cabina de ${e.nombre}`}</figcaption>
+        </figure>
         <div className="ficha-cabeza">
           <div className="ficha-dial" aria-hidden="true">
             <span className="frecuencia">{e.frecuencia.replace(' FM', '')}</span>

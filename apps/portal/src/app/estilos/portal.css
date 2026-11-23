@@ -271,3 +271,42 @@ video.anuncio-medio{max-height:240px;border-radius:12px;background:#000}
   .certificado dt,.certificado .nota{color:#333}
   .certificado dl div{border-color:#999}
 }
+
+/* ── fotos (next/image con fill: la caja manda el tamaño) ──────────────── */
+.foto{position:relative;display:block;overflow:hidden;background:var(--ink3)}
+
+/* franja del héroe: cabina ancha + dos más */
+.franja-fotos{display:grid;grid-template-columns:2fr 1fr 1fr;gap:12px;max-width:1100px;margin:28px auto 0;text-align:left}
+.franja-fotos figure{margin:0;position:relative;border-radius:22px;overflow:hidden;border:2px solid var(--line)}
+.franja-fotos .foto{height:220px}
+.franja-fotos figcaption{position:absolute;left:12px;bottom:12px;background:var(--ink);color:var(--cream);font:700 12px/1 var(--f-mono);letter-spacing:.1em;text-transform:uppercase;padding:7px 10px;border-radius:999px}
+@media (max-width:760px){.franja-fotos{grid-template-columns:1fr 1fr}.franja-fotos .ancha{grid-column:span 2}.franja-fotos .foto{height:160px}}
+
+/* tarjetas de programa: la foto debajo y un velo del color de la tarjeta encima (plano, sin degradado) */
+.pc.con-foto{position:relative;overflow:hidden;isolation:isolate}
+.pc.con-foto .pc-foto{position:absolute;inset:0;z-index:-2}
+.pc.con-foto .velo{position:absolute;inset:0;z-index:-1;background:inherit;opacity:.78}
+.pc.con-foto .tag,.pc.con-foto h3{position:relative}
+
+/* paquetes con foto arriba */
+.plan{overflow:hidden}
+.plan .plan-foto{height:150px;margin:-28px -28px 18px;border-bottom:2px solid var(--line)}
+@media (max-width:560px){.plan .plan-foto{margin:-22px -22px 16px}}
+
+/* emisoras: foto de la ciudad arriba de la tarjeta */
+.tarjeta.emisora{padding-top:0;overflow:hidden}
+.tarjeta.emisora .emisora-foto{height:130px;margin:0 -24px 6px}
+
+/* ficha de emisora: franja de foto arriba */
+.ficha-banner{position:relative;margin:12px 0 0;height:240px;border-radius:24px;overflow:hidden;border:2px solid var(--line)}
+.ficha-banner .foto{position:absolute;inset:0}
+.ficha-banner figcaption{position:absolute;left:16px;bottom:16px;background:var(--ink);color:var(--cream);font:700 13px/1 var(--f-mono);letter-spacing:.1em;text-transform:uppercase;padding:8px 12px;border-radius:999px}
+@media (max-width:640px){.ficha-banner{height:170px}}
+
+/* espera mientras carga */
+.cargando{display:grid;place-items:center;gap:14px;min-height:40vh;text-align:center;color:var(--soft)}
+.cargando .onda{display:flex;gap:5px;align-items:flex-end;height:36px}
+.cargando .onda i{width:7px;height:100%;border-radius:4px;background:var(--mustard);animation:onda 1s ease-in-out infinite}
+.cargando .onda i:nth-child(2){animation-delay:.12s}.cargando .onda i:nth-child(3){animation-delay:.24s}.cargando .onda i:nth-child(4){animation-delay:.36s}.cargando .onda i:nth-child(5){animation-delay:.48s}
+@keyframes onda{0%,100%{transform:scaleY(.3)}50%{transform:scaleY(1)}}
+@media (prefers-reduced-motion:reduce){.cargando .onda i{animation:none;transform:scaleY(.6)}}

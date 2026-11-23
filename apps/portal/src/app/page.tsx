@@ -1,5 +1,6 @@
 import type { Parrilla } from '@sp/schemas';
 import { Efectos } from '@/componentes/Efectos';
+import { FranjaFotos } from '@/componentes/FranjaFotos';
 import { FINAL, HERO_REDACCION, HERO_TEXTO, MEDIO, TONO } from '@/componentes/marcado';
 import { Buscador, Cotizador, Paquetes, Tienda, type DatosVenta } from '@/componentes/Venta';
 import { emisoras, parrilla, tarifario } from '@/lib/api';
@@ -27,6 +28,7 @@ export default async function Inicio() {
           <div className="wrap">
             {html(HERO_TEXTO)}
             <Buscador datos={datos} />
+            <FranjaFotos />
           </div>
           {html(HERO_REDACCION)}
         </section>

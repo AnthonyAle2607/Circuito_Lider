@@ -10,6 +10,8 @@ const config: NextConfig = {
   transpilePackages: ['@sp/schemas', '@sp/pricing'],
   // Los spots se suben por una acción del servidor: hasta 60 MB (la API pone el mismo tope).
   experimental: { serverActions: { bodySizeLimit: '61mb' } },
+  // Fotos locales (public/imagenes): next/image las sirve en AVIF o WebP al ancho que pide cada pantalla.
+  images: { formats: ['image/avif', 'image/webp'], minimumCacheTTL: 60 * 60 * 24 * 30 },
   async headers() {
     return [
       {
