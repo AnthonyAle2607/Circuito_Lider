@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { pasarelaDelEntorno } from '@sp/payments';
 import { almacenS3, configS3DelEntorno, leerReglas, revisarSpot, transcriptorDelEntorno } from '@sp/spots';
 import { COLAS, LATIDO, LIBERAR, REVISAR, latir, liberarReservas, revisarAnuncios } from './colas';
+import { AVISOS, despacharAvisos, destinoDelEntorno } from './avisos';
 import { CONCILIAR, conciliarPagos } from './conciliar';
 import { DETECTAR, detectarEmisiones } from './detectar';
 
@@ -39,6 +40,10 @@ if (herramientas) await cola.upsertJobScheduler('detectar-emisiones', { every: D
 // PT-5: conciliación de pagos con la misma pasarela (y las mismas sesiones en Redis) que la API.
 const pasarela = pasarelaDelEntorno(process.env, { get: (k) => conexion.get(k), set: (k, v) => conexion.set(k, v, 'EX', 7 * 86_400) });
 await cola.upsertJobScheduler('conciliar-pagos', { every: CONCILIAR.cadaMs }, { name: CONCILIAR.trabajo });
+// Avisos (outbox → n8n). Sin AVISOS_URL los eventos esperan en el outbox hasta que haya destino.
+const destinoAvisos = destinoDelEntorno(process.env);
+if (destinoAvisos) await cola.upsertJobScheduler('despachar-avisos', { every: AVISOS.cadaMs }, { name: AVISOS.trabajo });
+log('avisos', { destino: destinoAvisos ? new URL(destinoAvisos.url).host : 'ninguno (esperan en el outbox)' });
 log('revisión de anuncios', { almacen: Boolean(s3), transcriptor: transcriptor?.nombre ?? 'ninguno (todo a revisión humana)' });
 
 const trabajador = new Worker(
@@ -50,6 +55,7 @@ const trabajador = new Worker(
       if (n > 0) log('reservas vencidas liberadas', { pedidos: n });
     }
     if (job.name === CONCILIAR.trabajo) await conciliarPagos(db, pasarela, log);
+    if (job.name === AVISOS.trabajo && destinoAvisos) await despacharAvisos(db, destinoAvisos, undefined, log);
     if (job.name === DETECTAR.trabajo && herramientas) {
       await detectarEmisiones({ db, almacen: herramientas.almacen, ruta: (a) => resolve(grabaciones, a), log });
     }

@@ -19,6 +19,7 @@ import { rutasCuentas } from './routes/cuentas';
 import { rutasPanelCatalogo } from './routes/panel/catalogo';
 import { rutasPanelVentas } from './routes/panel/ventas';
 import { rutasPedidos } from './routes/pedidos';
+import { rutasRecuperarClave } from './routes/recuperar-clave';
 import { rutasMiPanel } from './routes/mi-panel';
 import { rutasPagos } from './routes/pagos';
 import { rutasSesionEquipo } from './routes/panel/sesion';
@@ -73,6 +74,7 @@ export async function buildApp(op: Opciones): Promise<FastifyInstance> {
       avisosEnConsola: op.avisosEnConsola ?? false,
       limiteAcceso: limites.acceso,
     });
+    rutasRecuperarClave(app, { db: op.db, portalUrl: op.portalUrl ?? 'http://localhost:3100', limiteAcceso: limites.acceso, avisosEnConsola: op.avisosEnConsola ?? false });
     await rutasSesionEquipo(app, { db: op.db, mfaKey: op.mfaKey, limiteAcceso: limites.acceso });
     await rutasCatalogo(app, op.db);
     await rutasPanelCatalogo(app, op.db);

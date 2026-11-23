@@ -158,4 +158,8 @@ evento que tenga quien lo consuma (el correo de verificación, con n8n).
   portal (`crearCotizacion`, P11); no da descuentos ni reserva en el chat (D18); topes de gasto en `config/agente.yaml`
   (P9). Sin `ANTHROPIC_API_KEY` queda apagado y Toño usa su guion fijo. Ver `docs/agente-vendedor.md`.
 - Cobro: precios en USD a tasa BCV (decisión 2026-11-23); pasarela real, banco y reembolsos se planifican al final.
-- Siguiente: recuperar clave, seguimiento de prospectos, programación (PT-8).
+- **Avisos y recuperar clave** (2026-11-23): migraciones `0012_avisos` y `0013_recuperar_clave`. El trabajo
+  `despachar-avisos` entrega cada evento del outbox a n8n (`AVISOS_URL`), firmado y con el contacto del anunciante,
+  con préstamo de 2 min y reintentos crecientes; sin URL los eventos esperan. Recuperar clave por enlace de un solo uso
+  (1 h, máx. 3 por hora, no revela si el correo existe); restablecer cierra todas las sesiones. Ver `docs/avisos.md`.
+- Siguiente: órdenes de pauta para los operadores, seguimiento de prospectos, servidor (PT-8).

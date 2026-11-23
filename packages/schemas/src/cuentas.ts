@@ -17,6 +17,13 @@ export type Registro = z.infer<typeof Registro>;
 
 export const VerificarCorreo = z.object({ codigo: z.string().min(20).max(100) });
 
+/** Recuperar la clave (0013): se pide con el correo y se restablece con el código del enlace. */
+export const PedirRecuperacion = z.object({ email: Email });
+export const RestablecerClave = z.object({
+  codigo: z.string().min(20).max(100),
+  password: z.string().min(12, 'La clave debe tener al menos 12 caracteres.').max(128),
+});
+
 export const Ingreso = z.object({ email: Email, password: ClaveDeIngreso });
 
 export const SesionAbierta = z.object({

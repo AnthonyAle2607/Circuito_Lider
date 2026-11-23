@@ -9,6 +9,7 @@ import type { TarifariosTabla, TarifasTabla, DescuentosVolumenTabla, Cotizacione
 import type { AnunciosTabla, PalabrasProhibidasTabla, GrabacionesTabla, CertificadosTabla } from './anuncios';
 import type { PagosTabla, WebhookEventosTabla } from './pagos';
 import type { AgenteGastoDiarioTabla, ConversacionMensajesTabla, ConversacionesTabla } from './agente';
+import type { RecuperacionesClaveTabla } from './clave';
 
 export type * from './comun';
 export type * from './identidad';
@@ -18,6 +19,7 @@ export type * from './ventas';
 export type * from './anuncios';
 export type * from './pagos';
 export type * from './agente';
+export type * from './clave';
 
 export interface Database {
   anunciantes: AnunciantesTabla;
@@ -49,4 +51,5 @@ export interface Database {
   conversaciones: ConversacionesTabla;
   conversacion_mensajes: ConversacionMensajesTabla;
   agente_gasto_diario: AgenteGastoDiarioTabla;
+  recuperaciones_clave: RecuperacionesClaveTabla;
 }

@@ -27,4 +27,6 @@ export interface OutboxTabla {
   despachado_at: Date | null;
   intentos: Generated<number>;
   ultimo_error: string | null;
+  /** 0012: cuándo se puede volver a intentar el despacho. */
+  proximo_intento_at: Generated<Date>;
 }
