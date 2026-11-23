@@ -121,3 +121,15 @@ export async function cerrarConversacion(f: FormData) {
   revalidatePath('/conversaciones');
   redirect(`/conversaciones?aviso=${encodeURIComponent('Conversación marcada como atendida.')}`);
 }
+
+/** Programación confirma que cargó el spot de una orden en el sistema de la emisora (RF-21). */
+export async function confirmarOrden(f: FormData) {
+  const id = texto(f, 'id');
+  const r = await apiEquipo(`/v1/panel/ordenes/${encodeURIComponent(id)}/cargada`, {
+    method: 'POST',
+    body: JSON.stringify({ nota: texto(f, 'nota') || undefined }),
+  });
+  if (!r.ok) redirect(`/ordenes?error=${encodeURIComponent(await mensajeDe(r))}`);
+  revalidatePath('/ordenes');
+  redirect(`/ordenes?aviso=${encodeURIComponent('Orden marcada como cargada.')}`);
+}

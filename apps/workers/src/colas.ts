@@ -31,6 +31,14 @@ export async function liberarReservas(db: { query(sql: string): Promise<{ rows: 
   return Number(r.rows[0]?.n ?? 0);
 }
 
+/** RF-20: cada minuto, los pedidos pagados con su spot aprobado generan sus órdenes de pauta por emisora. */
+export const PROGRAMAR = { trabajo: 'programar', cadaMs: 60_000 } as const;
+
+export async function programar(db: { query(sql: string): Promise<{ rows: Array<Record<string, unknown>> }> }): Promise<number> {
+  const r = await db.query('select generar_ordenes() as n');
+  return Number(r.rows[0]?.n ?? 0);
+}
+
 /** PT-6: cada 10 s se revisan los anuncios subidos (duración, transcripción y palabras prohibidas). */
 export const REVISAR = {
   trabajo: 'revisar-anuncios',

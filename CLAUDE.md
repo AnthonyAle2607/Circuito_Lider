@@ -162,4 +162,8 @@ evento que tenga quien lo consuma (el correo de verificación, con n8n).
   `despachar-avisos` entrega cada evento del outbox a n8n (`AVISOS_URL`), firmado y con el contacto del anunciante,
   con préstamo de 2 min y reintentos crecientes; sin URL los eventos esperan. Recuperar clave por enlace de un solo uso
   (1 h, máx. 3 por hora, no revela si el correo existe); restablecer cierra todas las sesiones. Ver `docs/avisos.md`.
-- Siguiente: órdenes de pauta para los operadores, seguimiento de prospectos, servidor (PT-8).
+- **PT-7c · Órdenes de pauta** (2026-11-23): migración `0014_ordenes_de_pauta`. El trabajo `programar` (cada minuto)
+  genera una orden por emisora para cada pedido pagado con su spot aprobado (cadena: todas; local: la suya); si el
+  cliente cambia de anuncio, las viejas se anulan. Panel `/ordenes` (rol programación): bajar el spot, ver fechas y
+  programas, marcar cargada (RF-21). El cliente ve «Programado» cuando todas están cargadas (RF-22).
+- Siguiente: seguimiento de prospectos del agente, que ventas responda en el chat, servidor (PT-8).

@@ -5,7 +5,7 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { pasarelaDelEntorno } from '@sp/payments';
 import { almacenS3, configS3DelEntorno, leerReglas, revisarSpot, transcriptorDelEntorno } from '@sp/spots';
-import { COLAS, LATIDO, LIBERAR, REVISAR, latir, liberarReservas, revisarAnuncios } from './colas';
+import { COLAS, LATIDO, LIBERAR, PROGRAMAR, REVISAR, latir, liberarReservas, programar, revisarAnuncios } from './colas';
 import { AVISOS, despacharAvisos, destinoDelEntorno } from './avisos';
 import { CONCILIAR, conciliarPagos } from './conciliar';
 import { DETECTAR, detectarEmisiones } from './detectar';
@@ -27,6 +27,7 @@ const log = (msg: string, extra: Record<string, unknown> = {}) => console.log(JS
 const cola = new Queue(COLAS.sistema, { connection: conexion });
 await cola.upsertJobScheduler('latido', { every: LATIDO.cadaMs }, { name: LATIDO.trabajo });
 await cola.upsertJobScheduler('liberar-reservas', { every: LIBERAR.cadaMs }, { name: LIBERAR.trabajo });
+await cola.upsertJobScheduler('programar', { every: PROGRAMAR.cadaMs }, { name: PROGRAMAR.trabajo });
 
 // PT-6: revisión de anuncios. Sin MinIO no hay archivos que revisar; sin Whisper todo pasa a revisión humana.
 const s3 = configS3DelEntorno();
@@ -53,6 +54,10 @@ const trabajador = new Worker(
     if (job.name === LIBERAR.trabajo) {
       const n = await liberarReservas(db);
       if (n > 0) log('reservas vencidas liberadas', { pedidos: n });
+    }
+    if (job.name === PROGRAMAR.trabajo) {
+      const n = await programar(db);
+      if (n > 0) log('órdenes de pauta generadas', { ordenes: n });
     }
     if (job.name === CONCILIAR.trabajo) await conciliarPagos(db, pasarela, log);
     if (job.name === AVISOS.trabajo && destinoAvisos) await despacharAvisos(db, destinoAvisos, undefined, log);

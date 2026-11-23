@@ -10,6 +10,7 @@ import type { AnunciosTabla, PalabrasProhibidasTabla, GrabacionesTabla, Certific
 import type { PagosTabla, WebhookEventosTabla } from './pagos';
 import type { AgenteGastoDiarioTabla, ConversacionMensajesTabla, ConversacionesTabla } from './agente';
 import type { RecuperacionesClaveTabla } from './clave';
+import type { OrdenesPautaTabla } from './ordenes';
 
 export type * from './comun';
 export type * from './identidad';
@@ -20,6 +21,7 @@ export type * from './anuncios';
 export type * from './pagos';
 export type * from './agente';
 export type * from './clave';
+export type * from './ordenes';
 
 export interface Database {
   anunciantes: AnunciantesTabla;
@@ -52,4 +54,5 @@ export interface Database {
   conversacion_mensajes: ConversacionMensajesTabla;
   agente_gasto_diario: AgenteGastoDiarioTabla;
   recuperaciones_clave: RecuperacionesClaveTabla;
+  ordenes_pauta: OrdenesPautaTabla;
 }

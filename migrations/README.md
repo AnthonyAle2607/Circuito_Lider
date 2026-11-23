@@ -14,6 +14,7 @@ Archivos `NNNN_nombre.sql`, aplicados en orden por `pnpm db:migrate` (runner en 
 - PT-5: `0010_pagos` (pagos por pasarela y transferencia, avisos idempotentes, conciliación).
 - PT-5b: `0011_agente_ventas` (conversaciones del agente, mensajes append-only, gasto diario).
 - Avisos: `0012_avisos` (despacho del outbox a n8n con préstamo y reintentos), `0013_recuperar_clave`.
+- PT-7c: `0014_ordenes_de_pauta` (una orden por emisora; programación confirma la carga).
 - Siguen: spots y revisión, programación, agente de ventas.
 - Cada migración que añade tablas actualiza `packages/db/src/schema/` (un archivo por dominio) en el mismo cambio.
 - Los roles `app_api` y `app_worker` los crea `0001` sin acceso; los permisos van en cada migración (`GRANT` mínimos).

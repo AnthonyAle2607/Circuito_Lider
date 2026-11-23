@@ -18,6 +18,7 @@ import { rutasCotizaciones } from './routes/cotizaciones';
 import { rutasCuentas } from './routes/cuentas';
 import { rutasPanelCatalogo } from './routes/panel/catalogo';
 import { rutasPanelVentas } from './routes/panel/ventas';
+import { rutasOrdenes } from './routes/ordenes';
 import { rutasPedidos } from './routes/pedidos';
 import { rutasRecuperarClave } from './routes/recuperar-clave';
 import { rutasMiPanel } from './routes/mi-panel';
@@ -84,6 +85,7 @@ export async function buildApp(op: Opciones): Promise<FastifyInstance> {
     if (op.almacen) await rutasAnuncios(app, { db: op.db, almacen: op.almacen, formatos: op.formatosSpot ?? ['mp4', 'mp3', 'wav'] });
     if (op.almacen) await rutasCertificados(app, { db: op.db, almacen: op.almacen });
     await rutasPanelVentas(app, op.db);
+    rutasOrdenes(app, { db: op.db, ...(op.almacen && { almacen: op.almacen }) });
     await rutasAgente(app, { db: op.db, portalUrl: op.portalUrl ?? 'http://localhost:3100', ...(op.agente && { agente: op.agente }) });
     if (op.pasarela) {
       await rutasPagos(app, { db: op.db, pasarela: op.pasarela, portalUrl: op.portalUrl ?? 'http://localhost:3100', ...(op.almacen && { almacen: op.almacen }), ...(op.transferencia && { transferencia: op.transferencia }) });

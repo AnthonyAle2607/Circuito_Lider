@@ -41,6 +41,8 @@ export default async function VerPedido({ params, searchParams }: { params: Prom
   if (vigente || p.estado === 'pagado') listos.add('Reservado');
   if (p.estado === 'pagado') listos.add('Pagado');
   if (asignado) listos.add('Spot aprobado');
+  // Programado: programación cargó el spot en todas las emisoras donde suena (RF-22).
+  if (p.programacion.ordenes > 0 && p.programacion.cargadas === p.programacion.ordenes) listos.add('Programado');
   if (certificados.length) ['Programado', 'Al aire', 'Certificado'].forEach((x) => listos.add(x));
 
   return (

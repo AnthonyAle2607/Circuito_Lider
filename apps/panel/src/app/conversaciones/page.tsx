@@ -48,6 +48,7 @@ export default async function PanelConversaciones({ searchParams }: { searchPara
           <h1 style={{ fontFamily: 'Oswald, Impact, sans-serif', margin: '4px 0' }}>Conversaciones con Toño</h1>
         </div>
         <nav style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+          <Link href="/ordenes" style={{ color: c.texto_suave }}>Órdenes</Link>
           <Link href="/pagos" style={{ color: c.texto_suave }}>Pagos</Link>
           <Link href="/anuncios" style={{ color: c.texto_suave }}>Anuncios</Link>
           <form action={salir}>

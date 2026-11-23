@@ -9,6 +9,17 @@ import { exigirAnunciante } from '../auth/sesiones';
 import { HttpError } from '../plugins/errores';
 import { pagosDe } from './pagos/comun';
 
+/** Cuántas órdenes de pauta vivas tiene el pedido y cuántas cargó programación. */
+async function programacionDe(t: Transaction<Database>, pedidoId: string) {
+  const f = await t
+    .selectFrom('ordenes_pauta')
+    .select((eb) => [eb.fn.countAll<number>().as('ordenes'), eb.fn.count<number>('cargada_at').as('cargadas')])
+    .where('pedido_id', '=', pedidoId)
+    .where('estado', '<>', 'anulada')
+    .executeTakeFirstOrThrow();
+  return { ordenes: Number(f.ordenes), cargadas: Number(f.cargadas) };
+}
+
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const noExiste = () => new HttpError(404, 'pedido_no_existe', 'No encontramos ese pedido.');
 
@@ -33,6 +44,7 @@ export async function leerPedido(t: Transaction<Database>, id: string): Promise<
     creadoAt: p.creado_at.toISOString(),
     reservas: reservas.map((r) => ({ franjaId: r.franja_id, fecha: r.fecha, segundos: r.segundos, estado: r.estado })),
     pagos: await pagosDe(t, id),
+    programacion: await programacionDe(t, id),
   };
 }
 

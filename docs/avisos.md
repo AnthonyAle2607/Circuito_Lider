@@ -46,6 +46,8 @@ se entrega se reintenta.
 | `pago.tardio` | Cobro con el pedido inactivo o ya pagado | Aviso interno a finanzas: devolver el dinero | `pago_id`, `pedido_id` |
 | `anuncio.revisado` | Revisión del spot | Correo al cliente: aprobado, o qué cambiar | `anuncio_id`, `estado` |
 | `emision.certificada` | Detección de una emisión | Opcional: resumen diario al cliente | `certificado_id` |
+| `orden.creada` | Pedido pagado con spot aprobado | Aviso interno a programación (una por emisora) | `orden_id`, `pedido_id`, `emisora_id` |
+| `orden.cargada` | Programación confirmó la carga | Opcional: al cliente cuando todas sus órdenes están cargadas | `orden_id`, `pedido_id` |
 | `agente.traspaso` | Toño pasó la conversación | Aviso interno a ventas con el enlace al panel | `conversacion_id`, `motivo` |
 
 Los enlaces (`enlace`) llevan códigos de un solo uso: n8n no debe guardarlos en sus registros más de lo necesario.

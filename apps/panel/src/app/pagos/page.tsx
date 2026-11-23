@@ -37,6 +37,7 @@ export default async function PanelPagos({ searchParams }: { searchParams: Promi
           </h1>
         </div>
         <nav style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+          <Link href="/ordenes" style={{ color: c.texto_suave }}>Órdenes</Link>
           <Link href="/parrilla" style={{ color: c.texto_suave }}>Parrilla</Link>
           <Link href="/conversaciones" style={{ color: c.texto_suave }}>Conversaciones</Link>
           <Link href="/anuncios" style={{ color: c.texto_suave }}>Anuncios</Link>

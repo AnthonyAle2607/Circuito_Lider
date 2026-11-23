@@ -85,10 +85,12 @@ export const Pedido = z.object({
   reservas: z.array(z.object({ franjaId: z.string(), fecha: z.string(), segundos: z.number().int(), estado: z.enum(['retenida', 'confirmada', 'liberada']) })),
   /** Intentos de pago del pedido, el más reciente primero (PT-5). */
   pagos: z.array(Pago).default([]),
+  /** Órdenes de pauta vivas por emisora y cuántas ya cargó programación (RF-22: «Programado»). */
+  programacion: z.object({ ordenes: z.number().int(), cargadas: z.number().int() }).default({ ordenes: 0, cargadas: 0 }),
 });
 export type Pedido = z.infer<typeof Pedido>;
 
-export const ResumenPedido = Pedido.omit({ reservas: true, anuncioId: true, pagos: true }).extend({ emisiones: z.number().int() });
+export const ResumenPedido = Pedido.omit({ reservas: true, anuncioId: true, pagos: true, programacion: true }).extend({ emisiones: z.number().int() });
 export type ResumenPedido = z.infer<typeof ResumenPedido>;
 
 // ── panel de ventas ─────────────────────────────────────────────────────────
