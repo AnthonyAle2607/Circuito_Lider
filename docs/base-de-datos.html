@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Base de datos · Sistema de Pautas Comerciales</title>
+<style>
+  :root { --tinta: #2E123E; --naranja: #FE6B00; --gris: #5B4568; --linea: #D9CCE2; --fondo: #F7F3F9; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 12px/1.45 "Segoe UI", Roboto, Arial, sans-serif; color: var(--tinta); background: #fff; }
+  main { max-width: 1100px; margin: 0 auto; padding: 28px 32px 40px; }
+  h1 { font-size: 26px; margin: 0 0 4px; }
+  h2 { font-size: 18px; margin: 28px 0 8px; padding-bottom: 4px; border-bottom: 3px solid var(--naranja); }
+  h3 { font-size: 14px; margin: 18px 0 6px; }
+  p { margin: 6px 0; }
+  .sub { color: var(--gris); margin-bottom: 14px; }
+  .leyenda { display: flex; gap: 18px; flex-wrap: wrap; background: var(--fondo); padding: 10px 14px; border-radius: 8px; margin: 12px 0; }
+  .leyenda span { display: inline-flex; gap: 6px; align-items: center; }
+  .caja { width: 14px; height: 14px; border-radius: 3px; display: inline-block; border: 2px solid var(--tinta); }
+  .caja.hecho { background: #fff; }
+  .caja.plan { background: #FFE6D3; border-style: dashed; border-color: var(--naranja); }
+  table { width: 100%; border-collapse: collapse; margin: 6px 0 10px; }
+  th, td { text-align: left; vertical-align: top; padding: 5px 7px; border-bottom: 1px solid var(--linea); }
+  th { font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--gris); }
+  td code, p code { font: 11px Consolas, monospace; background: var(--fondo); padding: 1px 4px; border-radius: 3px; }
+  .plan-fila td:first-child { color: #B24A00; }
+  .tag { display: inline-block; font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 99px; background: var(--tinta); color: #fff; margin-left: 4px; }
+  .tag.plan { background: var(--naranja); }
+  .tag.rls { background: #2F6B4F; }
+  .tag.inm { background: #7A1F3D; }
+  .diagrama { border: 1px solid var(--linea); border-radius: 8px; padding: 8px; margin: 8px 0 14px; page-break-inside: avoid; }
+  .pagina { page-break-before: always; }
+  .nota { color: var(--gris); font-size: 11px; }
+  @page { size: A4 landscape; margin: 12mm; }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js"></script>
+</head>
+<body>
+<main>
+  <h1>Base de datos del Sistema de Pautas Comerciales</h1>
+  <p class="sub">Invermedia · PostgreSQL 16 · estado al 23-11-2026 (migraciones 0001 a 0009) y lo planificado para las fases siguientes.</p>
+
+  <div class="leyenda">
+    <span><i class="caja hecho"></i> Construido (en <code>main</code> o en la rama de PT-7)</span>
+    <span><i class="caja plan"></i> Planificado, todavía no existe</span>
+    <span><b class="tag rls">RLS</b> cada anunciante ve solo sus filas</span>
+    <span><b class="tag inm">Inmutable</b> no se edita ni se borra</span>
+  </div>
+
+  <h2>1. Mapa general por áreas</h2>
+  <p>Cada rectángulo es un área; dentro, sus tablas. Las flechas muestran de qué depende cada área. Lo naranja punteado es lo planificado.</p>
+  <div class="diagrama">
+<pre class="mermaid">
+flowchart LR
+  subgraph ID[Identidad y acceso]
+    anunciantes --- usuarios
+    usuarios --- verificaciones_correo
+    usuarios --- sesiones
+    equipo --- retos_equipo
+    equipo --- sesiones
+  end
+  subgraph CAT[Catálogo de radio]
+    circuitos --- emisoras --- programas --- franjas
+  end
+  subgraph PRE[Precios]
+    tarifarios --- tarifas
+    tarifarios --- descuentos_volumen
+  end
+  subgraph COM[Venta e inventario]
+    cotizaciones --- cotizacion_lineas
+    cotizaciones --- pedidos --- reservas
+    cupos
+  end
+  subgraph SPT[Anuncios]
+    anuncios
+    palabras_prohibidas
+  end
+  subgraph CER[Grabación y certificado]
+    grabaciones --- certificados
+  end
+  subgraph PLA[Plataforma]
+    bitacora
+    outbox
+  end
+  subgraph PAG[Pagos · planificado]
+    pagos --- webhook_eventos
+    pagos --- facturas
+  end
+  subgraph AGT[Agente vendedor · planificado]
+    conversaciones --- mensajes_agente
+    conversaciones --- prospectos
+  end
+  subgraph NRM[Normativa y avisos · planificado]
+    checklist_conatel
+    notificaciones
+  end
+  ID --> COM
+  CAT --> COM
+  PRE --> COM
+  COM --> CER
+  SPT --> CER
+  CAT --> CER
+  COM -.-> PAG
+  COM -.-> AGT
+  SPT -.-> NRM
+  classDef plan fill:#FFE6D3,stroke:#FE6B00,stroke-dasharray:5 4,color:#2E123E;
+  class PAG,AGT,NRM,pagos,webhook_eventos,facturas,conversaciones,mensajes_agente,prospectos,checklist_conatel,notificaciones plan;
+</pre>
+  </div>
+
+  <h2 class="pagina">2. Lo construido: relaciones entre tablas</h2>
+  <h3>Identidad, catálogo y venta</h3>
+  <div class="diagrama">
+<pre class="mermaid">
+erDiagram
+  anunciantes ||--o{ usuarios : "tiene"
+  usuarios ||--o{ verificaciones_correo : "confirma con"
+  usuarios ||--o{ sesiones : "abre"
+  equipo ||--o{ sesiones : "abre"
+  equipo ||--o{ retos_equipo : "doble factor"
+  circuitos ||--o{ emisoras : "agrupa"
+  circuitos ||--o{ programas : "transmite"
+  emisoras |o--o{ programas : "local (vacío = en cadena)"
+  programas ||--o{ franjas : "horarios"
+  tarifarios ||--o{ tarifas : "precios"
+  tarifarios ||--o{ descuentos_volumen : "escalones"
+  tarifarios ||--o{ cotizaciones : "precio fijado con"
+  cotizaciones ||--o{ cotizacion_lineas : "emisiones"
+  franjas ||--o{ cotizacion_lineas : "en"
+  cotizaciones ||--o| pedidos : "se reserva como"
+  anunciantes ||--o{ pedidos : "compra"
+  pedidos ||--o{ reservas : "retiene"
+  franjas ||--o{ reservas : "en"
+  franjas ||--o{ cupos : "segundos usados por fecha"
+
+  anunciantes { uuid id PK
+    text empresa
+    char pais
+    text id_fiscal
+    estado_cuenta estado }
+  usuarios { uuid id PK
+    uuid anunciante_id FK
+    citext email UK
+    text password_hash
+    timestamptz correo_verificado_at }
+  equipo { uuid id PK
+    citext email UK
+    rol_equipo_array roles
+    bytea totp_secreto_cifrado }
+  emisoras { uuid id PK
+    text slug UK
+    text frecuencia
+    text stream_url
+    text descripcion }
+  programas { uuid id PK
+    uuid emisora_id FK
+    alcance_programa alcance
+    text locutores }
+  franjas { uuid id PK
+    uuid programa_id FK
+    smallint dia_semana
+    time hora_inicio
+    time hora_fin
+    int segundos_tanda }
+  tarifarios { uuid id PK
+    int version UK
+    char moneda
+    bigint umbral_aprobacion_centimos
+    bool es_ejemplo }
+  cotizaciones { uuid id PK
+    uuid tarifario_id FK
+    bigint total_centimos
+    estado_cotizacion estado
+    timestamptz vence_at }
+  pedidos { uuid id PK
+    uuid anunciante_id FK
+    uuid cotizacion_id FK
+    uuid anuncio_id FK
+    estado_pedido estado
+    timestamptz reserva_vence_at }
+  reservas { uuid id PK
+    uuid pedido_id FK
+    uuid franja_id FK
+    date fecha
+    int segundos
+    estado_reserva estado }
+  cupos { uuid franja_id PK
+    date fecha PK
+    int segundos_usados }
+</pre>
+  </div>
+
+  <h3 class="pagina">Anuncios, grabación y certificados</h3>
+  <div class="diagrama">
+<pre class="mermaid">
+erDiagram
+  anunciantes ||--o{ anuncios : "sube"
+  usuarios ||--o{ anuncios : "subido por"
+  equipo |o--o{ anuncios : "revisado por"
+  anuncios |o--o{ pedidos : "suena en"
+  emisoras ||--o{ grabaciones : "bloques de 1 h"
+  grabaciones ||--o{ certificados : "encontrado en"
+  pedidos ||--o{ certificados : "certifica"
+  anuncios ||--o{ certificados : "del spot"
+  reservas |o--o{ certificados : "de la reserva"
+  emisoras ||--o{ certificados : "en"
+
+  anuncios { uuid id PK
+    uuid anunciante_id FK
+    text archivo_clave UK
+    text formato
+    int duracion_ms
+    estado_anuncio estado
+    text transcripcion
+    jsonb coincidencias }
+  palabras_prohibidas { serial id PK
+    text palabra UK
+    text categoria
+    bool activa }
+  grabaciones { uuid id PK
+    uuid emisora_id FK
+    text archivo UK
+    timestamptz inicio_at
+    timestamptz fin_at
+    timestamptz analizada_at
+    timestamptz borrada_at }
+  certificados { uuid id PK
+    uuid anunciante_id FK
+    uuid pedido_id FK
+    uuid anuncio_id FK
+    uuid grabacion_id FK
+    timestamptz emitido_at
+    numeric parecido
+    text clip_clave
+    bytea clip_sha256 }
+  bitacora { bigint id PK
+    uuid anunciante_id
+    tipo_actor actor_tipo
+    text accion
+    bytea hash_prev
+    bytea hash }
+  outbox { bigint id PK
+    uuid anunciante_id
+    text tipo
+    jsonb datos
+    timestamptz despachado_at }
+</pre>
+  </div>
+
+  <h2 class="pagina">3. Lo planificado (fases siguientes)</h2>
+  <p>Diseño de la nota de arquitectura; puede ajustarse al construirlo. Se apoya en las tablas actuales (gris).</p>
+  <div class="diagrama">
+<pre class="mermaid">
+erDiagram
+  pedidos ||--o{ pagos : "se paga con"
+  pagos ||--o{ webhook_eventos : "avisos de la pasarela"
+  pedidos ||--o| facturas : "se factura"
+  anunciantes |o--o{ conversaciones : "conversa (o visitante)"
+  conversaciones ||--o{ mensajes_agente : "turnos"
+  conversaciones |o--o| prospectos : "deja datos"
+  conversaciones |o--o{ cotizaciones : "cotizó"
+  equipo |o--o{ conversaciones : "tomada por"
+  anunciantes ||--o{ notificaciones : "recibe"
+  checklist_conatel ||--o{ anuncios : "versión aplicada"
+
+  pagos { uuid id PK
+    uuid pedido_id FK
+    text proveedor
+    text referencia_externa UK
+    bigint monto_centimos
+    char moneda
+    estado_pago estado }
+  webhook_eventos { uuid id PK
+    text proveedor
+    text id_evento UK
+    jsonb crudo
+    timestamptz procesado_at }
+  facturas { uuid id PK
+    uuid pedido_id FK
+    text numero UK
+    bigint total_centimos }
+  conversaciones { uuid id PK
+    uuid anunciante_id FK
+    text canal
+    estado_conversacion estado
+    text motivo_traspaso
+    uuid tomada_por FK }
+  mensajes_agente { bigint id PK
+    uuid conversacion_id FK
+    text rol
+    text contenido
+    jsonb herramienta }
+  prospectos { uuid id PK
+    uuid conversacion_id FK
+    text email
+    text empresa }
+  notificaciones { uuid id PK
+    uuid anunciante_id FK
+    text tipo
+    timestamptz leida_at }
+  checklist_conatel { uuid id PK
+    int version UK
+    jsonb reglas }
+</pre>
+  </div>
+
+  <h2 class="pagina">4. Tabla por tabla</h2>
+  <table>
+    <thead><tr><th style="width:17%">Tabla</th><th style="width:9%">Migración</th><th>Para qué sirve</th><th style="width:26%">Reglas de seguridad</th></tr></thead>
+    <tbody>
+      <tr><td><code>anunciantes</code> <b class="tag rls">RLS</b></td><td>0001 · 0006</td><td>La empresa cliente: nombre, país, zona horaria y datos fiscales y de contacto.</td><td>Cada cuenta solo ve y edita la suya.</td></tr>
+      <tr><td><code>usuarios</code> <b class="tag rls">RLS</b></td><td>0001</td><td>Las personas de la empresa que entran al portal.</td><td>La API no puede escribir la clave directo: pasa por <code>cambiar_clave_usuario()</code>, que solo acepta un hash Argon2id.</td></tr>
+      <tr><td><code>verificaciones_correo</code> <b class="tag rls">RLS</b></td><td>0001</td><td>Enlaces de confirmación de correo (guardados como hash).</td><td>Vencen a las 48 h y se usan una sola vez.</td></tr>
+      <tr><td><code>equipo</code>, <code>retos_equipo</code></td><td>0001</td><td>El personal de Invermedia con sus roles (ventas, revisor, programación, finanzas, gerencia, admin) y el doble factor.</td><td>Código TOTP obligatorio; el secreto va cifrado; un código no se reusa.</td></tr>
+      <tr><td><code>sesiones</code></td><td>0001</td><td>Sesiones abiertas de clientes y equipo (token guardado como hash).</td><td>Vencen por inactividad y por tiempo total; cambiar la clave cierra las demás.</td></tr>
+      <tr><td><code>circuitos</code>, <code>emisoras</code>, <code>programas</code>, <code>franjas</code></td><td>0002 · 0004 · 0007</td><td>La parrilla: 10 emisoras con su señal en vivo, programas en cadena o locales, y cada horario con sus segundos de tanda.</td><td>Públicas para leer; solo programación las edita desde el panel.</td></tr>
+      <tr><td><code>bitacora</code> <b class="tag inm">Inmutable</b></td><td>0003</td><td>Registro de todo lo que pasa (quién, qué, cuándo), encadenado con hash.</td><td>No se edita ni se borra; <code>bitacora_verificar()</code> detecta cualquier alteración.</td></tr>
+      <tr><td><code>outbox</code></td><td>0003</td><td>Eventos para avisar afuera (correos, n8n) sin perder ninguno.</td><td>Se escriben en la misma transacción que el cambio.</td></tr>
+      <tr><td><code>tarifarios</code>, <code>tarifas</code>, <code>descuentos_volumen</code> <b class="tag inm">Inmutable</b></td><td>0005</td><td>Precios por alcance y duración (hoy de ejemplo: 30 y 40 s) y descuentos por volumen.</td><td>Un precio nuevo es una versión nueva; las cotizaciones viejas conservan el suyo.</td></tr>
+      <tr><td><code>cotizaciones</code>, <code>cotizacion_lineas</code></td><td>0005</td><td>El precio cerrado de una selección, con vigencia de 72 h y, si pasa del umbral, aprobación de ventas.</td><td>El precio lo calcula siempre <code>@sp/pricing</code>, nunca el navegador ni el agente.</td></tr>
+      <tr><td><code>pedidos</code>, <code>reservas</code> <b class="tag rls">RLS</b></td><td>0005 · 0009</td><td>La compra: el pedido, los espacios retenidos 24 h y el anuncio que suena.</td><td>Si no se paga a tiempo, un trabajo libera las reservas solo.</td></tr>
+      <tr><td><code>cupos</code></td><td>0005</td><td>Segundos usados de cada franja en cada fecha.</td><td>Bloqueo de fila: 50 reservas simultáneas por el último segundo → gana una (probado).</td></tr>
+      <tr><td><code>anuncios</code> <b class="tag rls">RLS</b></td><td>0008</td><td>Los spots subidos: archivo en MinIO, duración, transcripción, palabras halladas y estado de la revisión.</td><td>Solo funciones de la base cambian su estado (el trabajo de revisión y el revisor).</td></tr>
+      <tr><td><code>palabras_prohibidas</code></td><td>0008</td><td>La lista de 100 palabras que mandan un spot a revisión humana.</td><td>Se carga desde <code>datos/palabras-prohibidas.yaml</code>.</td></tr>
+      <tr><td><code>grabaciones</code></td><td>0009</td><td>Cada bloque de una hora grabado de cada emisora (el audio vive en disco).</td><td>El audio se borra a los 30 días; el registro queda.</td></tr>
+      <tr><td><code>certificados</code> <b class="tag rls">RLS</b> <b class="tag inm">Inmutable</b></td><td>0009</td><td>Cada emisión encontrada: emisora, hora exacta, parecido con el spot y el recorte con su SHA-256.</td><td>Solo los crea <code>certificar_emision()</code>; nadie los edita ni borra.</td></tr>
+      <tr class="plan-fila"><td><code>pagos</code>, <code>webhook_eventos</code>, <code>facturas</code> <b class="tag plan">Plan</b></td><td>PT-5</td><td>Pago con pasarela (pago alojado) o transferencia, avisos firmados de la pasarela, conciliación, reembolsos y factura.</td><td>Nunca datos de tarjeta; cada aviso se procesa una sola vez.</td></tr>
+      <tr class="plan-fila"><td><code>conversaciones</code>, <code>mensajes_agente</code>, <code>prospectos</code> <b class="tag plan">Plan</b></td><td>PT-5b</td><td>El chat de Toño con el agente vendedor: turnos, herramientas usadas, traspasos a una persona y los datos que deja el visitante.</td><td>El agente no tiene más poder que el portal; cada acción queda en la bitácora.</td></tr>
+      <tr class="plan-fila"><td><code>notificaciones</code> <b class="tag plan">Plan</b></td><td>—</td><td>Avisos al cliente (spot aprobado, pago, emisión certificada) en el portal y por correo.</td><td>Se alimenta del <code>outbox</code>.</td></tr>
+      <tr class="plan-fila"><td><code>checklist_conatel</code> <b class="tag plan">Plan</b></td><td>—</td><td>Las reglas de CONATEL que se aplican al revisar un spot, con su versión.</td><td>Se carga con el texto vigente que entregue Invermedia.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Roles de la base</h3>
+  <table>
+    <thead><tr><th style="width:17%">Rol</th><th>Qué puede</th></tr></thead>
+    <tbody>
+      <tr><td><code>app_api</code></td><td>El servidor web. Lee y escribe con los permisos mínimos y siempre dentro de la cuenta fijada (<code>withTenant</code>); para lo que cruza cuentas usa funciones de la base.</td></tr>
+      <tr><td><code>app_worker</code></td><td>Los trabajos en segundo plano: liberar reservas, revisar anuncios, anotar grabaciones y certificar emisiones, solo mediante sus funciones.</td></tr>
+      <tr><td>dueño (migraciones)</td><td>Crea y cambia el esquema y carga la parrilla, el tarifario de ejemplo y las palabras. No lo usa ninguna aplicación.</td></tr>
+    </tbody>
+  </table>
+  <p class="nota">Generado desde <code>migrations/0001…0009</code> y la nota «Sistema de Pautas - Arquitectura de construcción» (sección 5). Repositorio: <code>docs/base-de-datos.html</code>.</p>
+</main>
+<script>
+  mermaid.initialize({ startOnLoad: true, theme: 'base', securityLevel: 'strict',
+    themeVariables: { primaryColor: '#F7F3F9', primaryBorderColor: '#2E123E', primaryTextColor: '#2E123E', lineColor: '#5B4568', fontSize: '12px' },
+    er: { useMaxWidth: true }, flowchart: { useMaxWidth: true } });
+</script>
+</body>
+</html>
