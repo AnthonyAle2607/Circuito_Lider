@@ -66,6 +66,7 @@ packages/
   pricing/    Cálculo puro de precios (centavos, descuento por volumen, umbral de aprobación)
   inventory/  Cupos: tomar (UPDATE condicionado con bloqueo), devolver, segundos libres; fechas de Caracas
   payments/   Interfaz de pasarela, firma de avisos, pasarela de prueba y config/pagos.yaml
+  sales-agent/ Agente vendedor (Toño): bucle con Claude, herramientas con límites, gasto, config/agente.yaml
 datos/        circuito-lider.yaml (parrilla publicada) y tarifario-ejemplo.yaml (precios de EJEMPLO)
 migrations/   NNNN_nombre.sql; una aplicada no se edita nunca
 config/       marca.yaml (y luego tarifario, validador, agente, pasarela, límites de gasto)
@@ -73,7 +74,7 @@ infra/        docker-compose.yml de desarrollo
 scripts/      iniciar.mjs
 ```
 
-Paquetes por venir, cada uno en su PT: `sales-agent` (PT-5b),
+Paquetes por venir, cada uno en su PT:
 `provider-gateway`, `ui` (PT-4), `services/validador` en Python (PT-6). El despachador del outbox llega con el primer
 evento que tenga quien lo consuma (el correo de verificación, con n8n).
 
@@ -151,4 +152,10 @@ evento que tenga quien lo consuma (el correo de verificación, con n8n).
   revisión de finanzas en el panel `/pagos`). Idempotente (P5): un aviso repetido no cambia nada; un cobro que llega
   tarde o duplicado queda registrado como `pago.tardio` para devolverlo. Mientras Invermedia elige proveedor
   (pregunta 1) corre la pasarela de PRUEBA (`PAGOS_PROVEEDOR=prueba`, no arranca en producción). Ver `docs/pagos.md`.
-- Siguiente: **PT-5b · Agente vendedor**, proveedor de pago real y reembolsos, recuperar clave.
+- **PT-5b · Agente vendedor** (2026-11-23): `@sp/sales-agent` con Claude Opus 5.5 (esfuerzo bajo, streaming, caché de
+  instrucciones y herramientas, respaldo por rechazo), migración `0011_agente_ventas`, chat SSE `/v1/agente/mensajes`
+  conectado a Toño, bandeja `/conversaciones` en el panel con la meta del 80 %. Cotiza con la misma función que el
+  portal (`crearCotizacion`, P11); no da descuentos ni reserva en el chat (D18); topes de gasto en `config/agente.yaml`
+  (P9). Sin `ANTHROPIC_API_KEY` queda apagado y Toño usa su guion fijo. Ver `docs/agente-vendedor.md`.
+- Cobro: precios en USD a tasa BCV (decisión 2026-11-23); pasarela real, banco y reembolsos se planifican al final.
+- Siguiente: recuperar clave, seguimiento de prospectos, programación (PT-8).

@@ -112,3 +112,12 @@ export async function decidirPago(f: FormData) {
         : 'Transferencia rechazada; el cliente ve el motivo.';
   redirect(`/pagos?aviso=${encodeURIComponent(aviso)}`);
 }
+
+/** Ventas atendió por su cuenta una conversación que Toño le pasó: queda cerrada. */
+export async function cerrarConversacion(f: FormData) {
+  const id = texto(f, 'id');
+  const r = await apiEquipo(`/v1/panel/agente/conversaciones/${encodeURIComponent(id)}/cerrar`, { method: 'POST' });
+  if (!r.ok) redirect(`/conversaciones?error=${encodeURIComponent(await mensajeDe(r))}`);
+  revalidatePath('/conversaciones');
+  redirect(`/conversaciones?aviso=${encodeURIComponent('Conversación marcada como atendida.')}`);
+}

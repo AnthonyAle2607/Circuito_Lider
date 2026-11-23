@@ -11,6 +11,7 @@
     "crear-miembro-equipo": "tsx --env-file-if-exists=../../.env scripts/crear-miembro-equipo.ts"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "1.6.0",
     "@fastify/helmet": "^13.0.1",
     "@fastify/multipart": "9.0.3",
     "@fastify/rate-limit": "^10.2.2",
@@ -22,6 +23,7 @@
     "@sp/inventory": "workspace:*",
     "@sp/payments": "workspace:*",
     "@sp/pricing": "workspace:*",
+    "@sp/sales-agent": "workspace:*",
     "@sp/schemas": "workspace:*",
     "@sp/spots": "workspace:^",
     "fastify": "^5.2.1",

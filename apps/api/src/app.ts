@@ -9,6 +9,8 @@ import type { Pasarela } from '@sp/payments';
 import type { DatosTransferencia } from '@sp/schemas';
 import type { Almacen } from '@sp/spots';
 import { manejarErrores } from './plugins/errores';
+import type { OpcionesAgente } from './routes/agente';
+import { rutasAgente } from './routes/agente';
 import { rutasAnuncios } from './routes/anuncios';
 import { rutasCatalogo } from './routes/catalogo';
 import { rutasCertificados } from './routes/certificados';
@@ -46,6 +48,8 @@ export interface Opciones {
   pasarela?: Pasarela;
   /** Datos bancarios y tope del comprobante (config/pagos.yaml). */
   transferencia?: { datos: DatosTransferencia; maximoBytes: number };
+  /** Agente vendedor (PT-5b). Sin él, el chat responde «agente apagado» y el portal usa sus respuestas fijas. */
+  agente?: OpcionesAgente['agente'];
 }
 
 /** Términos en borrador hasta que Invermedia entregue el contrato modelo (pregunta abierta 5). */
@@ -78,6 +82,7 @@ export async function buildApp(op: Opciones): Promise<FastifyInstance> {
     if (op.almacen) await rutasAnuncios(app, { db: op.db, almacen: op.almacen, formatos: op.formatosSpot ?? ['mp4', 'mp3', 'wav'] });
     if (op.almacen) await rutasCertificados(app, { db: op.db, almacen: op.almacen });
     await rutasPanelVentas(app, op.db);
+    await rutasAgente(app, { db: op.db, portalUrl: op.portalUrl ?? 'http://localhost:3100', ...(op.agente && { agente: op.agente }) });
     if (op.pasarela) {
       await rutasPagos(app, { db: op.db, pasarela: op.pasarela, portalUrl: op.portalUrl ?? 'http://localhost:3100', ...(op.almacen && { almacen: op.almacen }), ...(op.transferencia && { transferencia: op.transferencia }) });
     }

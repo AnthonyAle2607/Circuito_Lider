@@ -37,6 +37,7 @@ export default async function PanelAnuncios({ searchParams }: { searchParams: Pr
         </div>
         <nav style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
           <Link href="/parrilla" style={{ color: c.texto_suave }}>Parrilla</Link>
+          <Link href="/conversaciones" style={{ color: c.texto_suave }}>Conversaciones</Link>
           <Link href="/pagos" style={{ color: c.texto_suave }}>Pagos</Link>
           <form action={salir}>
             <button type="submit" style={{ background: 'transparent', color: c.texto_suave, border: `1px solid ${c.texto_suave}`, borderRadius: 999, padding: '6px 14px', cursor: 'pointer' }}>Salir</button>

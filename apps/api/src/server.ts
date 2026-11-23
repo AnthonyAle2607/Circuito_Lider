@@ -1,8 +1,10 @@
+import Anthropic from '@anthropic-ai/sdk';
 import { Redis } from 'ioredis';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createDb, pingDb } from '@sp/db';
 import { leerConfigPagos, pasarelaDelEntorno } from '@sp/payments';
+import { leerConfigAgente } from '@sp/sales-agent';
 import { almacenS3, configS3DelEntorno, leerReglas } from '@sp/spots';
 import { buildApp } from './app';
 import { loadConfig } from './config';
@@ -16,6 +18,9 @@ const s3 = configS3DelEntorno();
 const reglasSpot = leerReglas(resolve(dirname(fileURLToPath(import.meta.url)), '../../../config/spots.yaml'));
 // Pagos (PT-5): la pasarela guarda sus sesiones en Redis para que la conciliación de los trabajos vea las mismas.
 const pasarela = pasarelaDelEntorno(process.env, { get: (k) => redis.get(k), set: (k, v) => redis.set(k, v, 'EX', 7 * 86_400) });
+// Agente vendedor (PT-5b): solo con credenciales de la API de Claude; sin ellas el chat usa las respuestas fijas.
+const conClave = Boolean(process.env.ANTHROPIC_API_KEY || process.env.ANTHROPIC_AUTH_TOKEN);
+const agente = conClave ? { cliente: new Anthropic(), config: leerConfigAgente(resolve(dirname(fileURLToPath(import.meta.url)), '../../../config/agente.yaml')) } : undefined;
 const pagos = leerConfigPagos(resolve(dirname(fileURLToPath(import.meta.url)), '../../../config/pagos.yaml'));
 
 const app = await buildApp({
@@ -37,6 +42,7 @@ const app = await buildApp({
   ...(s3 && { almacen: almacenS3(s3) }),
   formatosSpot: reglasSpot.formatos,
   pasarela,
+  ...(agente && { agente }),
   transferencia: { datos: pagos.transferencia, maximoBytes: pagos.comprobanteMaxBytes },
 });
 

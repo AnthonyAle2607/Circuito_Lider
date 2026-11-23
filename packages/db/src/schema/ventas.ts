@@ -46,6 +46,8 @@ export interface CotizacionesTabla {
   motivo_decision: string | null;
   ip: string | null;
   creado_at: Generated<Date>;
+  /** Conversación del agente que la creó (0011, P12); null si la creó el portal. */
+  conversacion_id: ColumnType<string | null, string | null | undefined, never>;
 }
 
 export interface CotizacionLineasTabla {

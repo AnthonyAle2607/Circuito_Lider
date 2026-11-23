@@ -1,5 +1,6 @@
 import { $, svg, type Control } from './control';
 import { MARCA as K } from './datos';
+import { QUE_HACE, conversar, pintarTexto } from './tono-agente';
 import { RAPIDAS, RESPUESTAS, responder } from './tono-respuestas';
 
 /**
@@ -101,13 +102,40 @@ export function tono(c: Control) {
   aviso.onclick = abrir;
   $('#tclose')?.addEventListener('click', cerrar);
   c.enVentana('keydown', (e) => e.key === 'Escape' && !panel.hidden && cerrar());
+  // Un mensaje libre va al agente vendedor; si está apagado, se responde con el guion fijo.
+  let ocupado = false;
+  const enviarAlAgente = async (v: string) => {
+    ocupado = true;
+    hablar(true);
+    estado.textContent = 'Toño está escribiendo…';
+    let caja: HTMLElement | null = null;
+    let texto = '';
+    const r = await conversar(v, {
+      alTexto: (t) => {
+        caja ??= burbuja('t');
+        texto += t;
+        caja.textContent = texto;
+        bajar();
+      },
+      alHerramienta: (n) => (estado.textContent = QUE_HACE[n] ?? 'Toño está buscando…'),
+      alFin: (e) => {
+        if (e === 'traspasada') estado.textContent = 'Te atenderá el equipo de ventas';
+      },
+    });
+    if (caja) pintarTexto(caja, texto);
+    hablar(false);
+    if (!estado.textContent?.startsWith('Te atenderá')) estado.textContent = 'Soporte Invermedia · en línea';
+    if (r === 'apagado') decir(responder(v));
+    if (r === 'error' && !caja) decir('No pude conectarme. Intenta de nuevo en un momento. 🙏');
+    ocupado = false;
+  };
   $('#pf')?.addEventListener('submit', (e) => {
     e.preventDefault();
     const v = entrada.value.trim();
-    if (!v) return;
+    if (!v || ocupado) return;
     entrada.value = '';
     usuario(v);
-    decir(responder(v));
+    void enviarAlAgente(v);
   });
   // En teléfonos, al seguir un enlace del chat se cierra para dejar ver la sección.
   mensajes.addEventListener('click', (e) => {

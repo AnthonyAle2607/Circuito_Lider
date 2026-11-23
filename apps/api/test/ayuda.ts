@@ -19,6 +19,7 @@ export async function montar(
     almacen?: import('@sp/spots').Almacen;
     pasarela?: import('@sp/payments').Pasarela;
     transferencia?: { datos: import('@sp/schemas').DatosTransferencia; maximoBytes: number };
+    agente?: import('../src/app').Opciones['agente'];
   } = {},
 ) {
   const b = await baseDePrueba();
@@ -32,6 +33,7 @@ export async function montar(
     ...(op.almacen && { almacen: op.almacen }),
     ...(op.pasarela && { pasarela: op.pasarela }),
     ...(op.transferencia && { transferencia: op.transferencia }),
+    ...(op.agente && { agente: op.agente }),
   });
   await app.ready();
   await b.comoApi();

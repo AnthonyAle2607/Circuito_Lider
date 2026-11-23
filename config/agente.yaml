@@ -1,0 +1,13 @@
+# Agente vendedor (PT-5b). Lo editable es dato (P8); los topes de gasto son la guarda P9.
+# Si se pasa un tope, el cliente recibe un mensaje amable y la conversación pasa a ventas.
+topes:
+  # Gasto máximo de un turno (una respuesta de Toño, con sus herramientas), en USD.
+  por_turno_usd: 0.50
+  # Gasto máximo de una conversación completa, en USD.
+  por_conversacion_usd: 3.00
+  # Gasto máximo del agente en un día (hora de Venezuela), sumando todas las conversaciones, en USD.
+  por_dia_usd: 40.00
+  # Mensajes del cliente por conversación.
+  turnos: 40
+  # Largo máximo de un mensaje del cliente, en caracteres.
+  largo_mensaje: 2000

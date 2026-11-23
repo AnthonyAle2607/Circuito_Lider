@@ -8,6 +8,7 @@ import type { BitacoraTabla, OutboxTabla } from './bitacora';
 import type { TarifariosTabla, TarifasTabla, DescuentosVolumenTabla, CotizacionesTabla, CotizacionLineasTabla, PedidosTabla, CuposTabla, ReservasTabla } from './ventas';
 import type { AnunciosTabla, PalabrasProhibidasTabla, GrabacionesTabla, CertificadosTabla } from './anuncios';
 import type { PagosTabla, WebhookEventosTabla } from './pagos';
+import type { AgenteGastoDiarioTabla, ConversacionMensajesTabla, ConversacionesTabla } from './agente';
 
 export type * from './comun';
 export type * from './identidad';
@@ -16,6 +17,7 @@ export type * from './bitacora';
 export type * from './ventas';
 export type * from './anuncios';
 export type * from './pagos';
+export type * from './agente';
 
 export interface Database {
   anunciantes: AnunciantesTabla;
@@ -44,4 +46,7 @@ export interface Database {
   certificados: CertificadosTabla;
   pagos: PagosTabla;
   webhook_eventos: WebhookEventosTabla;
+  conversaciones: ConversacionesTabla;
+  conversacion_mensajes: ConversacionMensajesTabla;
+  agente_gasto_diario: AgenteGastoDiarioTabla;
 }

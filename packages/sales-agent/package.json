@@ -1,0 +1,23 @@
+{
+  "name": "@sp/sales-agent",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./simulador": "./test/simulador.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run",
+    "evals": "tsx evals/correr.ts"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "1.6.0",
+    "zod": "^3.24.1",
+    "yaml": "2.9.1"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.2"
+  }
+}

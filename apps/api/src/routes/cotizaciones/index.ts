@@ -9,6 +9,7 @@ import { rutaCotizar } from './cotizar';
 import { rutaDisponibilidad } from './disponibilidad';
 import { rutaReservar } from './reservar';
 
+export { crearCotizacion } from './crear';
 export { leerCotizacion } from './lectura';
 
 export interface OpcionesCotizaciones {
