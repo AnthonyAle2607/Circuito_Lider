@@ -20,6 +20,7 @@
     "@sp/core-fsm": "workspace:*",
     "@sp/db": "workspace:*",
     "@sp/inventory": "workspace:*",
+    "@sp/payments": "workspace:*",
     "@sp/pricing": "workspace:*",
     "@sp/schemas": "workspace:*",
     "@sp/spots": "workspace:^",

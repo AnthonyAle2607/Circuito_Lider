@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { Pago } from './pagos';
 
 const Fecha = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'fecha AAAA-MM-DD');
 const Uuid = z.string().uuid();
@@ -82,10 +83,12 @@ export const Pedido = z.object({
   /** El spot asignado a la campaña (PT-7); null mientras el cliente no elija uno. */
   anuncioId: z.string().nullable().default(null),
   reservas: z.array(z.object({ franjaId: z.string(), fecha: z.string(), segundos: z.number().int(), estado: z.enum(['retenida', 'confirmada', 'liberada']) })),
+  /** Intentos de pago del pedido, el más reciente primero (PT-5). */
+  pagos: z.array(Pago).default([]),
 });
 export type Pedido = z.infer<typeof Pedido>;
 
-export const ResumenPedido = Pedido.omit({ reservas: true, anuncioId: true }).extend({ emisiones: z.number().int() });
+export const ResumenPedido = Pedido.omit({ reservas: true, anuncioId: true, pagos: true }).extend({ emisiones: z.number().int() });
 export type ResumenPedido = z.infer<typeof ResumenPedido>;
 
 // ── panel de ventas ─────────────────────────────────────────────────────────

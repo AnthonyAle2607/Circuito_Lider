@@ -92,3 +92,23 @@ export async function decidirAnuncio(f: FormData) {
   revalidatePath('/anuncios');
   redirect(`/anuncios?aviso=${encodeURIComponent(decision === 'aprobar' ? 'Anuncio aprobado.' : 'Anuncio rechazado; el cliente ve el motivo.')}`);
 }
+
+/** Revisión de una transferencia por finanzas: aprobar confirma el pedido; rechazar pide el motivo que verá el cliente. */
+export async function decidirPago(f: FormData) {
+  const id = texto(f, 'id');
+  const decision = texto(f, 'decision') === 'aprobar' ? 'aprobar' : 'rechazar';
+  const r = await apiEquipo(`/v1/panel/pagos/${encodeURIComponent(id)}/decision`, {
+    method: 'POST',
+    body: JSON.stringify({ decision, motivo: texto(f, 'motivo') || undefined }),
+  });
+  if (!r.ok) redirect(`/pagos?error=${encodeURIComponent(await mensajeDe(r))}`);
+  const { resultado } = (await r.json()) as { resultado: string };
+  revalidatePath('/pagos');
+  const aviso =
+    resultado === 'confirmado'
+      ? 'Pago aprobado: el pedido quedó pagado.'
+      : resultado === 'tardio'
+        ? 'Pago aprobado, pero el pedido ya no estaba activo: hay que devolver el dinero.'
+        : 'Transferencia rechazada; el cliente ve el motivo.';
+  redirect(`/pagos?aviso=${encodeURIComponent(aviso)}`);
+}

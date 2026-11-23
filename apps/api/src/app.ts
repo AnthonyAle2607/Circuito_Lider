@@ -5,6 +5,8 @@ import rateLimit from '@fastify/rate-limit';
 import type { Redis } from 'ioredis';
 import type { Kysely } from 'kysely';
 import type { Database } from '@sp/db';
+import type { Pasarela } from '@sp/payments';
+import type { DatosTransferencia } from '@sp/schemas';
 import type { Almacen } from '@sp/spots';
 import { manejarErrores } from './plugins/errores';
 import { rutasAnuncios } from './routes/anuncios';
@@ -16,6 +18,7 @@ import { rutasPanelCatalogo } from './routes/panel/catalogo';
 import { rutasPanelVentas } from './routes/panel/ventas';
 import { rutasPedidos } from './routes/pedidos';
 import { rutasMiPanel } from './routes/mi-panel';
+import { rutasPagos } from './routes/pagos';
 import { rutasSesionEquipo } from './routes/panel/sesion';
 import { rutasSalud, type Comprobaciones } from './routes/salud';
 
@@ -39,6 +42,10 @@ export interface Opciones {
   almacen?: Almacen;
   /** Formatos de spot aceptados (config/spots.yaml). */
   formatosSpot?: string[];
+  /** Pasarela de pago (PT-5). Sin ella no se montan las rutas de pago. */
+  pasarela?: Pasarela;
+  /** Datos bancarios y tope del comprobante (config/pagos.yaml). */
+  transferencia?: { datos: DatosTransferencia; maximoBytes: number };
 }
 
 /** Términos en borrador hasta que Invermedia entregue el contrato modelo (pregunta abierta 5). */
@@ -71,6 +78,9 @@ export async function buildApp(op: Opciones): Promise<FastifyInstance> {
     if (op.almacen) await rutasAnuncios(app, { db: op.db, almacen: op.almacen, formatos: op.formatosSpot ?? ['mp4', 'mp3', 'wav'] });
     if (op.almacen) await rutasCertificados(app, { db: op.db, almacen: op.almacen });
     await rutasPanelVentas(app, op.db);
+    if (op.pasarela) {
+      await rutasPagos(app, { db: op.db, pasarela: op.pasarela, portalUrl: op.portalUrl ?? 'http://localhost:3100', ...(op.almacen && { almacen: op.almacen }), ...(op.transferencia && { transferencia: op.transferencia }) });
+    }
   }
   return app;
 }

@@ -1,7 +1,8 @@
 import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
-import { Anuncio, Certificado, Cotizacion, Pedido } from '@sp/schemas';
+import { Anuncio, Certificado, Cotizacion, DatosTransferencia, Pedido } from '@sp/schemas';
 import { asignarAnuncio, cancelarPedido } from '../../../acciones';
+import { PagarPedido } from '@/componentes/PagarPedido';
 import { dinero, fechaCorta } from '@/lib/fechas';
 import { api, exigirSesion } from '@/lib/sesion';
 
@@ -10,10 +11,10 @@ export const metadata = { title: 'Pedido · Invermedia Radio', robots: { index: 
 
 const ESTADOS: Record<string, string> = { reservado: 'Reservado · falta pagar', pagado: 'Pagado', cancelado: 'Cancelado', vencido: 'Vencido' };
 
-/** Los pasos del pedido. En PT-4 llegan hasta la reserva; pago, spot y emisiones se encienden en sus PT. */
+/** Los pasos del pedido, de la reserva al certificado. */
 const PASOS = ['Reservado', 'Pagado', 'Spot aprobado', 'Programado', 'Al aire', 'Certificado'];
 
-export default async function VerPedido({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ nuevo?: string; error?: string; anuncio?: string }> }) {
+export default async function VerPedido({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ nuevo?: string; error?: string; anuncio?: string; pago?: string }> }) {
   const { id } = await params;
   const q = await searchParams;
   if (!/^[0-9a-f-]{36}$/i.test(id)) notFound();
@@ -24,7 +25,12 @@ export default async function VerPedido({ params, searchParams }: { params: Prom
   const p = Pedido.parse(r.datos);
   const c = Cotizacion.parse((await api(`/v1/cotizaciones/${p.cotizacionId}`)).datos);
   const vence = new Date(p.reservaVenceAt).toLocaleString('es-VE', { timeZone: 'America/Caracas', dateStyle: 'medium', timeStyle: 'short' });
-  const [ra, rc] = await Promise.all([api('/v1/anuncios', { conSesion: true }), api(`/v1/certificados?pedido=${p.id}`, { conSesion: true })]);
+  const [ra, rc, rb] = await Promise.all([
+    api('/v1/anuncios', { conSesion: true }),
+    api(`/v1/certificados?pedido=${p.id}`, { conSesion: true }),
+    p.estado === 'reservado' ? api('/v1/pagos/transferencia', { conSesion: true }) : null,
+  ]);
+  const banco = rb?.ok ? DatosTransferencia.parse(rb.datos) : null;
   const anuncios = ra.ok ? Anuncio.array().parse(ra.datos) : [];
   const aprobados = anuncios.filter((a) => a.estado === 'aprobado');
   const asignado = anuncios.find((a) => a.id === p.anuncioId) ?? null;
@@ -49,11 +55,11 @@ export default async function VerPedido({ params, searchParams }: { params: Prom
         </p>
         {q.error && <div className="aviso error" role="alert">{q.error}</div>}
         {p.estado === 'reservado' && (
-          <div className="aviso ejemplo">
-            Tus espacios están retenidos hasta el {vence} (hora de Venezuela). El pago en línea llega en la siguiente etapa; si no se paga a tiempo, se liberan
-            solos.
-          </div>
+          <div className="aviso ejemplo">Tus espacios están retenidos hasta el {vence} (hora de Venezuela). Si no se pagan a tiempo, se liberan solos.</div>
         )}
+        {q.pago === 'transferencia' && <div className="aviso ok" role="status">Recibimos tu comprobante. Te avisamos cuando finanzas lo confirme.</div>}
+        {q.pago === 'cancelado' && p.estado === 'reservado' && <div className="aviso" role="status">No se completó el pago. Puedes intentarlo de nuevo cuando quieras.</div>}
+        <PagarPedido pedido={p} banco={banco} volvioDePagar={q.pago === 'ok'} />
 
         <ol className="tarjeta" style={{ display: 'flex', flexWrap: 'wrap', gap: 8, listStyle: 'none', margin: '0 0 16px', padding: 16 }} aria-label="Avance del pedido">
           {PASOS.map((paso) => (

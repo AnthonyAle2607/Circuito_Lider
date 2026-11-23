@@ -7,6 +7,7 @@ import { devolverCupos } from '@sp/inventory';
 import type { Pedido, ResumenPedido } from '@sp/schemas';
 import { exigirAnunciante } from '../auth/sesiones';
 import { HttpError } from '../plugins/errores';
+import { pagosDe } from './pagos/comun';
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const noExiste = () => new HttpError(404, 'pedido_no_existe', 'No encontramos ese pedido.');
@@ -31,6 +32,7 @@ export async function leerPedido(t: Transaction<Database>, id: string): Promise<
     anuncioId: p.anuncio_id ?? null,
     creadoAt: p.creado_at.toISOString(),
     reservas: reservas.map((r) => ({ franjaId: r.franja_id, fecha: r.fecha, segundos: r.segundos, estado: r.estado })),
+    pagos: await pagosDe(t, id),
   };
 }
 

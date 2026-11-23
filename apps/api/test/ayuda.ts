@@ -13,7 +13,14 @@ export const CLAVE = 'Clave-de-prueba-123';
  * La API completa sobre PGlite corriendo con el rol real `app_api`. `dueño()` corre algo como dueño de la base
  * (sembrar y mirar sin RLS) y vuelve al rol de la API.
  */
-export async function montar(op: { limiteAcceso?: number; almacen?: import('@sp/spots').Almacen } = {}) {
+export async function montar(
+  op: {
+    limiteAcceso?: number;
+    almacen?: import('@sp/spots').Almacen;
+    pasarela?: import('@sp/payments').Pasarela;
+    transferencia?: { datos: import('@sp/schemas').DatosTransferencia; maximoBytes: number };
+  } = {},
+) {
   const b = await baseDePrueba();
   const app: FastifyInstance = await buildApp({
     comprobaciones: {},
@@ -23,6 +30,8 @@ export async function montar(op: { limiteAcceso?: number; almacen?: import('@sp/
     trustProxy: true,
     limites: { general: 1000, acceso: op.limiteAcceso ?? 1000 },
     ...(op.almacen && { almacen: op.almacen }),
+    ...(op.pasarela && { pasarela: op.pasarela }),
+    ...(op.transferencia && { transferencia: op.transferencia }),
   });
   await app.ready();
   await b.comoApi();

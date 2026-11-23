@@ -11,6 +11,7 @@ Archivos `NNNN_nombre.sql`, aplicados en orden por `pnpm db:migrate` (runner en 
 - Vitrina: `0007_vitrina` (señal en vivo y descripción de cada emisora).
 - PT-6: `0008_anuncios` (spots subidos, su revisión automática y humana, palabras prohibidas).
 - PT-7: `0009_grabacion_y_certificados` (bloques grabados de cada emisora, anuncio del pedido, certificados inmutables).
-- Siguen: pagos, spots y revisión, programación, agente de ventas.
-- Cada migración que añade tablas actualiza `packages/db/src/schema.ts` en el mismo cambio.
+- PT-5: `0010_pagos` (pagos por pasarela y transferencia, avisos idempotentes, conciliación).
+- Siguen: spots y revisión, programación, agente de ventas.
+- Cada migración que añade tablas actualiza `packages/db/src/schema/` (un archivo por dominio) en el mismo cambio.
 - Los roles `app_api` y `app_worker` los crea `0001` sin acceso; los permisos van en cada migración (`GRANT` mínimos).

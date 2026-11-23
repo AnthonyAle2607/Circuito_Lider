@@ -1,0 +1,16 @@
+# Pagos (PT-5). Lo editable es dato (P8).
+#
+# Pasarela: la elige Invermedia (pregunta abierta 1). Mientras tanto la API usa la pasarela de PRUEBA
+# (PAGOS_PROVEEDOR=prueba en .env), que no cobra y no se puede activar en producción.
+#
+# Transferencia: datos que el portal muestra para pagar por banco. Son de EJEMPLO hasta que finanzas los entregue;
+# con es_ejemplo: true el portal lo dice junto a los datos.
+transferencia:
+  titular: "Invermedia (por confirmar)"
+  banco: "Por confirmar con finanzas"
+  cuenta: "Por confirmar con finanzas"
+  moneda: "USD"
+  nota: "Escribe el número del pedido en el concepto de la transferencia y sube el comprobante aquí."
+  es_ejemplo: true
+# Comprobantes: PDF o imagen, hasta 10 MB.
+comprobante_max_mb: 10

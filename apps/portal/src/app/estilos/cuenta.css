@@ -97,3 +97,15 @@ video.anuncio-medio { max-height: 240px; border-radius: var(--radio-chico); back
   .panel-rejilla { display: block; }
   .certificado { border: 2px solid #000; color: #000; background: #fff; }
 }
+
+/* Pagar un pedido (componentes/PagarPedido.tsx): dos opciones lado a lado, en teléfonos una sobre otra. */
+.pago { margin-bottom: 16px; }
+.pago-opciones { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; align-items: start; }
+.pago-opcion { display: grid; gap: 10px; margin-top: 0; }
+.pago-opcion h3 { font-size: 22px; }
+.pago-opcion .nota { margin: 0; font-size: 15px; }
+.pago-opcion .campo { margin-bottom: 0; }
+.pago-opcion .campo > span { font: 500 12px/1.3 var(--f-titulo); letter-spacing: 1.5px; text-transform: uppercase; color: var(--texto-suave); }
+.datos-banco { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 14px; margin: 0; font-size: 15px; }
+.datos-banco dt { color: var(--texto-suave); }
+.datos-banco dd { margin: 0; font-family: var(--f-dato); overflow-wrap: anywhere; }

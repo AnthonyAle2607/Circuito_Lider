@@ -19,6 +19,7 @@ src/
     layout.tsx           Marco: cabecera, pie, radio en vivo y la pauta compartida. Importa los estilos en orden.
     page.tsx             Portada: solo compone secciones (inicio/ y venta/).
     acciones.ts          Acciones de servidor (formularios): cotizar, registro, ingreso, reservar, subir anuncio…
+    acciones-pagos.ts    Pagar en línea (lleva a la pasarela) y enviar el comprobante de transferencia.
     estilos/             CSS por pieza (ver abajo).
     cuenta/              Panel del anunciante (layout con menú, una carpeta por sección).
     emisoras/            Vitrina en vivo y ficha de cada emisora.

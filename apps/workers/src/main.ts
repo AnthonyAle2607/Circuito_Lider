@@ -3,8 +3,10 @@ import { Redis } from 'ioredis';
 import pg from 'pg';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { pasarelaDelEntorno } from '@sp/payments';
 import { almacenS3, configS3DelEntorno, leerReglas, revisarSpot, transcriptorDelEntorno } from '@sp/spots';
 import { COLAS, LATIDO, LIBERAR, REVISAR, latir, liberarReservas, revisarAnuncios } from './colas';
+import { CONCILIAR, conciliarPagos } from './conciliar';
 import { DETECTAR, detectarEmisiones } from './detectar';
 
 const redisUrl = process.env.REDIS_URL;
@@ -34,6 +36,9 @@ if (herramientas) await cola.upsertJobScheduler('revisar-anuncios', { every: REV
 // PT-7: detección de emisiones en los bloques que deja el grabador (pnpm grabar), en GRABACIONES_DIR.
 const grabaciones = resolve(dirname(fileURLToPath(import.meta.url)), '../../..', process.env.GRABACIONES_DIR ?? 'grabaciones');
 if (herramientas) await cola.upsertJobScheduler('detectar-emisiones', { every: DETECTAR.cadaMs }, { name: DETECTAR.trabajo });
+// PT-5: conciliación de pagos con la misma pasarela (y las mismas sesiones en Redis) que la API.
+const pasarela = pasarelaDelEntorno(process.env, { get: (k) => conexion.get(k), set: (k, v) => conexion.set(k, v, 'EX', 7 * 86_400) });
+await cola.upsertJobScheduler('conciliar-pagos', { every: CONCILIAR.cadaMs }, { name: CONCILIAR.trabajo });
 log('revisión de anuncios', { almacen: Boolean(s3), transcriptor: transcriptor?.nombre ?? 'ninguno (todo a revisión humana)' });
 
 const trabajador = new Worker(
@@ -44,6 +49,7 @@ const trabajador = new Worker(
       const n = await liberarReservas(db);
       if (n > 0) log('reservas vencidas liberadas', { pedidos: n });
     }
+    if (job.name === CONCILIAR.trabajo) await conciliarPagos(db, pasarela, log);
     if (job.name === DETECTAR.trabajo && herramientas) {
       await detectarEmisiones({ db, almacen: herramientas.almacen, ruta: (a) => resolve(grabaciones, a), log });
     }

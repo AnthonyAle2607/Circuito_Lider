@@ -2,6 +2,7 @@ import { Redis } from 'ioredis';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createDb, pingDb } from '@sp/db';
+import { leerConfigPagos, pasarelaDelEntorno } from '@sp/payments';
 import { almacenS3, configS3DelEntorno, leerReglas } from '@sp/spots';
 import { buildApp } from './app';
 import { loadConfig } from './config';
@@ -13,6 +14,9 @@ redis.on('error', () => {}); // /v1/ready informa la caída; no se tumba el proc
 // Spots: archivos en MinIO; formatos aceptados según config/spots.yaml.
 const s3 = configS3DelEntorno();
 const reglasSpot = leerReglas(resolve(dirname(fileURLToPath(import.meta.url)), '../../../config/spots.yaml'));
+// Pagos (PT-5): la pasarela guarda sus sesiones en Redis para que la conciliación de los trabajos vea las mismas.
+const pasarela = pasarelaDelEntorno(process.env, { get: (k) => redis.get(k), set: (k, v) => redis.set(k, v, 'EX', 7 * 86_400) });
+const pagos = leerConfigPagos(resolve(dirname(fileURLToPath(import.meta.url)), '../../../config/pagos.yaml'));
 
 const app = await buildApp({
   comprobaciones: {
@@ -32,6 +36,8 @@ const app = await buildApp({
   logger: true,
   ...(s3 && { almacen: almacenS3(s3) }),
   formatosSpot: reglasSpot.formatos,
+  pasarela,
+  transferencia: { datos: pagos.transferencia, maximoBytes: pagos.comprobanteMaxBytes },
 });
 
 const detener = async () => {
