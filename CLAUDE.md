@@ -15,6 +15,7 @@ El mapa interactivo del plan está en `vault/proyectos/sistema-de-pautas/floorpl
 | Instalar | `pnpm install` |
 | Encender todo (contenedores, migraciones, API, trabajos, portal, panel) | `pnpm iniciar` |
 | Solo contenedores y migraciones | `pnpm iniciar --sin-apps` |
+| Sin Docker (servicios nativos de Windows) | `pnpm iniciar --nativo` o `PAUTAS_SERVICIOS=nativos` en `.env` |
 | Tipos | `pnpm typecheck` |
 | Pruebas | `pnpm test` |
 | Compilar el portal sin pisar el `next dev` | `NEXT_DIST_DIR=.next-ci pnpm --filter @sp/portal build` (después `git checkout apps/portal/tsconfig.json`) |
@@ -35,7 +36,7 @@ El mapa interactivo del plan está en `vault/proyectos/sistema-de-pautas/floorpl
 - **`app_worker`** (`DATABASE_URL_WORKER`): trabajos en segundo plano; añade a la bitácora, lee el outbox y corre
   `liberar_reservas_vencidas()`.
 - Dinero: `bigint` en centavos, llega como `number`. Fechas: `date` llega como texto `AAAA-MM-DD` (ver `PARSERS` en `@sp/db`).
-- Las migraciones crean los roles sin acceso; `pnpm iniciar` les pone la clave de desarrollo.
+- Las migraciones crean los roles sin acceso; `pnpm iniciar` les asigna la clave de su URL en `.env` (`pnpm db:claves-roles`).
 - Pruebas: `@sp/db/testing` da una base PGlite migrada; `comoApi()` cambia al rol real para que la RLS y los permisos se prueben de verdad.
 - Los arreglos de enums (`rol_equipo[]`) llegan como texto desde el driver: selecciónalos con `rolesEquipo` de `@sp/db`.
 
@@ -70,7 +71,7 @@ packages/
 datos/        circuito-lider.yaml (parrilla publicada) y tarifario-ejemplo.yaml (precios de EJEMPLO)
 migrations/   NNNN_nombre.sql; una aplicada no se edita nunca
 config/       marca.yaml (y luego tarifario, validador, agente, pasarela, límites de gasto)
-infra/        docker-compose.yml de desarrollo
+infra/        docker-compose.yml de desarrollo; windows/ (servicios NSSM y actualizar del servidor Windows)
 scripts/      iniciar.mjs
 ```
 
@@ -166,4 +167,7 @@ evento que tenga quien lo consuma (el correo de verificación, con n8n).
   genera una orden por emisora para cada pedido pagado con su spot aprobado (cadena: todas; local: la suya); si el
   cliente cambia de anuncio, las viejas se anulan. Panel `/ordenes` (rol programación): bajar el spot, ver fechas y
   programas, marcar cargada (RF-21). El cliente ve «Programado» cuando todas están cargadas (RF-22).
+- **Servidor Windows Server 2019** (2026-11-24): sin Docker (no corre imágenes Linux). Postgres 16 (EDB), Memurai y
+  MinIO nativos; las apps como servicios `Pautas*` con NSSM (`infra/windows/instalar-servicios.ps1`), y
+  `infra/windows/actualizar.ps1` para cada despliegue. Ver `docs/servidor-windows.md`.
 - Siguiente: seguimiento de prospectos del agente, que ventas responda en el chat, servidor (PT-8).

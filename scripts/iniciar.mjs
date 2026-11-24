@@ -1,13 +1,17 @@
 #!/usr/bin/env node
-// Enciende el Sistema de Pautas para desarrollar, en Windows, macOS o Linux:
+// Enciende el Sistema de Pautas, en Windows, macOS o Linux:
 //   1. crea .env desde .env.example si falta (valores solo de desarrollo)
-//   2. levanta Postgres, Redis y MinIO (docker compose) y espera a que estén sanos
-//   3. aplica las migraciones
+//   2. levanta Postgres, Redis y MinIO y espera a que respondan:
+//        - con Docker (por defecto): docker compose
+//        - nativos (--nativo, o PAUTAS_SERVICIOS=nativos en .env): ya corren como servicios de Windows; solo los espera
+//          (Windows Server 2019 no corre las imágenes Linux del compose; ver docs/servidor-windows.md)
+//   3. aplica las migraciones y da a los roles app_api y app_worker la clave de su URL en .env
 //   4. enciende API, trabajos, portal y panel, espera a que respondan y muestra las direcciones
-// Uso:  pnpm iniciar [--sin-apps]   (--sin-apps: solo base, colas y almacén)
-// Ctrl-C lo apaga todo (los contenedores siguen arriba; se apagan con: docker compose -f infra/docker-compose.yml stop).
+// Uso:  pnpm iniciar [--nativo] [--sin-apps]   (--sin-apps: solo base, colas y almacén)
+// Ctrl-C apaga las apps (los contenedores siguen arriba; se apagan con: docker compose -f infra/docker-compose.yml stop).
 import { spawn, spawnSync } from 'node:child_process';
 import { copyFileSync, existsSync } from 'node:fs';
+import { connect } from 'node:net';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -32,17 +36,41 @@ if (!existsSync('.env')) {
   console.log('Creé .env a partir de .env.example (valores de desarrollo).');
 }
 
-if (spawnSync('docker', ['info'], { stdio: 'ignore' }).status !== 0) fallar('Docker no está encendido. Ábrelo y vuelve a intentar.');
-console.log('Levantando Postgres, Redis y MinIO…');
-if (!correr('docker', [...COMPOSE, 'up', '-d', '--wait', 'postgres', 'redis', 'minio'])) fallar('No levantaron los contenedores.');
-if (!correr('pnpm', ['db:migrate'])) fallar('Fallaron las migraciones (pnpm db:migrate).');
+process.loadEnvFile('.env');
+const NATIVO = process.argv.includes('--nativo') || process.env.PAUTAS_SERVICIOS === 'nativos';
 
-// Solo desarrollo: las migraciones crean los roles de la aplicación sin acceso; aquí se les da la clave de .env.example.
-// En producción las claves las pone el runbook del servidor y este paso no corre.
-const claves = "ALTER ROLE app_api WITH LOGIN PASSWORD 'app_api_dev'; ALTER ROLE app_worker WITH LOGIN PASSWORD 'app_worker_dev';";
-if (spawnSync('docker', [...COMPOSE, 'exec', '-T', 'postgres', 'psql', '-q', '-U', 'postgres', '-d', 'pautas', '-c', claves], { stdio: 'ignore' }).status !== 0) {
-  fallar('No pude dejar listos los roles app_api y app_worker.');
+/** Espera a que algo escuche en host:puerto (Postgres, Redis o MinIO como servicio de Windows). */
+async function puertoAbierto(nombre, direccion, segundos = 60) {
+  const u = new URL(direccion);
+  const puerto = Number(u.port) || { 'postgres:': 5432, 'redis:': 6379, 'http:': 80, 'https:': 443 }[u.protocol];
+  for (let i = 0; i < segundos; i++) {
+    const ok = await new Promise((listo) => {
+      const s = connect({ host: u.hostname, port: puerto, timeout: 1000 });
+      s.once('connect', () => (s.destroy(), listo(true)));
+      s.once('error', () => listo(false));
+      s.once('timeout', () => (s.destroy(), listo(false)));
+    });
+    if (ok) return;
+    await new Promise((r) => setTimeout(r, 1000));
+  }
+  fallar(`${nombre} no responde en ${u.hostname}:${puerto}. ¿Está encendido su servicio de Windows?`);
 }
+
+if (NATIVO) {
+  console.log('Esperando Postgres, Redis y MinIO (servicios nativos)…');
+  await puertoAbierto('Postgres', process.env.DATABASE_URL_MIGRATOR);
+  await puertoAbierto('Redis', process.env.REDIS_URL);
+  await puertoAbierto('MinIO', process.env.S3_ENDPOINT);
+} else {
+  if (spawnSync('docker', ['info'], { stdio: 'ignore' }).status !== 0) {
+    fallar('Docker no está encendido. Ábrelo y vuelve a intentar (o usa --nativo con servicios de Windows).');
+  }
+  console.log('Levantando Postgres, Redis y MinIO…');
+  if (!correr('docker', [...COMPOSE, 'up', '-d', '--wait', 'postgres', 'redis', 'minio'])) fallar('No levantaron los contenedores.');
+}
+if (!correr('pnpm', ['db:migrate'])) fallar('Fallaron las migraciones (pnpm db:migrate).');
+// Las migraciones crean los roles de la aplicación sin acceso; aquí reciben la clave de su URL en .env.
+if (!correr('pnpm', ['db:claves-roles'])) fallar('No pude dejar listos los roles app_api y app_worker.');
 // La parrilla de Circuito Líder: solo añade lo que falta, nunca pisa lo corregido en el panel.
 if (!correr('pnpm', ['cargar-parrilla'])) fallar('No se pudo cargar la parrilla (pnpm cargar-parrilla).');
 // Tarifario de EJEMPLO, solo si la base no tiene ninguno (los precios reales se publican desde el panel).
@@ -81,6 +109,6 @@ if (listos.every(Boolean)) {
   console.log('  Portal:  http://localhost:3100');
   console.log('  Panel:   http://localhost:3110');
   console.log('  API:     http://127.0.0.1:4100/v1/health');
-  console.log('  MinIO:   http://127.0.0.1:9101 (consola del almacén)');
+  console.log(`  MinIO:   ${NATIVO ? process.env.S3_ENDPOINT : 'http://127.0.0.1:9101 (consola del almacén)'}`);
   console.log('  Ctrl-C lo apaga todo.\n');
 }
