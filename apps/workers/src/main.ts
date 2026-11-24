@@ -4,7 +4,7 @@ import pg from 'pg';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { pasarelaDelEntorno } from '@sp/payments';
-import { almacenS3, configS3DelEntorno, leerReglas, revisarSpot, transcriptorDelEntorno } from '@sp/spots';
+import { almacenDelEntorno, leerReglas, revisarSpot, transcriptorDelEntorno } from '@sp/spots';
 import { COLAS, LATIDO, LIBERAR, PROGRAMAR, REVISAR, latir, liberarReservas, programar, revisarAnuncios } from './colas';
 import { AVISOS, despacharAvisos, destinoDelEntorno } from './avisos';
 import { CONCILIAR, conciliarPagos } from './conciliar';
@@ -29,11 +29,11 @@ await cola.upsertJobScheduler('latido', { every: LATIDO.cadaMs }, { name: LATIDO
 await cola.upsertJobScheduler('liberar-reservas', { every: LIBERAR.cadaMs }, { name: LIBERAR.trabajo });
 await cola.upsertJobScheduler('programar', { every: PROGRAMAR.cadaMs }, { name: PROGRAMAR.trabajo });
 
-// PT-6: revisión de anuncios. Sin MinIO no hay archivos que revisar; sin Whisper todo pasa a revisión humana.
-const s3 = configS3DelEntorno();
+// PT-6: revisión de anuncios. Sin almacén no hay archivos que revisar; sin Whisper todo pasa a revisión humana.
+const almacen = almacenDelEntorno();
 const reglas = leerReglas(resolve(dirname(fileURLToPath(import.meta.url)), '../../../config/spots.yaml'));
 const transcriptor = transcriptorDelEntorno();
-const herramientas = s3 ? { almacen: almacenS3(s3), transcriptor } : null;
+const herramientas = almacen ? { almacen, transcriptor } : null;
 if (herramientas) await cola.upsertJobScheduler('revisar-anuncios', { every: REVISAR.cadaMs }, { name: REVISAR.trabajo });
 // PT-7: detección de emisiones en los bloques que deja el grabador (pnpm grabar), en GRABACIONES_DIR.
 const grabaciones = resolve(dirname(fileURLToPath(import.meta.url)), '../../..', process.env.GRABACIONES_DIR ?? 'grabaciones');
@@ -45,7 +45,7 @@ await cola.upsertJobScheduler('conciliar-pagos', { every: CONCILIAR.cadaMs }, { 
 const destinoAvisos = destinoDelEntorno(process.env);
 if (destinoAvisos) await cola.upsertJobScheduler('despachar-avisos', { every: AVISOS.cadaMs }, { name: AVISOS.trabajo });
 log('avisos', { destino: destinoAvisos ? new URL(destinoAvisos.url).host : 'ninguno (esperan en el outbox)' });
-log('revisión de anuncios', { almacen: Boolean(s3), transcriptor: transcriptor?.nombre ?? 'ninguno (todo a revisión humana)' });
+log('revisión de anuncios', { almacen: Boolean(almacen), transcriptor: transcriptor?.nombre ?? 'ninguno (todo a revisión humana)' });
 
 const trabajador = new Worker(
   COLAS.sistema,

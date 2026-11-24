@@ -36,7 +36,7 @@ const enviarArchivo = (reply: FastifyReply, datos: Buffer, formato: keyof typeof
 
 /**
  * Anuncios (PT-6). El cliente sube su spot y ve en qué punto está la revisión; el equipo con rol de revisor decide lo
- * que la revisión automática no pudo dar por bueno. El archivo va al almacén (MinIO); la base guarda solo su clave.
+ * que la revisión automática no pudo dar por bueno. El archivo va al almacén configurado; la base guarda solo su clave.
  */
 export async function rutasAnuncios(app: FastifyInstance, op: { db: Kysely<Database>; almacen: Almacen; formatos: string[] }): Promise<void> {
   const { db, almacen } = op;

@@ -132,7 +132,7 @@ evento que tenga quien lo consuma (el correo de verificación, con n8n).
   `componentes/Radio.tsx`: sigue sonando al navegar), qué suena ahora y después (`lib/vivo.ts`, hora de Caracas) y la
   ficha de cada programa. Migración `0007_vitrina` (`emisoras.stream_url`, `emisoras.descripcion`); los textos de
   `datos/circuito-lider.yaml` son PROVISIONALES y el cargador solo completa lo que falta.
-- **PT-6 · Subida y revisión de spots** (2026-11-19): `/cuenta/anuncios` sube MP4/MP3/WAV (≤60 MB) a MinIO; el trabajo
+- **PT-6 · Subida y revisión de spots** (2026-11-19): `/cuenta/anuncios` sube MP4/MP3/WAV (≤60 MB) al almacén de archivos; el trabajo
   `revisar-anuncios` (cada 10 s, `@sp/spots`) mide con ffprobe, rechaza lo que pasa de 40 s, transcribe con whisper.cpp
   (`WHISPER_BIN`, `WHISPER_MODEL`) y busca `palabras_prohibidas` (`pnpm cargar-palabras`); una coincidencia o la falta de
   transcripción lo mandan a revisión humana en el panel (`/anuncios`, rol revisor). Migración `0008_anuncios`: la API no
@@ -140,7 +140,7 @@ evento que tenga quien lo consuma (el correo de verificación, con n8n).
 - **PT-7 · Grabación y certificado** (2026-11-19): `apps/grabador` (`pnpm grabar`) copia el streaming de cada emisora en
   bloques de 1 h (sin recomprimir) a `GRABACIONES_DIR` y los anota en `grabaciones`; borra el audio a los 30 días.
   El trabajo `detectar-emisiones` busca con la huella acústica propia (`@sp/huella`) los spots asignados a cada pedido
-  en sus franjas, recorta el momento (±3 s) a MinIO y crea el certificado con `certificar_emision()`: `certificados` es
+  en sus franjas, recorta el momento (±3 s) al almacén de archivos y crea el certificado con `certificar_emision()`: `certificados` es
   inmutable (no se edita ni borra). Portal: asignar anuncio en el pedido, `/cuenta/certificados` y certificado imprimible.
 - **PT-4e · Rediseño profesional y auditoría** (2026-11-23): secciones claras y oscuras alternadas, fotos sin velos,
   una sola cinta (héroe), CSS en diez archivos por pieza con tokens semánticos (`app/estilos/`), portada en componentes
@@ -149,7 +149,7 @@ evento que tenga quien lo consuma (el correo de verificación, con n8n).
   partidos: `Venta.tsx`, `schema.ts` (por dominio), `routes/cotizaciones/`. Ver `docs/arquitectura-portal.md` y
   `docs/diseno-portal.md`.
 - **PT-5 · Pagos** (2026-11-23): migración `0010_pagos`; pago por pasarela (sesión alojada, aviso firmado en
-  `/v1/pagos/webhook/:proveedor`, conciliación cada 2 min en los trabajos) y por transferencia (comprobante a MinIO,
+  `/v1/pagos/webhook/:proveedor`, conciliación cada 2 min en los trabajos) y por transferencia (comprobante al almacén,
   revisión de finanzas en el panel `/pagos`). Idempotente (P5): un aviso repetido no cambia nada; un cobro que llega
   tarde o duplicado queda registrado como `pago.tardio` para devolverlo. Mientras Invermedia elige proveedor
   (pregunta 1) corre la pasarela de PRUEBA (`PAGOS_PROVEEDOR=prueba`, no arranca en producción). Ver `docs/pagos.md`.
@@ -168,6 +168,6 @@ evento que tenga quien lo consuma (el correo de verificación, con n8n).
   cliente cambia de anuncio, las viejas se anulan. Panel `/ordenes` (rol programación): bajar el spot, ver fechas y
   programas, marcar cargada (RF-21). El cliente ve «Programado» cuando todas están cargadas (RF-22).
 - **Servidor Windows Server 2019** (2026-11-24): sin Docker (no corre imágenes Linux). Postgres 16 (EDB), Memurai y
-  MinIO nativos; las apps como servicios `Pautas*` con NSSM (`infra/windows/instalar-servicios.ps1`), y
+  archivos en disco local; las apps como servicios `Pautas*` con NSSM (`infra/windows/instalar-servicios.ps1`), y
   `infra/windows/actualizar.ps1` para cada despliegue. Ver `docs/servidor-windows.md`.
 - Siguiente: seguimiento de prospectos del agente, que ventas responda en el chat, servidor (PT-8).
