@@ -3,7 +3,7 @@
   Guía completa y requisitos previos: docs/servidor-windows.md.
 
   Crea (o recrea, si ya existen) estos servicios, que arrancan solos con Windows:
-    PautasMinio     almacén S3 (minio.exe) en 127.0.0.1:9100, consola en 127.0.0.1:9101
+    PautasMinio     almacén S3 local, solo si se indica -Minio
     PautasApi       API (puerto 4100)
     PautasWorkers   trabajos en segundo plano
     PautasPortal    portal de clientes (puerto 3100)
@@ -12,15 +12,16 @@
 
   Antes de arrancar las apps prepara la base (pnpm iniciar --nativo --sin-apps).
   Postgres y Memurai (Redis) no se registran aquí: sus instaladores crean su propio servicio.
+  Sin -Minio usa el endpoint S3 configurado en .env (por ejemplo, AWS S3).
   Las claves salen del .env del servidor; este script no guarda ninguna.
 
   Uso (PowerShell como administrador, desde la raíz del repo):
-    .\infra\windows\instalar-servicios.ps1 -Nssm (Get-Command nssm).Source -Minio C:\herramientas\minio\minio.exe
+    .\infra\windows\instalar-servicios.ps1 -Nssm (Get-Command nssm).Source
 #>
 [CmdletBinding()]
 param(
   [Parameter(Mandatory)] [string] $Nssm,
-  [Parameter(Mandatory)] [string] $Minio,
+  [string] $Minio,
   [string] $Raiz = (Resolve-Path "$PSScriptRoot\..\..").Path,
   [string] $DatosMinio = 'C:\datos\minio',
   [string] $ServicioPostgres = 'postgresql-x64-16',
@@ -31,7 +32,9 @@ $ErrorActionPreference = 'Stop'
 
 $principal = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
 if (-not $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) { throw 'Abre PowerShell como administrador.' }
-foreach ($f in @($Nssm, $Minio, "$Raiz\.env")) { if (-not (Test-Path $f)) { throw "No existe: $f" } }
+$archivos = @($Nssm, "$Raiz\.env")
+if ($Minio) { $archivos += $Minio }
+foreach ($f in $archivos) { if (-not (Test-Path $f)) { throw "No existe: $f" } }
 foreach ($s in @($ServicioPostgres, $ServicioRedis)) {
   if (-not (Get-Service -Name $s -ErrorAction SilentlyContinue)) { throw "No encuentro el servicio $s. Instala Postgres y Memurai primero (docs/servidor-windows.md)." }
 }
@@ -42,11 +45,20 @@ $envVars = @{}
 foreach ($linea in Get-Content "$Raiz\.env") {
   if ($linea -match '^\s*([A-Z0-9_]+)\s*=\s*(.*)$') { $envVars[$Matches[1]] = $Matches[2].Trim() }
 }
-foreach ($k in 'S3_ACCESS_KEY', 'S3_SECRET_KEY') { if (-not $envVars[$k]) { throw "Falta $k en .env" } }
-if ($envVars['S3_SECRET_KEY'] -eq 'minio-dev-only') { throw 'S3_SECRET_KEY sigue con el valor de desarrollo: pon una clave real en .env.' }
+foreach ($k in 'S3_ENDPOINT', 'S3_REGION', 'S3_BUCKET', 'S3_ACCESS_KEY', 'S3_SECRET_KEY') {
+  if (-not $envVars[$k]) { throw "Falta $k en .env" }
+}
+if (-not $Minio) {
+  if ($envVars['S3_ENDPOINT'] -notmatch '^https://') { throw 'El endpoint S3 remoto debe usar HTTPS.' }
+  if ($envVars['S3_ACCESS_KEY'] -eq 'minio' -or $envVars['S3_SECRET_KEY'] -eq 'minio-dev-only') {
+    throw 'Las credenciales S3 siguen con valores de desarrollo: configura las credenciales de IAM en .env.'
+  }
+} elseif ($envVars['S3_SECRET_KEY'] -eq 'minio-dev-only') {
+  throw 'S3_SECRET_KEY sigue con el valor de desarrollo: pon una clave real en .env.'
+}
 
 $registros = Join-Path $Raiz 'registros'
-New-Item -ItemType Directory -Force $registros, $DatosMinio | Out-Null
+New-Item -ItemType Directory -Force $registros | Out-Null
 
 function Install-Servicio {
   param([string] $Nombre, [string] $Programa, [string] $Argumentos, [string] $Carpeta, [string] $Descripcion, [string[]] $Depende, [string[]] $Entorno = @())
@@ -73,12 +85,16 @@ function Install-Servicio {
 }
 
 Write-Host 'Registrando servicios…'
-Install-Servicio -Nombre PautasMinio -Programa $Minio `
-  -Argumentos "server `"$DatosMinio`" --address 127.0.0.1:9100 --console-address 127.0.0.1:9101" `
-  -Carpeta (Split-Path $Minio) -Descripcion 'Sistema de Pautas: almacén S3 (spots, comprobantes, certificados)' `
-  -Depende @() -Entorno @("MINIO_ROOT_USER=$($envVars['S3_ACCESS_KEY'])", "MINIO_ROOT_PASSWORD=$($envVars['S3_SECRET_KEY'])")
+$base = @($ServicioPostgres, $ServicioRedis)
+if ($Minio) {
+  New-Item -ItemType Directory -Force $DatosMinio | Out-Null
+  Install-Servicio -Nombre PautasMinio -Programa $Minio `
+    -Argumentos "server `"$DatosMinio`" --address 127.0.0.1:9100 --console-address 127.0.0.1:9101" `
+    -Carpeta (Split-Path $Minio) -Descripcion 'Sistema de Pautas: almacén S3 (spots, comprobantes, certificados)' `
+    -Depende @() -Entorno @("MINIO_ROOT_USER=$($envVars['S3_ACCESS_KEY'])", "MINIO_ROOT_PASSWORD=$($envVars['S3_SECRET_KEY'])")
+  $base += 'PautasMinio'
+}
 
-$base = @($ServicioPostgres, $ServicioRedis, 'PautasMinio')
 $apps = @(
   @{ Nombre = 'PautasApi'; Carpeta = 'apps\api'; Script = 'start'; Desc = 'Sistema de Pautas: API' },
   @{ Nombre = 'PautasWorkers'; Carpeta = 'apps\workers'; Script = 'start'; Desc = 'Sistema de Pautas: trabajos en segundo plano' },
@@ -92,8 +108,12 @@ foreach ($a in $apps) {
     -Carpeta (Join-Path $Raiz $a.Carpeta) -Descripcion $a.Desc -Depende $base
 }
 
-Write-Host 'Arrancando MinIO y preparando la base (migraciones, roles, parrilla)…'
-Start-Service PautasMinio
+if ($Minio) {
+  Write-Host 'Arrancando MinIO y preparando la base (migraciones, roles, parrilla)…'
+  Start-Service PautasMinio
+} else {
+  Write-Host "Usando almacén S3 remoto ($($envVars['S3_ENDPOINT'])); preparando la base…"
+}
 Push-Location $Raiz
 try {
   pnpm iniciar --nativo --sin-apps

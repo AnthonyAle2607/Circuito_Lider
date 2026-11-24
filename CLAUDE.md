@@ -168,6 +168,6 @@ evento que tenga quien lo consuma (el correo de verificación, con n8n).
   cliente cambia de anuncio, las viejas se anulan. Panel `/ordenes` (rol programación): bajar el spot, ver fechas y
   programas, marcar cargada (RF-21). El cliente ve «Programado» cuando todas están cargadas (RF-22).
 - **Servidor Windows Server 2019** (2026-11-24): sin Docker (no corre imágenes Linux). Postgres 16 (EDB), Memurai y
-  MinIO nativos; las apps como servicios `Pautas*` con NSSM (`infra/windows/instalar-servicios.ps1`), y
+  AWS S3; las apps como servicios `Pautas*` con NSSM (`infra/windows/instalar-servicios.ps1`), y
   `infra/windows/actualizar.ps1` para cada despliegue. Ver `docs/servidor-windows.md`.
 - Siguiente: seguimiento de prospectos del agente, que ventas responda en el chat, servidor (PT-8).

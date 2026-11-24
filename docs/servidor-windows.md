@@ -14,27 +14,27 @@ El compose se queda para desarrollar en los equipos de escritorio.
 
 ## Qué corre en el servidor
 
-| Pieza | En el servidor | Puerto (solo 127.0.0.1) | Servicio de Windows |
+| Pieza | En el servidor | Puerto/destino | Servicio de Windows |
 |---|---|---|---|
 | Base de datos | PostgreSQL 16 (Chocolatey) | 5433 | `postgresql-x64-16` |
 | Colas y límites | Memurai (compatible con Redis 7, Chocolatey) | 6380 | `Memurai` |
-| Almacén S3 | MinIO (`minio.exe`) | 9100, consola 9101 | `PautasMinio` |
+| Almacén S3 | AWS S3 (bucket privado) | HTTPS 443 saliente | — |
 | API | Node 22 + tsx | 4100 | `PautasApi` |
 | Trabajos | Node 22 + tsx | — | `PautasWorkers` |
 | Portal | Next.js (`next start`) | 3100 | `PautasPortal` |
 | Panel | Next.js (`next start`) | 3110 | `PautasPanel` |
 | Grabador (opcional) | Node 22 + ffmpeg | — | `PautasGrabador` |
 
-Los puertos son los mismos que en desarrollo, así el `.env` cambia solo en las claves. Los servicios `Pautas*` los registra `infra/windows/instalar-servicios.ps1` con NSSM; si se caen, vuelven a arrancar solos a los 5 segundos. Sus registros quedan en `registros\<servicio>.log` y rotan a los 10 MB.
+Los puertos locales son los mismos que en desarrollo; el `.env` del servidor debe usar sus endpoints, región, bucket y credenciales propios. Los servicios `Pautas*` los registra `infra/windows/instalar-servicios.ps1` con NSSM; si se caen, vuelven a arrancar solos a los 5 segundos. Sus registros quedan en `registros\<servicio>.log` y rotan a los 10 MB.
 
-## Antes de empezar: tres decisiones
+## Antes de empezar
 
 1. **Licencia de Memurai.** Redis no tiene versión oficial para Windows. Memurai es la alternativa compatible:
    - Su edición Developer es gratis, pero no está pensada para producción.
    - Para producción se compra la edición Enterprise.
 
    BullMQ necesita algo compatible con Redis 6.2 o superior, y Memurai lo es. Verifica las condiciones vigentes en memurai.com antes de instalar.
-2. **Descarga de MinIO.** En 2025 MinIO cambió cómo distribuye los binarios gratuitos. Antes de instalar, confirma que `minio.exe` para Windows siga disponible en su sitio oficial y en qué condiciones.
+2. **AWS S3.** Crea un bucket privado y una identidad de IAM dedicada, restringida a ese bucket. Mantén bloqueado el acceso público y habilita el cifrado predeterminado. El servidor necesita salida HTTPS al endpoint regional de S3.
 3. **`NODE_ENV`.** La pasarela de pagos de prueba se niega a arrancar con `NODE_ENV=production`, y por ahora es la única pasarela que hay ([pagos.md](pagos.md)). Por eso la API y los trabajos corren sin esa variable. El portal y el panel ya la usan por su cuenta con `next start`.
 
 ## Instalación (una sola vez)
@@ -115,15 +115,31 @@ Comprueba que responde (debe decir `PONG`):
 & 'C:\Program Files\Memurai\memurai-cli.exe' -p 6380 ping
 ```
 
-### 5. MinIO
+### 5. AWS S3
 
-```powershell
-New-Item -ItemType Directory -Force C:\herramientas\minio | Out-Null; Invoke-WebRequest https://dl.min.io/server/minio/release/windows-amd64/minio.exe -OutFile C:\herramientas\minio\minio.exe -UseBasicParsing
+En AWS, crea el bucket en la región que usarás en `S3_REGION`. Crea una política para la identidad de IAM con acceso solo a ese bucket; no uses `AdministratorAccess`:
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": "s3:ListBucket",
+      "Resource": "arn:aws:s3:::NOMBRE_DEL_BUCKET"
+    },
+    {
+      "Effect": "Allow",
+      "Action": ["s3:GetObject", "s3:PutObject"],
+      "Resource": "arn:aws:s3:::NOMBRE_DEL_BUCKET/*"
+    }
+  ]
+}
 ```
 
-Si la descarga falla, es por el cambio de distribución de MinIO (ver «Antes de empezar»).
+Mantén el acceso público bloqueado y habilita el cifrado predeterminado del bucket. Usa las credenciales de esa identidad en `S3_ACCESS_KEY` y `S3_SECRET_KEY`. El bucket debe existir antes de arrancar la aplicación.
 
-No se configura nada más. El servicio lo crea el script del paso 7, que toma usuario y clave de `S3_ACCESS_KEY` y `S3_SECRET_KEY` del `.env`. El bucket `pautas` lo crea la aplicación la primera vez que guarda un archivo.
+Para una región como `us-east-1`, el endpoint es `https://s3.us-east-1.amazonaws.com`; usa el endpoint regional correspondiente a `S3_REGION`. No se instala ningún servicio de MinIO en Windows.
 
 ### 6. El repositorio y el `.env`
 
@@ -147,7 +163,8 @@ Edita el `.env` con `notepad .env`. Debe vivir solo en el servidor, nunca en git
 - **Claves de las URLs de la base:**
   - `DATABASE_URL_MIGRATOR` lleva la clave de `postgres` del paso 3.
   - `DATABASE_URL` (rol `app_api`) y `DATABASE_URL_WORKER` (rol `app_worker`) llevan claves nuevas y fuertes. `pnpm iniciar` se las asigna a esos roles.
-- **`S3_SECRET_KEY`:** una clave real. El script se niega a usar `minio-dev-only`.
+- **`S3_ENDPOINT`, `S3_REGION` y `S3_BUCKET`:** endpoint regional, región y nombre exacto del bucket de AWS creado en el paso 5.
+- **`S3_ACCESS_KEY` y `S3_SECRET_KEY`:** credenciales de la identidad IAM limitada al bucket; no uses los valores de desarrollo.
 - **`MFA_KEY`, `PAGOS_PRUEBA_SECRETO` y `AVISOS_SECRETO`:** valores nuevos. El `.env.example` dice cómo generar cada uno.
 - **`FFMPEG_BIN=C:/ProgramData/chocolatey/bin/ffmpeg.exe`.**
 - **`PORTAL_URL` y `API_URL_PUBLICA`:** las direcciones con que se llegará al servidor.
@@ -166,12 +183,12 @@ pnpm build
 ### 7. Servicios de Windows
 
 ```powershell
-Set-ExecutionPolicy Bypass -Scope Process -Force; .\infra\windows\instalar-servicios.ps1 -Nssm (Get-Command nssm).Source -Minio C:\herramientas\minio\minio.exe
+Set-ExecutionPolicy Bypass -Scope Process -Force; .\infra\windows\instalar-servicios.ps1 -Nssm (Get-Command nssm).Source
 ```
 
-Al terminar muestra los servicios `Pautas*` en estado `Running`. Antes de encender las apps, el script arranca MinIO y corre `pnpm iniciar --sin-apps`, que hace cuatro cosas:
+Al terminar muestra los servicios `Pautas*` en estado `Running`. Antes de encender las apps, el script corre `pnpm iniciar --nativo --sin-apps`, que hace cuatro cosas:
 
-1. Espera a Postgres, Memurai y MinIO.
+1. Espera a Postgres, Memurai y al endpoint regional de AWS S3.
 2. Aplica las migraciones.
 3. Asigna las claves de las URLs del `.env` a `app_api` y `app_worker`.
 4. Carga la parrilla, el tarifario de ejemplo (solo si no hay ninguno) y las palabras prohibidas.
@@ -201,7 +218,7 @@ Invoke-WebRequest http://127.0.0.1:4100/v1/ready -UseBasicParsing
 El script hace esto, en orden:
 
 1. Baja lo último de la rama con `git pull --ff-only`.
-2. Detiene las apps. MinIO, Postgres y Memurai siguen arriba.
+2. Detiene las apps. Postgres y Memurai siguen arriba; AWS S3 es remoto.
 3. Instala las dependencias.
 4. Compila el portal y el panel.
 5. Aplica las migraciones nuevas.

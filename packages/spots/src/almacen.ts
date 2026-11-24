@@ -1,6 +1,6 @@
 import { CreateBucketCommand, GetObjectCommand, HeadBucketCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 
-/** Dónde viven los archivos de los spots. En producción, el S3 propio (MinIO); en las pruebas, memoria. */
+/** Dónde viven los archivos de los spots. En producción usa el proveedor S3 configurado; en pruebas, memoria. */
 export interface Almacen {
   guardar(clave: string, datos: Buffer, tipo: string): Promise<void>;
   leer(clave: string): Promise<Buffer>;
