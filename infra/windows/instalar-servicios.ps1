@@ -12,8 +12,8 @@
 
   Antes de arrancar las apps prepara la base (pnpm iniciar --nativo --sin-apps).
   Postgres y Memurai (Redis) no se registran aquí: sus instaladores crean su propio servicio.
-  Sin -Minio usa el endpoint S3 configurado en .env (por ejemplo, AWS S3).
-  Las claves salen del .env del servidor; este script no guarda ninguna.
+  Sin -Minio usa SPOTS_DIR local o el endpoint S3 configurado en .env.
+  Los secretos salen del .env del servidor; este script no guarda ninguno.
 
   Uso (PowerShell como administrador, desde la raíz del repo):
     .\infra\windows\instalar-servicios.ps1 -Nssm (Get-Command nssm).Source
@@ -45,16 +45,24 @@ $envVars = @{}
 foreach ($linea in Get-Content "$Raiz\.env") {
   if ($linea -match '^\s*([A-Z0-9_]+)\s*=\s*(.*)$') { $envVars[$Matches[1]] = $Matches[2].Trim() }
 }
-foreach ($k in 'S3_ENDPOINT', 'S3_REGION', 'S3_BUCKET', 'S3_ACCESS_KEY', 'S3_SECRET_KEY') {
-  if (-not $envVars[$k]) { throw "Falta $k en .env" }
-}
-if (-not $Minio) {
+if ($Minio -and $envVars['SPOTS_DIR']) { throw 'Configura SPOTS_DIR o -Minio, no ambos.' }
+if ($Minio) {
+  foreach ($k in 'S3_ENDPOINT', 'S3_REGION', 'S3_BUCKET', 'S3_ACCESS_KEY', 'S3_SECRET_KEY') {
+    if (-not $envVars[$k]) { throw "Falta $k en .env" }
+  }
+  if ($envVars['S3_SECRET_KEY'] -eq 'minio-dev-only') { throw 'S3_SECRET_KEY sigue con el valor de desarrollo: pon una clave real en .env.' }
+} elseif ($envVars['SPOTS_DIR']) {
+  $envVars['SPOTS_DIR'] = [Environment]::ExpandEnvironmentVariables($envVars['SPOTS_DIR'])
+  if (-not [IO.Path]::IsPathRooted($envVars['SPOTS_DIR'])) { throw 'SPOTS_DIR debe ser una ruta absoluta, por ejemplo C:/datos/pautas/archivos.' }
+  New-Item -ItemType Directory -Force $envVars['SPOTS_DIR'] | Out-Null
+} else {
+  foreach ($k in 'S3_ENDPOINT', 'S3_REGION', 'S3_BUCKET', 'S3_ACCESS_KEY', 'S3_SECRET_KEY') {
+    if (-not $envVars[$k]) { throw "Falta $k en .env o configura SPOTS_DIR para guardar en disco local." }
+  }
   if ($envVars['S3_ENDPOINT'] -notmatch '^https://') { throw 'El endpoint S3 remoto debe usar HTTPS.' }
   if ($envVars['S3_ACCESS_KEY'] -eq 'minio' -or $envVars['S3_SECRET_KEY'] -eq 'minio-dev-only') {
     throw 'Las credenciales S3 siguen con valores de desarrollo: configura las credenciales de IAM en .env.'
   }
-} elseif ($envVars['S3_SECRET_KEY'] -eq 'minio-dev-only') {
-  throw 'S3_SECRET_KEY sigue con el valor de desarrollo: pon una clave real en .env.'
 }
 
 $registros = Join-Path $Raiz 'registros'
@@ -111,6 +119,8 @@ foreach ($a in $apps) {
 if ($Minio) {
   Write-Host 'Arrancando MinIO y preparando la base (migraciones, roles, parrilla)…'
   Start-Service PautasMinio
+} elseif ($envVars['SPOTS_DIR']) {
+  Write-Host "Usando almacenamiento local en $($envVars['SPOTS_DIR']); preparando la base…"
 } else {
   Write-Host "Usando almacén S3 remoto ($($envVars['S3_ENDPOINT'])); preparando la base…"
 }

@@ -36,7 +36,7 @@ services:
       retries: 10
 
   # Almacén S3 local para spots, comprobantes y certificados. Misma imagen que ContentSniper
-  # (copia pública de Bitnami, solo para desarrollo). En producción es MinIO en el servidor físico.
+  # (copia pública de Bitnami, solo para desarrollo); en Windows Server se usa almacenamiento en disco local.
   minio:
     image: bitnamilegacy/minio:latest
     restart: unless-stopped

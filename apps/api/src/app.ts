@@ -42,7 +42,7 @@ export interface Opciones {
   /** Detrás de Caddy y del túnel: confiar en X-Forwarded-For para saber la IP real. */
   trustProxy?: boolean;
   logger?: boolean;
-  /** Almacén de los archivos de los spots (MinIO). Sin él no se montan las rutas de anuncios. */
+  /** Almacén de archivos. Sin él no se montan las rutas de anuncios. */
   almacen?: Almacen;
   /** Formatos de spot aceptados (config/spots.yaml). */
   formatosSpot?: string[];

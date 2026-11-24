@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Enciende el Sistema de Pautas, en Windows, macOS o Linux:
 //   1. crea .env desde .env.example si falta (valores solo de desarrollo)
-//   2. levanta Postgres, Redis y el almacén S3 y espera a que respondan:
+//   2. levanta Postgres, Redis y el almacén S3 de desarrollo:
 //        - con Docker (por defecto): docker compose
 //        - nativos (--nativo, o PAUTAS_SERVICIOS=nativos en .env): ya corren como servicios de Windows; solo los espera
 //          (Windows Server 2019 no corre las imágenes Linux del compose; ver docs/servidor-windows.md)
@@ -39,7 +39,7 @@ if (!existsSync('.env')) {
 process.loadEnvFile('.env');
 const NATIVO = process.argv.includes('--nativo') || process.env.PAUTAS_SERVICIOS === 'nativos';
 
-/** Espera a que algo escuche en host:puerto (Postgres, Redis o el endpoint S3). */
+/** Espera a que algo escuche en host:puerto (Postgres, Redis o el endpoint S3 remoto). */
 async function puertoAbierto(nombre, direccion, segundos = 60) {
   const u = new URL(direccion);
   const puerto = Number(u.port) || { 'postgres:': 5432, 'redis:': 6379, 'http:': 80, 'https:': 443 }[u.protocol];
@@ -57,10 +57,10 @@ async function puertoAbierto(nombre, direccion, segundos = 60) {
 }
 
 if (NATIVO) {
-  console.log('Esperando Postgres, Redis y el endpoint S3…');
+  console.log('Esperando Postgres y Redis…');
   await puertoAbierto('Postgres', process.env.DATABASE_URL_MIGRATOR);
   await puertoAbierto('Redis', process.env.REDIS_URL);
-  await puertoAbierto('Almacén S3', process.env.S3_ENDPOINT);
+  if (!process.env.SPOTS_DIR) await puertoAbierto('Almacén S3', process.env.S3_ENDPOINT);
 } else {
   if (spawnSync('docker', ['info'], { stdio: 'ignore' }).status !== 0) {
     fallar('Docker no está encendido. Ábrelo y vuelve a intentar (o usa --nativo con servicios de Windows).');
@@ -109,6 +109,6 @@ if (listos.every(Boolean)) {
   console.log('  Portal:  http://localhost:3100');
   console.log('  Panel:   http://localhost:3110');
   console.log('  API:     http://127.0.0.1:4100/v1/health');
-  console.log(`  Almacén S3: ${NATIVO ? process.env.S3_ENDPOINT : 'http://127.0.0.1:9101 (consola MinIO)'}`);
+  console.log(`  Almacén: ${process.env.SPOTS_DIR ?? (NATIVO ? process.env.S3_ENDPOINT : 'http://127.0.0.1:9101 (S3 de desarrollo)')}`);
   console.log('  Ctrl-C lo apaga todo.\n');
 }

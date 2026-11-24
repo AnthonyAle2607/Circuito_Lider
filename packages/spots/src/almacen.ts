@@ -1,6 +1,8 @@
 import { CreateBucketCommand, GetObjectCommand, HeadBucketCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { dirname, isAbsolute, relative, resolve, sep } from 'node:path';
 
-/** Dónde viven los archivos de los spots. En producción usa el proveedor S3 configurado; en pruebas, memoria. */
+/** Dónde viven los archivos de spots, comprobantes y certificados. */
 export interface Almacen {
   guardar(clave: string, datos: Buffer, tipo: string): Promise<void>;
   leer(clave: string): Promise<Buffer>;
@@ -48,6 +50,28 @@ export function almacenS3(c: ConfigS3): Almacen {
   };
 }
 
+export function almacenLocal(directorio: string): Almacen {
+  const raiz = resolve(directorio);
+  const ruta = (clave: string) => {
+    const archivo = resolve(raiz, clave);
+    const relativa = relative(raiz, archivo);
+    if (!relativa || relativa === '..' || relativa.startsWith(`..${sep}`) || isAbsolute(relativa)) {
+      throw new Error(`clave de archivo fuera del almacén: ${clave}`);
+    }
+    return archivo;
+  };
+  return {
+    async guardar(clave, datos) {
+      const archivo = ruta(clave);
+      await mkdir(dirname(archivo), { recursive: true });
+      await writeFile(archivo, datos);
+    },
+    async leer(clave) {
+      return readFile(ruta(clave));
+    },
+  };
+}
+
 /** Lee la configuración S3 del entorno (las mismas variables que `.env.example`). */
 export function configS3DelEntorno(env: NodeJS.ProcessEnv = process.env): ConfigS3 | null {
   const { S3_ENDPOINT, S3_REGION, S3_BUCKET, S3_ACCESS_KEY, S3_SECRET_KEY } = env;
@@ -55,7 +79,14 @@ export function configS3DelEntorno(env: NodeJS.ProcessEnv = process.env): Config
   return { endpoint: S3_ENDPOINT, region: S3_REGION ?? 'us-east-1', bucket: S3_BUCKET, accessKey: S3_ACCESS_KEY, secretKey: S3_SECRET_KEY };
 }
 
-/** Para pruebas y desarrollo sin MinIO. */
+/** Prefiere disco local si está configurado; S3 sigue disponible para desarrollo y otros despliegues. */
+export function almacenDelEntorno(env: NodeJS.ProcessEnv = process.env): Almacen | null {
+  if (env.SPOTS_DIR) return almacenLocal(env.SPOTS_DIR);
+  const config = configS3DelEntorno(env);
+  return config ? almacenS3(config) : null;
+}
+
+/** Para pruebas. */
 export function almacenEnMemoria(): Almacen & { claves(): string[] } {
   const m = new Map<string, Buffer>();
   return {

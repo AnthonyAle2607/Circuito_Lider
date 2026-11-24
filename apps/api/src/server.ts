@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { createDb, pingDb } from '@sp/db';
 import { leerConfigPagos, pasarelaDelEntorno } from '@sp/payments';
 import { leerConfigAgente } from '@sp/sales-agent';
-import { almacenS3, configS3DelEntorno, leerReglas } from '@sp/spots';
+import { almacenDelEntorno, leerReglas } from '@sp/spots';
 import { buildApp } from './app';
 import { loadConfig } from './config';
 
@@ -13,8 +13,8 @@ const cfg = loadConfig();
 const db = createDb(cfg.databaseUrl);
 const redis = new Redis(cfg.redisUrl, { maxRetriesPerRequest: 1 });
 redis.on('error', () => {}); // /v1/ready informa la caída; no se tumba el proceso.
-// Spots: archivos en MinIO; formatos aceptados según config/spots.yaml.
-const s3 = configS3DelEntorno();
+// Spots: archivos en disco local o en el almacén S3 configurado.
+const almacen = almacenDelEntorno();
 const reglasSpot = leerReglas(resolve(dirname(fileURLToPath(import.meta.url)), '../../../config/spots.yaml'));
 // Pagos (PT-5): la pasarela guarda sus sesiones en Redis para que la conciliación de los trabajos vea las mismas.
 const pasarela = pasarelaDelEntorno(process.env, { get: (k) => redis.get(k), set: (k, v) => redis.set(k, v, 'EX', 7 * 86_400) });
@@ -39,7 +39,7 @@ const app = await buildApp({
   terminosVersion: cfg.terminosVersion,
   trustProxy: cfg.trustProxy,
   logger: true,
-  ...(s3 && { almacen: almacenS3(s3) }),
+  ...(almacen && { almacen }),
   formatosSpot: reglasSpot.formatos,
   pasarela,
   ...(agente && { agente }),
