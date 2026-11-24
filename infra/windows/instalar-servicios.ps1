@@ -15,7 +15,7 @@
   Las claves salen del .env del servidor; este script no guarda ninguna.
 
   Uso (PowerShell como administrador, desde la raíz del repo):
-    .\infra\windows\instalar-servicios.ps1 -Nssm C:\herramientas\nssm\nssm.exe -Minio C:\herramientas\minio\minio.exe
+    .\infra\windows\instalar-servicios.ps1 -Nssm (Get-Command nssm).Source -Minio C:\herramientas\minio\minio.exe
 #>
 [CmdletBinding()]
 param(

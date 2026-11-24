@@ -16,8 +16,8 @@ El compose se queda para desarrollar en los equipos de escritorio.
 
 | Pieza | En el servidor | Puerto (solo 127.0.0.1) | Servicio de Windows |
 |---|---|---|---|
-| Base de datos | PostgreSQL 16 (instalador oficial de EDB) | 5433 | `postgresql-x64-16` |
-| Colas y límites | Memurai (compatible con Redis 7) | 6380 | `Memurai` |
+| Base de datos | PostgreSQL 16 (Chocolatey) | 5433 | `postgresql-x64-16` |
+| Colas y límites | Memurai (compatible con Redis 7, Chocolatey) | 6380 | `Memurai` |
 | Almacén S3 | MinIO (`minio.exe`) | 9100, consola 9101 | `PautasMinio` |
 | API | Node 22 + tsx | 4100 | `PautasApi` |
 | Trabajos | Node 22 + tsx | — | `PautasWorkers` |
@@ -39,71 +39,117 @@ Los puertos son los mismos que en desarrollo, así el `.env` cambia solo en las 
 
 ## Instalación (una sola vez)
 
-Todo se hace en PowerShell como administrador.
+Todo se hace en **PowerShell como administrador**, no en `cmd.exe`. Desde una consola `cmd` de administrador basta con escribir `powershell`.
 
-### 1. Herramientas
+Windows Server 2019 no trae `winget`, así que los programas se instalan con Chocolatey.
 
-- **Git.**
-- **Node.js 22 LTS:** el instalador MSI, para todo el equipo.
-- **pnpm:** activarlo con `corepack enable`.
-- **NSSM:** descomprimirlo, por ejemplo en `C:\herramientas\nssm\nssm.exe`.
-- **ffmpeg** y, si se transcriben spots, **whisper.cpp:** sus rutas van en `FFMPEG_BIN`, `WHISPER_BIN` y `WHISPER_MODEL` del `.env`.
-
-Tras instalar Node, abre una consola nueva para que el `PATH` del sistema incluya `node` y `pnpm`. Los servicios corren como LocalSystem y usan ese `PATH`.
-
-### 2. PostgreSQL 16
-
-1. Instala PostgreSQL 16 con el instalador de EDB:
-   - **Puerto:** 5433.
-   - **Clave de `postgres`:** una clave fuerte. Esa clave va en `DATABASE_URL_MIGRATOR`.
-2. Deja que escuche solo en el equipo. En `C:\Program Files\PostgreSQL\16\data\postgresql.conf`, pon `listen_addresses = 'localhost'` y reinicia el servicio.
-3. Crea la base en UTC, igual que en Docker:
-
-   ```powershell
-   & "C:\Program Files\PostgreSQL\16\bin\createdb.exe" -p 5433 -U postgres pautas
-   ```
-
-   ```powershell
-   & "C:\Program Files\PostgreSQL\16\bin\psql.exe" -p 5433 -U postgres -d pautas -c "ALTER DATABASE pautas SET timezone TO 'UTC';"
-   ```
-
-### 3. Memurai
-
-1. Instálalo.
-2. En su `memurai.conf`, cambia estas líneas:
-
-   ```
-   port 6380
-   bind 127.0.0.1
-   appendonly yes
-   ```
-
-3. Reinicia el servicio `Memurai`.
-
-### 4. MinIO
-
-1. Guarda `minio.exe`, por ejemplo en `C:\herramientas\minio\minio.exe`.
-2. No se configura nada más. El servicio lo crea el script del paso 6 y toma usuario y clave de `S3_ACCESS_KEY` y `S3_SECRET_KEY` del `.env`.
-3. El bucket `pautas` lo crea la aplicación la primera vez que guarda un archivo.
-
-### 5. El repositorio y el `.env`
+### 1. Chocolatey
 
 ```powershell
-cd C:\sistema-de-pautas
+Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+```
+
+Después cierra PowerShell y ábrelo otra vez como administrador.
+
+### 2. Git, Node.js, NSSM y ffmpeg
+
+```powershell
+choco install git nodejs-lts nssm ffmpeg -y
+```
+
+Vuelve a abrir PowerShell para que el `PATH` incluya los programas nuevos. Luego instala pnpm en la versión del proyecto:
+
+```powershell
+npm install -g pnpm@9.15.4
+```
+
+Comprueba que todo quedó instalado:
+
+```powershell
+node -v; pnpm -v; git --version; nssm version; ffmpeg -version
+```
+
+Los servicios corren como LocalSystem y usan el `PATH` del sistema, donde Chocolatey deja estos programas. Si se transcriben spots, instala también **whisper.cpp** y pon sus rutas en `WHISPER_BIN` y `WHISPER_MODEL` del `.env`.
+
+### 3. PostgreSQL 16
+
+En el comando, cambia `CLAVE_POSTGRES` por una clave fuerte. Es la misma que va en `DATABASE_URL_MIGRATOR`.
+
+```powershell
+choco install postgresql16 -y --params "/Password:CLAVE_POSTGRES /Port:5433"
+```
+
+Haz que escuche solo en el propio equipo y reinicia el servicio:
+
+```powershell
+$conf = 'C:\Program Files\PostgreSQL\16\data\postgresql.conf'; (Get-Content $conf) -replace "^#?listen_addresses\s*=.*", "listen_addresses = 'localhost'" | Set-Content $conf -Encoding ascii; Restart-Service postgresql-x64-16
+```
+
+Crea la base y déjala en hora UTC, igual que en Docker. Cada comando pide la clave de `postgres`.
+
+```powershell
+& 'C:\Program Files\PostgreSQL\16\bin\createdb.exe' -p 5433 -U postgres pautas
+```
+
+```powershell
+& 'C:\Program Files\PostgreSQL\16\bin\psql.exe' -p 5433 -U postgres -d pautas -c "ALTER DATABASE pautas SET timezone TO 'UTC';"
+```
+
+### 4. Memurai (en lugar de Redis)
+
+Este comando instala la edición Developer. Para producción hace falta la licencia Enterprise. Si Chocolatey no encuentra el paquete, `choco search memurai` muestra su nombre.
+
+```powershell
+choco install memurai-developer -y
+```
+
+Ponlo en el puerto 6380, solo en el propio equipo y con guardado en disco, y reinícialo:
+
+```powershell
+$conf = 'C:\Program Files\Memurai\memurai.conf'; (Get-Content $conf) -replace '^port\s+\d+', 'port 6380' -replace '^#?\s*bind\s+.*', 'bind 127.0.0.1' -replace '^appendonly\s+no', 'appendonly yes' | Set-Content $conf -Encoding ascii; Restart-Service Memurai
+```
+
+Comprueba que responde (debe decir `PONG`):
+
+```powershell
+& 'C:\Program Files\Memurai\memurai-cli.exe' -p 6380 ping
+```
+
+### 5. MinIO
+
+```powershell
+New-Item -ItemType Directory -Force C:\herramientas\minio | Out-Null; Invoke-WebRequest https://dl.min.io/server/minio/release/windows-amd64/minio.exe -OutFile C:\herramientas\minio\minio.exe -UseBasicParsing
+```
+
+Si la descarga falla, es por el cambio de distribución de MinIO (ver «Antes de empezar»).
+
+No se configura nada más. El servicio lo crea el script del paso 7, que toma usuario y clave de `S3_ACCESS_KEY` y `S3_SECRET_KEY` del `.env`. El bucket `pautas` lo crea la aplicación la primera vez que guarda un archivo.
+
+### 6. El repositorio y el `.env`
+
+Entra a la carpeta donde está clonado el repositorio. En el servidor actual es `C:\Users\Administrador\Circuito_Lider`.
+
+```powershell
+cd C:\Users\Administrador\Circuito_Lider
+```
+
+```powershell
+git pull
 ```
 
 ```powershell
 copy .env.example .env
 ```
 
-Edita el `.env`. Debe vivir solo en el servidor, nunca en git ni en el vault:
+Edita el `.env` con `notepad .env`. Debe vivir solo en el servidor, nunca en git ni en el vault:
 
 - **`PAUTAS_SERVICIOS=nativos`:** hace que `pnpm iniciar` no busque Docker.
 - **Claves de las URLs de la base:**
-  - `DATABASE_URL_MIGRATOR` lleva la clave de `postgres` que pusiste al instalar.
+  - `DATABASE_URL_MIGRATOR` lleva la clave de `postgres` del paso 3.
   - `DATABASE_URL` (rol `app_api`) y `DATABASE_URL_WORKER` (rol `app_worker`) llevan claves nuevas y fuertes. `pnpm iniciar` se las asigna a esos roles.
 - **`S3_SECRET_KEY`:** una clave real. El script se niega a usar `minio-dev-only`.
 - **`MFA_KEY`, `PAGOS_PRUEBA_SECRETO` y `AVISOS_SECRETO`:** valores nuevos. El `.env.example` dice cómo generar cada uno.
+- **`FFMPEG_BIN=C:/ProgramData/chocolatey/bin/ffmpeg.exe`.**
 - **`PORTAL_URL` y `API_URL_PUBLICA`:** las direcciones con que se llegará al servidor.
 - **`AVISOS_EN_CONSOLA`:** quítalo cuando n8n reciba los avisos.
 
@@ -117,13 +163,13 @@ pnpm install --frozen-lockfile
 pnpm build
 ```
 
-### 6. Servicios de Windows
+### 7. Servicios de Windows
 
 ```powershell
-.\infra\windows\instalar-servicios.ps1 -Nssm C:\herramientas\nssm\nssm.exe -Minio C:\herramientas\minio\minio.exe
+Set-ExecutionPolicy Bypass -Scope Process -Force; .\infra\windows\instalar-servicios.ps1 -Nssm (Get-Command nssm).Source -Minio C:\herramientas\minio\minio.exe
 ```
 
-Antes de encender las apps, el script arranca MinIO y corre `pnpm iniciar --sin-apps`, que hace cuatro cosas:
+Al terminar muestra los servicios `Pautas*` en estado `Running`. Antes de encender las apps, el script arranca MinIO y corre `pnpm iniciar --sin-apps`, que hace cuatro cosas:
 
 1. Espera a Postgres, Memurai y MinIO.
 2. Aplica las migraciones.
