@@ -69,7 +69,7 @@ Comprueba que todo quedó instalado:
 node -v; pnpm -v; git --version; nssm version; ffmpeg -version
 ```
 
-Los servicios corren como LocalSystem y usan el `PATH` del sistema, donde Chocolatey deja estos programas. Si se transcriben spots, instala también **whisper.cpp** y pon sus rutas en `WHISPER_BIN` y `WHISPER_MODEL` del `.env`.
+Los servicios corren como LocalSystem. El instalador registra la ruta completa de `pnpm.cmd`; Node.js y ffmpeg deben estar disponibles en el `PATH` del sistema o configurados en `.env`. Si se transcriben spots, instala también **whisper.cpp** y pon sus rutas en `WHISPER_BIN` y `WHISPER_MODEL` del `.env`.
 
 ### 3. PostgreSQL 16
 

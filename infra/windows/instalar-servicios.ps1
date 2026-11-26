@@ -38,7 +38,8 @@ foreach ($f in $archivos) { if (-not (Test-Path $f)) { throw "No existe: $f" } }
 foreach ($s in @($ServicioPostgres, $ServicioRedis)) {
   if (-not (Get-Service -Name $s -ErrorAction SilentlyContinue)) { throw "No encuentro el servicio $s. Instala Postgres y Memurai primero (docs/servidor-windows.md)." }
 }
-if (-not (Get-Command pnpm.cmd -ErrorAction SilentlyContinue)) { throw 'pnpm no está en el PATH del sistema (corepack enable).' }
+$pnpm = (Get-Command pnpm.cmd -ErrorAction SilentlyContinue).Source
+if (-not $pnpm) { throw 'pnpm.cmd no está disponible en esta sesión de PowerShell (npm install -g pnpm@9.15.4).' }
 
 # Lee el .env (KEY=valor, sin comentarios).
 $envVars = @{}
@@ -112,7 +113,8 @@ $apps = @(
 if ($ConGrabador) { $apps += @{ Nombre = 'PautasGrabador'; Carpeta = 'apps\grabador'; Script = 'grabar'; Desc = 'Sistema de Pautas: grabación de emisoras' } }
 
 foreach ($a in $apps) {
-  Install-Servicio -Nombre $a.Nombre -Programa $env:ComSpec -Argumentos "/c pnpm $($a.Script)" `
+  $argumentos = "/d /s /c `"`"$pnpm`" $($a.Script)`""
+  Install-Servicio -Nombre $a.Nombre -Programa $env:ComSpec -Argumentos $argumentos `
     -Carpeta (Join-Path $Raiz $a.Carpeta) -Descripcion $a.Desc -Depende $base
 }
 

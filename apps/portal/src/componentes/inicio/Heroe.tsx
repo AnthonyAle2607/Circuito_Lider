@@ -6,7 +6,7 @@ import type { ReactNode } from 'react';
  */
 export function Heroe({ buscador }: { buscador: ReactNode }) {
   return (
-    <section className="hero oscura">
+    <section className="hero oscura hero-senal">
       <div className="wrap">
         <span className="onair">
           <i aria-hidden="true" />
@@ -19,6 +19,15 @@ export function Heroe({ buscador }: { buscador: ReactNode }) {
           Invermedia pone tu marca en las diez emisoras de Circuito Líder. Eliges la hora, subes tu spot y pagas en línea desde cualquier
           país. Te enviamos la prueba de cada emisión.
         </p>
+        <a className="btn primary hero-cta" href="#espacios">
+          Arma tu pauta <span className="arrow" aria-hidden="true">→</span>
+        </a>
+        <div className="hero-cifras" aria-label="Datos principales">
+          <div><b>10</b><span>emisoras FM</span></div>
+          <div><b>13</b><span>programas a la venta</span></div>
+          <div><b>$15</b><span>desde, por spot</span></div>
+          <div><b>100%</b><span>emisiones certificadas</span></div>
+        </div>
         {buscador}
       </div>
       <svg
