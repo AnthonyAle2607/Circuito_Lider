@@ -1,7 +1,28 @@
 /* Héroe oscuro: tablero «al aire», titular, buscador y la redacción de agentes. */
 .hero { background: var(--fondo); color: var(--texto); padding-top: 56px; text-align: center; overflow: hidden; }
-.hero h1 { font-size: clamp(38px, 5.6vw, 76px); margin: 22px auto 18px; max-width: 16ch; line-height: 1.02; }
-.hero .lead { font-size: 19px; color: var(--texto-suave); max-width: 56ch; margin: 0 auto; }
+.hero-senal { position: relative; isolation: isolate; min-height: min(92vh, 780px); text-align: left; padding-top: 72px; background: var(--morado); }
+.hero-senal::before { content: ''; position: absolute; inset: 0; z-index: -2; background: url('/imagenes/radio/microfono-estudio.jpg') 62% 40% / cover no-repeat; transform: scale(1.02); }
+.hero-senal::after { content: ''; position: absolute; inset: 0; z-index: -1; background: #1e0e29; opacity: .58; }
+.hero-senal > .wrap { position: relative; z-index: 2; }
+.hero h1 { font-size: clamp(38px, 7.2vw, 112px); margin: 22px 0 18px; max-width: 11ch; line-height: .96; }
+.hero-senal h1 { color: #fff; }
+.hero-senal .tape { background: none; color: var(--naranja); padding: 0; transform: none; }
+.hero .lead { font-size: 19px; color: var(--texto-suave); max-width: 56ch; margin: 0; }
+.hero-senal .lead { color: #eee6f3; max-width: 50ch; }
+.hero-cta { margin-top: 28px; }
+.hero-cifras { display: flex; gap: 32px; flex-wrap: wrap; margin-top: 40px; padding-top: 22px; border-top: 1px solid #ffffff33; max-width: 760px; }
+.hero-cifras div { display: grid; }
+.hero-cifras b { font: 600 34px/1 var(--f-titulo); color: #fff; }
+.hero-cifras span { font-size: 13px; color: var(--suave-osc); }
+.hero-senal .buscador { margin: 32px 0 0; text-align: left; }
+@media (max-width: 760px) {
+  .hero-senal { min-height: 0; padding-top: 48px; }
+  .hero-senal::before { background-position: 68% 40%; }
+  .hero h1 { font-size: clamp(42px, 13vw, 64px); }
+  .hero-cifras { gap: 18px 24px; }
+  .hero-cifras b { font-size: 28px; }
+  .hero-senal .buscador { margin-inline: 0; }
+}
 
 /* La única cinta del sitio: «10 radios» en el titular. */
 .tape { display: inline-block; background: var(--naranja); color: var(--morado); padding: 0.02em 0.18em 0.06em; transform: rotate(-2deg); }

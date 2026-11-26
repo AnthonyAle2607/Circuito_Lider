@@ -74,6 +74,8 @@
 @media (max-width: 860px) { .faq { grid-template-columns: 1fr; gap: 8px; } }
 
 /* Cierre. */
-.final { text-align: center; }
+.final { position: relative; isolation: isolate; text-align: center; overflow: hidden; background: var(--morado); }
+.final::before { content: ''; position: absolute; inset: 0; z-index: -2; background: url('/imagenes/radio/al-aire-rojo.jpg') center 55% / cover no-repeat; }
+.final::after { content: ''; position: absolute; inset: 0; z-index: -1; background: var(--morado); opacity: .72; }
 .final h2 { font-size: clamp(32px, 4.4vw, 56px); max-width: 18ch; margin: 14px auto 28px; }
 .final .ctas { justify-content: center; }
